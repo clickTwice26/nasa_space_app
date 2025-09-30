@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missions - NASA Space App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 NASA Missions</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/missions">Missions</a>
+                <a href="/data">Data</a>
+                <a href="/about">About</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2>Mission Control</h2>
+                <div class="mission-controls">
+                    <button onclick="loadMissions()">Load All Missions</button>
+                    <button onclick="showCreateMissionForm()">Create New Mission</button>
+                </div>
+            </div>
+            
+            <div class="card" id="mission-form" style="display: none;">
+                <h2>Create New Mission</h2>
+                <form id="new-mission-form">
+                    <div class="form-group">
+                        <label for="mission-name">Mission Name:</label>
+                        <input type="text" id="mission-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mission-description">Description:</label>
+                        <textarea id="mission-description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="mission-type">Mission Type:</label>
+                        <select id="mission-type">
+                            <option value="">Select Type</option>
+                            <option value="Earth Observation">Earth Observation</option>
+                            <option value="Mars Exploration">Mars Exploration</option>
+                            <option value="ISS">International Space Station</option>
+                            <option value="Deep Space">Deep Space</option>
+                            <option value="Lunar">Lunar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="launch-date">Launch Date:</label>
+                        <input type="date" id="launch-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="mission-status">Status:</label>
+                        <select id="mission-status">
+                            <option value="Active">Active</option>
+                            <option value="Planned">Planned</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <button type="submit">Create Mission</button>
+                    <button type="button" onclick="hideMissionForm()">Cancel</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>Missions List</h2>
+                <div id="missions-list">
+                    <p>Click "Load All Missions" to see missions data</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/missions.js') }}"></script>
+</body>
+</html>

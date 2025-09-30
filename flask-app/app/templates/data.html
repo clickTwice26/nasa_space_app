@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Explorer - NASA Space App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Data Explorer</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/missions">Missions</a>
+                <a href="/data">Data</a>
+                <a href="/about">About</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2>Data Statistics</h2>
+                <div id="data-stats">
+                    <button onclick="loadDataStats()">Load Statistics</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Data Filters</h2>
+                <div class="filter-controls">
+                    <div class="form-group">
+                        <label for="record-type">Record Type:</label>
+                        <select id="record-type">
+                            <option value="">All Types</option>
+                            <option value="telemetry">Telemetry</option>
+                            <option value="image">Image</option>
+                            <option value="sensor">Sensor</option>
+                            <option value="observation">Observation</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mission-filter">Mission ID:</label>
+                        <input type="number" id="mission-filter" placeholder="Enter mission ID">
+                    </div>
+                    <button onclick="loadFilteredData()">Apply Filters</button>
+                    <button onclick="loadAllData()">Load All Data</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Data Records</h2>
+                <div id="data-list">
+                    <p>Use the controls above to load data records</p>
+                </div>
+                <div class="pagination" id="pagination">
+                    <!-- Pagination controls will be inserted here -->
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/data.js') }}"></script>
+</body>
+</html>

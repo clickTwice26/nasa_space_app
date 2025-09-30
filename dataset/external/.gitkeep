@@ -1,0 +1,2 @@
+# This file ensures the external data directory exists in git
+# External data sources and API responses will be stored here
