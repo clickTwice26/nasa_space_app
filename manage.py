@@ -1508,23 +1508,44 @@ class PM2Manager:
             return False
     
     def restart_applications(self, app='all'):
-        """Restart PM2 applications"""
-        Logger.section("Restarting Applications")
+        """Restart PM2 applications (only NASA Space App ones)"""
+        Logger.section("Restarting NASA Space App Applications")
         
+        # Define our specific applications to avoid restarting others
         if app == 'all':
-            result = subprocess.run(["pm2", "restart", "all"], capture_output=True, text=True)
+            apps_to_restart = ['nasa-space-app', 'terrapulse-team-website']
         elif app == 'flask':
-            result = subprocess.run(["pm2", "restart", "nasa-space-app"], capture_output=True, text=True)
+            apps_to_restart = ['nasa-space-app']
         elif app == 'team':
-            result = subprocess.run(["pm2", "restart", "terrapulse-team-website"], capture_output=True, text=True)
-        
-        if result.returncode == 0:
-            Logger.success("Applications restarted successfully")
-            self._show_running_status()
-            return True
+            apps_to_restart = ['terrapulse-team-website']
         else:
-            Logger.error(f"Failed to restart applications: {result.stderr}")
-            return False
+            apps_to_restart = []
+        
+        success = True
+        
+        for app_name in apps_to_restart:
+            Logger.info(f"Restarting {app_name}...")
+            result = subprocess.run(["pm2", "restart", app_name], capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                Logger.success(f"✅ {app_name} restarted successfully")
+            else:
+                # Check if the app doesn't exist (which is not an error for restart in some cases)
+                if "Process or Namespace" in result.stderr and "not found" in result.stderr:
+                    Logger.warning(f"⚠️  {app_name} was not running (cannot restart)")
+                    success = False
+                else:
+                    Logger.error(f"❌ Failed to restart {app_name}: {result.stderr}")
+                    success = False
+        
+        if success:
+            Logger.success("🎉 NASA Space App applications restarted successfully")
+            Logger.info("✋ Other PM2 applications were left untouched")
+            self._show_running_status()
+        else:
+            Logger.error("Some restarts failed")
+        
+        return success
     
     def delete_applications(self, app='all'):
         """Delete PM2 applications (only NASA Space App ones)"""
