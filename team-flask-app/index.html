@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TerraPulse - NASA Space Apps Challenge 2025</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0D1117 0%, #161B22 50%, #21262D 100%);
+        }
+        
+        .card-gradient {
+            background: linear-gradient(145deg, #161B22 0%, #1C2128 100%);
+        }
+        
+        .accent-gradient {
+            background: linear-gradient(135deg, #00D4AA 0%, #00BFA5 100%);
+        }
+        
+        .secondary-gradient {
+            background: linear-gradient(135deg, #4ADE80 0%, #22C55E 100%);
+        }
+        
+        .hero-bg {
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 170, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(74, 222, 128, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                linear-gradient(135deg, #0D1117 0%, #161B22 100%);
+        }
+        
+        .star-field {
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.4), transparent),
+                radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.6), transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: drift 20s infinite linear;
+            opacity: 0.3;
+        }
+        
+        @keyframes drift {
+            from { transform: translateX(0); }
+            to { transform: translateX(-200px); }
+        }
+        
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+        }
+        
+        .text-shadow {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .backdrop-blur {
+            backdrop-filter: blur(10px);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white gradient-bg overflow-x-hidden">
+    <!-- Weather/Earth Particle Animation -->
+    <script src="static/js/weather_earth_particles.js"></script>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 backdrop-blur bg-gray-900/80 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full accent-gradient flex items-center justify-center">
+                        <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold">TerraPulse</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#overview" class="hover:text-teal-400 transition-colors">Overview</a>
+                    <a href="#data" class="hover:text-teal-400 transition-colors">Data & Impact</a>
+                    <a href="#team" class="hover:text-teal-400 transition-colors">Team</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center hero-bg overflow-hidden">
+        <div class="absolute inset-0 star-field"></div>
+        <div class="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+            <h1 class="hero-title text-5xl md:text-7xl font-black mb-6 text-shadow">
+                <span class="bg-gradient-to-r from-teal-400 via-cyan-400 to-green-400 bg-clip-text text-transparent">
+                    TerraPulse
+                </span>
+            </h1>
+            <p class="hero-subtitle text-xl md:text-2xl text-gray-300 mb-4 font-medium">
+                Turning NASA's Earth Data into Personalized Climate Action
+            </p>
+            <p class="text-lg md:text-xl text-teal-400 mb-12 font-semibold">
+                NASA Space Apps Challenge 2025 Submission
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#overview" class="px-8 py-4 accent-gradient rounded-xl font-semibold text-white hover:shadow-lg transform hover:scale-105 transition-all duration-300 glow-effect">
+                    Explore Our Solution
+                </a>
+                <a href="#team" class="px-8 py-4 border-2 border-teal-400 rounded-xl font-semibold text-teal-400 hover:bg-teal-400 hover:text-gray-900 transition-all duration-300">
+                    Meet the Team
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <i data-lucide="chevron-down" class="w-6 h-6 text-teal-400"></i>
+        </div>
+    </section>
+
+    <!-- Overview & Challenge Section -->
+    <section id="overview" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    <span class="bg-gradient-to-r from-teal-400 to-green-400 bg-clip-text text-transparent">
+                        Overview & Challenge
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Transforming complex NASA Earth data into actionable climate insights for communities worldwide
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- The Problem -->
+                <div class="card-gradient rounded-2xl p-8 border border-gray-700 hover-lift">
+                    <div class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-6">
+                        <i data-lucide="alert-triangle" class="w-8 h-8 text-red-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-red-400">The Problem</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        Generic weather apps fail to provide the contextual, actionable climate insights needed for local adaptation, leaving communities vulnerable to heat stress, poor air quality, and extreme weather events.
+                    </p>
+                </div>
+
+                <!-- The Solution -->
+                <div class="card-gradient rounded-2xl p-8 border border-gray-700 hover-lift glow-effect">
+                    <div class="w-16 h-16 rounded-full accent-gradient flex items-center justify-center mb-6">
+                        <i data-lucide="zap" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-teal-400">The Solution</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        TerraPulse is a mobile app that synthesizes NASA APIs (POWER, GPM, MODIS) and real-time feeds to provide personalized, localized risk assessments, calculating how the environment feels and its risk to your specific activity.
+                    </p>
+                </div>
+
+                <!-- Our Goal -->
+                <div class="card-gradient rounded-2xl p-8 border border-gray-700 hover-lift">
+                    <div class="w-16 h-16 rounded-full secondary-gradient flex items-center justify-center mb-6">
+                        <i data-lucide="target" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-green-400">Our Goal</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        To empower every individual with data-driven environmental awareness. Our goal is global—to scale TerraPulse beyond South Asia to every community facing climate change, creating a healthier, more adaptable population worldwide.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data & Impact Section -->
+    <section id="data" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    <span class="bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent">
+                        Data & Impact
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Leveraging NASA's powerful Earth observation data to create meaningful global impact
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- NASA Data Integration -->
+                <div class="card-gradient rounded-2xl p-8 border border-gray-700 hover-lift">
+                    <div class="flex items-center mb-8">
+                        <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mr-4">
+                            <i data-lucide="satellite" class="w-8 h-8 text-blue-400"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-blue-400">NASA Data Integration</h3>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-3 h-3 rounded-full accent-gradient mt-2 flex-shrink-0"></div>
+                            <div>
+                                <h4 class="font-semibold text-teal-400 mb-1">NASA POWER API</h4>
+                                <p class="text-gray-300">Used for solar radiation, temperature, and wind data, vital for calculating Heat Stress Index and farming suitability.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-3 h-3 rounded-full accent-gradient mt-2 flex-shrink-0"></div>
+                            <div>
+                                <h4 class="font-semibold text-teal-400 mb-1">GPM API</h4>
+                                <p class="text-gray-300">Analyzes rainfall intensity for localized "very wet" condition alerts.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-3 h-3 rounded-full accent-gradient mt-2 flex-shrink-0"></div>
+                            <div>
+                                <h4 class="font-semibold text-teal-400 mb-1">MODIS Air Quality & Aerosol Data</h4>
+                                <p class="text-gray-300">Provides real-time pollution levels for Health Safety Advisories.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-3 h-3 rounded-full accent-gradient mt-2 flex-shrink-0"></div>
+                            <div>
+                                <h4 class="font-semibold text-teal-400 mb-1">Earth Observatory Datasets</h4>
+                                <p class="text-gray-300">Visualizes long-term trends for climate education and long-term planning.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supporting UN SDGs -->
+                <div class="card-gradient rounded-2xl p-8 border border-gray-700 hover-lift">
+                    <div class="flex items-center mb-8">
+                        <div class="w-16 h-16 rounded-full secondary-gradient flex items-center justify-center mr-4">
+                            <i data-lucide="globe" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-green-400">Supporting UN SDGs</h3>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-3 h-3 rounded-full secondary-gradient mt-2 flex-shrink-0"></div>
+                            <div>
+                                <h4 class="font-semibold text-green-400 mb-1">SDG 13 (Climate Action)</h4>
+                                <p class="text-gray-300">By raising awareness and promoting proactive, informed adaptation strategies.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-3 h-3 rounded-full secondary-gradient mt-2 flex-shrink-0"></div>
+                            <div>
+                                <h4 class="font-semibold text-green-400 mb-1">SDG 3 (Good Health & Well-being)</h4>
+                                <p class="text-gray-300">By providing critical warnings to protect users from heatstroke and unsafe outdoor exposure.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-3 h-3 rounded-full secondary-gradient mt-2 flex-shrink-0"></div>
+                            <div>
+                                <h4 class="font-semibold text-green-400 mb-1">SDG 11 (Sustainable Cities & Communities)</h4>
+                                <p class="text-gray-300">By giving urban citizens the essential tools to navigate and adapt to local climate risks.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        Meet Our Team
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Passionate innovators working together to make climate data accessible and actionable
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Team Member 1 -->
+                <div class="card-gradient rounded-2xl p-6 border border-gray-700 hover-lift text-center">
+                    <div class="w-20 h-20 rounded-full accent-gradient mx-auto mb-4 flex items-center justify-center">
+                        <i data-lucide="code" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-teal-400 mb-2">Shagato Chowdhury</h3>
+                    <p class="text-gray-400 font-medium">Backend Developer</p>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="card-gradient rounded-2xl p-6 border border-gray-700 hover-lift text-center">
+                    <div class="w-20 h-20 rounded-full bg-pink-500/20 mx-auto mb-4 flex items-center justify-center">
+                        <i data-lucide="palette" class="w-10 h-10 text-pink-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-pink-400 mb-2">Umma Iman Monea</h3>
+                    <p class="text-gray-400 font-medium">Frontend Developer</p>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div class="card-gradient rounded-2xl p-6 border border-gray-700 hover-lift text-center">
+                    <div class="w-20 h-20 rounded-full bg-orange-500/20 mx-auto mb-4 flex items-center justify-center">
+                        <i data-lucide="edit" class="w-10 h-10 text-orange-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-orange-400 mb-2">Md. Arman Nazib</h3>
+                    <p class="text-gray-400 font-medium">Design & Editing</p>
+                </div>
+
+                <!-- Team Member 4 -->
+                <div class="card-gradient rounded-2xl p-6 border border-gray-700 hover-lift text-center">
+                    <div class="w-20 h-20 rounded-full secondary-gradient mx-auto mb-4 flex items-center justify-center">
+                        <i data-lucide="search" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-green-400 mb-2">Md Asifur Rahman Asif</h3>
+                    <p class="text-gray-400 font-medium">Researcher</p>
+                </div>
+
+                <!-- Team Member 5 -->
+                <div class="card-gradient rounded-2xl p-6 border border-gray-700 hover-lift text-center">
+                    <div class="w-20 h-20 rounded-full bg-blue-500/20 mx-auto mb-4 flex items-center justify-center">
+                        <i data-lucide="book-open" class="w-10 h-10 text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-blue-400 mb-2">Saif Hasan Emon</h3>
+                    <p class="text-gray-400 font-medium">Researcher</p>
+                </div>
+
+                <!-- Team Member 6 -->
+                <div class="card-gradient rounded-2xl p-6 border border-gray-700 hover-lift text-center">
+                    <div class="w-20 h-20 rounded-full bg-purple-500/20 mx-auto mb-4 flex items-center justify-center">
+                        <i data-lucide="layout" class="w-10 h-10 text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-purple-400 mb-2">Faysal Ahmed</h3>
+                    <p class="text-gray-400 font-medium">UI/UX Designer</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-8 h-8 rounded-full accent-gradient flex items-center justify-center">
+                        <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold">TerraPulse</span>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400 mb-2">
+                        Copyright 2025 Team TerraPulse
+                    </p>
+                    <p class="text-teal-400 font-medium">
+                        Built for the NASA International Space Apps Challenge
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Social Links -->
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center">
+                <div class="flex justify-center space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors">
+                        <i data-lucide="github" class="w-6 h-6"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors">
+                        <i data-lucide="linkedin" class="w-6 h-6"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors">
+                        <i data-lucide="twitter" class="w-6 h-6"></i>
+                    </a>
+                </div>
+                <p class="text-gray-500 text-sm mt-4">
+                    🚀 Turning NASA's Earth Data into Personalized Climate Action 🌍
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80; // Account for fixed navbar
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add intersection observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document.querySelectorAll('.hover-lift, section').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Initialize hero section as visible
+        document.querySelector('section').style.opacity = '1';
+        document.querySelector('section').style.transform = 'translateY(0)';
+    </script>
+</body>
+</html>

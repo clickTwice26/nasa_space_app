@@ -37,9 +37,24 @@ from datetime import datetime
 import importlib.util
 from contextlib import contextmanager
 
+# Import configuration manager
+try:
+    from config import config
+except ImportError:
+    # Fallback if config.py is not available
+    class DummyConfig:
+        def get_int(self, key, default): return default
+        def get(self, key, default): return default
+        def get_bool(self, key, default): return default
+        def get_flask_config(self): return {'port': 6767, 'host': '0.0.0.0', 'debug': True}
+        def get_team_website_config(self): return {'port': 8080, 'host': '0.0.0.0', 'debug': True}
+        def get_jupyter_config(self): return {'port': 8888, 'host': 'localhost'}
+    config = DummyConfig()
+
 # Project configuration
 PROJECT_ROOT = Path(__file__).parent
 FLASK_APP_DIR = PROJECT_ROOT / "flask-app"
+TEAM_FLASK_APP_DIR = PROJECT_ROOT / "team-flask-app"
 ML_PROJECT_DIR = PROJECT_ROOT / "ml-project"
 DATASET_DIR = PROJECT_ROOT / "dataset"
 
@@ -410,6 +425,197 @@ class FlaskManager(ProjectManager):
         self.app_file = self.project_dir / "app.py"
         self.db_file = self.project_dir / "instance" / "nasa_space_app.db"
         self.init_db_file = self.project_dir / "init_db.py"
+    """Team website Flask application management"""
+    
+    def __init__(self):
+        super().__init__(TEAM_FLASK_APP_DIR)
+        self.app_file = self.project_dir / "app.py"
+        self.index_file = self.project_dir / "index.html"
+    
+    def setup(self):
+        """Setup team Flask application"""
+        Logger.section("Setting up Team Website")
+        
+        total_steps = 4
+        
+        # Step 1: Create virtual environment
+        Logger.step(1, total_steps, "Creating virtual environment")
+        if not self.create_venv():
+            Logger.error("Failed to create virtual environment")
+            return False
+        
+        # Step 2: Install requirements
+        Logger.step(2, total_steps, "Installing dependencies")
+        if not self.install_requirements():
+            Logger.error("Failed to install requirements")
+            return False
+        
+        # Step 3: Validate files
+        Logger.step(3, total_steps, "Validating website files")
+        if not self.index_file.exists():
+            Logger.error("Website index.html not found")
+            return False
+        
+        if not self.app_file.exists():
+            Logger.error("Flask app.py not found")
+            return False
+        
+        # Step 4: Validation
+        Logger.step(4, total_steps, "Validating setup")
+        if self.validate_setup():
+            Logger.success("Team website setup completed successfully! 🎉")
+            self._show_setup_summary()
+            return True
+        else:
+            Logger.error("Setup validation failed")
+            return False
+    
+    def validate_setup(self):
+        """Validate team website setup"""
+        checks = [
+            ("Virtual environment", self.venv_dir.exists()),
+            ("Dependencies installed", self.check_dependencies()),
+            ("App file exists", self.app_file.exists()),
+            ("Website file exists", self.index_file.exists())
+        ]
+        
+        all_good = True
+        for check_name, result in checks:
+            status = "✅" if result else "❌"
+            print(f"  {status} {check_name}")
+            if not result:
+                all_good = False
+        
+        return all_good
+    
+    def _show_setup_summary(self):
+        """Show setup summary for team website"""
+        summary = [
+            "🎯 TerraPulse Team Website Ready!",
+            "",
+            "Next steps:",
+            "  1. Start team website: python3 manage.py team run",
+            "  2. Open browser: http://localhost:5000",
+            "  3. Share your team story with the world!",
+            "",
+            "Available commands:",
+            "  • team run       - Start team website server",
+            "  • team setup     - Setup team website environment"
+        ]
+        
+        box = BoxDrawer.draw_box(summary, title="Team Website Ready", width=60)
+        print(f"\n{Colors.GREEN}{box}{Colors.ENDC}")
+    
+    def run_server(self, port=5000, host="0.0.0.0", debug=True):
+        """Run team website server"""
+        Logger.section("Starting TerraPulse Team Website")
+        
+        # Pre-flight checks
+        if not self._pre_flight_check():
+            return False
+        
+        python_path = self.venv_dir / ("Scripts/python" if os.name == 'nt' else "bin/python")
+        
+        # Set environment variables
+        env = os.environ.copy()
+        env['FLASK_PORT'] = str(port)
+        env['FLASK_HOST'] = host
+        env['FLASK_DEBUG'] = str(debug).lower()
+        
+        # Show server info
+        server_info = [
+            f"🌐 Team Website URL: http://{host}:{port}",
+            f"🔧 Debug mode: {'ON' if debug else 'OFF'}",
+            f"📁 Working directory: {self.project_dir}",
+            "",
+            "🚀 TerraPulse Team Website - NASA Space Apps Challenge 2025",
+            "",
+            "Press Ctrl+C to stop the server",
+            "Server logs will appear below:"
+        ]
+        
+        box = BoxDrawer.draw_box(server_info, title="TerraPulse Team Website", width=70)
+        print(f"{Colors.GREEN}{box}{Colors.ENDC}")
+        
+        Logger.separator()
+        
+        try:
+            # Use signal handler for graceful shutdown
+            def signal_handler(sig, frame):
+                print(f"\n{Colors.WARNING}🛑 Team website shutdown requested{Colors.ENDC}")
+                sys.exit(0)
+            
+            signal.signal(signal.SIGINT, signal_handler)
+            
+            # Start server
+            subprocess.run([str(python_path), str(self.app_file)], 
+                         cwd=self.project_dir, env=env)
+        except KeyboardInterrupt:
+            Logger.info("Team website stopped by user")
+        except Exception as e:
+            Logger.error(f"Server error: {str(e)}")
+        
+        return True
+    
+    def _pre_flight_check(self):
+        """Check if everything is ready to run the team website"""
+        Logger.info("Running pre-flight checks...")
+        
+        checks = [
+            ("Virtual environment", self.venv_dir.exists()),
+            ("Application file", self.app_file.exists()),
+            ("Website HTML file", self.index_file.exists()),
+            ("Dependencies", self.check_dependencies())
+        ]
+        
+        progress = ProgressBar(len(checks), prefix="Checking")
+        
+        all_good = True
+        for i, (check_name, result) in enumerate(checks):
+            progress.update(i + 1, f"- {check_name}")
+            time.sleep(0.2)
+            
+            if not result:
+                Logger.error(f"❌ {check_name} check failed")
+                all_good = False
+            else:
+                Logger.success(f"✅ {check_name} check passed")
+        
+        if not all_good:
+            Logger.error("Pre-flight checks failed. Please run setup first.")
+            return False
+        
+        Logger.success("All pre-flight checks passed! 🚀")
+        return True
+    
+    def get_status(self):
+        """Get team website status"""
+        status = {
+            "venv_exists": self.venv_dir.exists(),
+            "app_file_exists": self.app_file.exists(),
+            "index_file_exists": self.index_file.exists(),
+            "requirements_installed": self.check_dependencies(),
+            "port_available": self._check_port_available(5000)
+        }
+        
+        return status
+    
+    def _check_port_available(self, port):
+        """Check if port is available"""
+        import socket
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind(('localhost', port))
+                return True
+        except OSError:
+            return False
+    """Flask application management"""
+    
+    def __init__(self):
+        super().__init__(FLASK_APP_DIR)
+        self.app_file = self.project_dir / "app.py"
+        self.db_file = self.project_dir / "instance" / "nasa_space_app.db"
+        self.init_db_file = self.project_dir / "init_db.py"
     
     def setup(self):
         """Complete Flask application setup with enhanced progress tracking"""
@@ -591,9 +797,15 @@ DATABASE_URL=sqlite:///instance/nasa_space_app.db
         except Exception as e:
             Logger.error(f"Could not read database info: {str(e)}")
     
-    def run_server(self, port=6767, host="0.0.0.0", debug=True):
-        """Run Flask development server with enhanced startup"""
+    def run_server(self, port=None, host=None, debug=None):
+        """Run Flask development server with centralized configuration"""
         Logger.section("Starting Flask Development Server")
+        
+        # Use centralized config with fallbacks
+        flask_config = config.get_flask_config()
+        port = port or flask_config['port']
+        host = host or flask_config['host'] 
+        debug = debug if debug is not None else flask_config['debug']
         
         # Pre-flight checks
         if not self._pre_flight_check():
@@ -612,6 +824,7 @@ DATABASE_URL=sqlite:///instance/nasa_space_app.db
             f"🌐 Server URL: http://{host}:{port}",
             f"🔧 Debug mode: {'ON' if debug else 'OFF'}",
             f"📁 Working directory: {self.project_dir}",
+            f"⚙️  Configuration: Global .env",
             "",
             "Press Ctrl+C to stop the server",
             "Server logs will appear below:"
@@ -686,12 +899,13 @@ DATABASE_URL=sqlite:///instance/nasa_space_app.db
     
     def get_status(self):
         """Get Flask application status with detailed information"""
+        flask_config = config.get_flask_config()
         status = {
             "venv_exists": self.venv_dir.exists(),
             "database_exists": self.db_file.exists(),
             "app_file_exists": self.app_file.exists(),
             "requirements_installed": self.check_dependencies(),
-            "port_available": self._check_port_available(6767)
+            "port_available": self._check_port_available(flask_config['port'])
         }
         
         if status["database_exists"]:
@@ -712,6 +926,202 @@ DATABASE_URL=sqlite:///instance/nasa_space_app.db
             except Exception:
                 status["database_tables"] = []
                 status["table_counts"] = {}
+        
+        return status
+    
+    def _check_port_available(self, port=None):
+        """Check if port is available"""
+        import socket
+        if port is None:
+            port = config.get_int('FLASK_APP_PORT', 6767)
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind(('localhost', port))
+                return True
+        except OSError:
+            return False
+
+class TeamFlaskManager(ProjectManager):
+    """Team website Flask application management"""
+    
+    def __init__(self):
+        super().__init__(TEAM_FLASK_APP_DIR)
+        self.app_file = self.project_dir / "app.py"
+        self.index_file = self.project_dir / "index.html"
+    
+    def setup(self):
+        """Setup team Flask application"""
+        Logger.section("Setting up Team Website")
+        
+        total_steps = 4
+        
+        # Step 1: Create virtual environment
+        Logger.step(1, total_steps, "Creating virtual environment")
+        if not self.create_venv():
+            Logger.error("Failed to create virtual environment")
+            return False
+        
+        # Step 2: Install requirements
+        Logger.step(2, total_steps, "Installing dependencies")
+        if not self.install_requirements():
+            Logger.error("Failed to install requirements")
+            return False
+        
+        # Step 3: Validate files
+        Logger.step(3, total_steps, "Validating website files")
+        if not self.index_file.exists():
+            Logger.error("Website index.html not found")
+            return False
+        
+        if not self.app_file.exists():
+            Logger.error("Flask app.py not found")
+            return False
+        
+        # Step 4: Validation
+        Logger.step(4, total_steps, "Validating setup")
+        if self.validate_setup():
+            Logger.success("Team website setup completed successfully! 🎉")
+            self._show_setup_summary()
+            return True
+        else:
+            Logger.error("Setup validation failed")
+            return False
+    
+    def validate_setup(self):
+        """Validate team website setup"""
+        checks = [
+            ("Virtual environment", self.venv_dir.exists()),
+            ("Dependencies installed", self.check_dependencies()),
+            ("App file exists", self.app_file.exists()),
+            ("Website file exists", self.index_file.exists())
+        ]
+        
+        all_good = True
+        for check_name, result in checks:
+            status = "✅" if result else "❌"
+            print(f"  {status} {check_name}")
+            if not result:
+                all_good = False
+        
+        return all_good
+    
+    def _show_setup_summary(self):
+        """Show setup summary for team website"""
+        summary = [
+            "🎯 TerraPulse Team Website Ready!",
+            "",
+            "Next steps:",
+            "  1. Start team website: python3 manage.py team run",
+            "  2. Open browser: http://localhost:5000",
+            "  3. Share your team story with the world!",
+            "",
+            "Available commands:",
+            "  • team run       - Start team website server",
+            "  • team setup     - Setup team website environment"
+        ]
+        
+        box = BoxDrawer.draw_box(summary, title="Team Website Ready", width=60)
+        print(f"\n{Colors.GREEN}{box}{Colors.ENDC}")
+    
+    def run_server(self, port=None, host=None, debug=None):
+        """Run team website server with centralized configuration"""
+        Logger.section("Starting TerraPulse Team Website")
+        
+        # Use centralized config with fallbacks
+        team_config = config.get_team_website_config()
+        port = port or team_config['port']
+        host = host or team_config['host']
+        debug = debug if debug is not None else team_config['debug']
+        
+        Logger.section("Starting TerraPulse Team Website")
+        
+        # Pre-flight checks
+        if not self._pre_flight_check():
+            return False
+        
+        python_path = self.venv_dir / ("Scripts/python" if os.name == 'nt' else "bin/python")
+        
+        # Set environment variables
+        env = os.environ.copy()
+        env['FLASK_PORT'] = str(port)
+        env['FLASK_HOST'] = host
+        env['FLASK_DEBUG'] = str(debug).lower()
+        
+        # Show server info
+        server_info = [
+            f"🌐 Team Website URL: http://{host}:{port}",
+            f"🔧 Debug mode: {'ON' if debug else 'OFF'}",
+            f"📁 Working directory: {self.project_dir}",
+            "",
+            "🚀 TerraPulse Team Website - NASA Space Apps Challenge 2025",
+            "",
+            "Press Ctrl+C to stop the server",
+            "Server logs will appear below:"
+        ]
+        
+        box = BoxDrawer.draw_box(server_info, title="TerraPulse Team Website", width=70)
+        print(f"{Colors.GREEN}{box}{Colors.ENDC}")
+        
+        Logger.separator()
+        
+        try:
+            # Use signal handler for graceful shutdown
+            def signal_handler(sig, frame):
+                print(f"\n{Colors.WARNING}🛑 Team website shutdown requested{Colors.ENDC}")
+                sys.exit(0)
+            
+            signal.signal(signal.SIGINT, signal_handler)
+            
+            # Start server
+            subprocess.run([str(python_path), str(self.app_file)], 
+                         cwd=self.project_dir, env=env)
+        except KeyboardInterrupt:
+            Logger.info("Team website stopped by user")
+        except Exception as e:
+            Logger.error(f"Server error: {str(e)}")
+        
+        return True
+    
+    def _pre_flight_check(self):
+        """Check if everything is ready to run the team website"""
+        Logger.info("Running pre-flight checks...")
+        
+        checks = [
+            ("Virtual environment", self.venv_dir.exists()),
+            ("Application file", self.app_file.exists()),
+            ("Website HTML file", self.index_file.exists()),
+            ("Dependencies", self.check_dependencies())
+        ]
+        
+        progress = ProgressBar(len(checks), prefix="Checking")
+        
+        all_good = True
+        for i, (check_name, result) in enumerate(checks):
+            progress.update(i + 1, f"- {check_name}")
+            time.sleep(0.2)
+            
+            if not result:
+                Logger.error(f"❌ {check_name} check failed")
+                all_good = False
+            else:
+                Logger.success(f"✅ {check_name} check passed")
+        
+        if not all_good:
+            Logger.error("Pre-flight checks failed. Please run setup first.")
+            return False
+        
+        Logger.success("All pre-flight checks passed! 🚀")
+        return True
+    
+    def get_status(self):
+        """Get team website status"""
+        status = {
+            "venv_exists": self.venv_dir.exists(),
+            "app_file_exists": self.app_file.exists(),
+            "index_file_exists": self.index_file.exists(),
+            "requirements_installed": self.check_dependencies(),
+            "port_available": self._check_port_available(5000)
+        }
         
         return status
     
@@ -754,9 +1164,13 @@ class MLManager(ProjectManager):
         Logger.success("ML project setup complete")
         return True
     
-    def start_jupyter(self, port=8888):
-        """Start Jupyter notebook server"""
+    def start_jupyter(self, port=None):
+        """Start Jupyter notebook server with centralized configuration"""
         Logger.section("Starting Jupyter Notebook")
+        
+        # Use centralized config with fallback
+        jupyter_config = config.get_jupyter_config()
+        port = port or jupyter_config['port']
         
         jupyter_path = self.venv_dir / ("Scripts/jupyter" if os.name == 'nt' else "bin/jupyter")
         
@@ -765,6 +1179,7 @@ class MLManager(ProjectManager):
             return False
         
         Logger.info(f"Starting Jupyter on port {port}")
+        Logger.info("Configuration loaded from global .env")
         Logger.info("Jupyter will open in your browser")
         
         try:
@@ -884,6 +1299,360 @@ class DatasetManager:
         
         return status
 
+class PM2Manager:
+    """PM2 production process management"""
+    
+    def __init__(self):
+        self.project_dir = PROJECT_ROOT
+        self.flask_manager = FlaskManager()
+        self.team_manager = TeamFlaskManager()
+        self.ecosystem_file = self.project_dir / "ecosystem.config.js"
+    
+    def check_pm2_installed(self):
+        """Check if PM2 is installed"""
+        try:
+            result = subprocess.run(["pm2", "--version"], capture_output=True, text=True)
+            return result.returncode == 0
+        except FileNotFoundError:
+            return False
+    
+    def install_pm2(self):
+        """Install PM2 globally"""
+        Logger.section("Installing PM2")
+        
+        if self.check_pm2_installed():
+            Logger.info("PM2 is already installed")
+            return True
+        
+        with spinner_context(
+            "Installing PM2 globally with npm",
+            "PM2 installed successfully",
+            "Failed to install PM2"
+        ):
+            result = subprocess.run(["npm", "install", "-g", "pm2"], capture_output=True)
+            return result.returncode == 0
+    
+    def generate_ecosystem_config(self):
+        """Generate PM2 ecosystem configuration file"""
+        Logger.section("Generating PM2 Configuration")
+        
+        # Get configuration from centralized config
+        flask_config = config.get_flask_config()
+        team_config = config.get_team_website_config()
+        
+        ecosystem_config = f"""module.exports = {{
+  apps: [
+    {{
+      name: 'nasa-space-app',
+      script: 'app.py',
+      cwd: '{FLASK_APP_DIR}',
+      interpreter: '{FLASK_APP_DIR}/venv/bin/python',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {{
+        NODE_ENV: 'production',
+        FLASK_ENV: 'production',
+        FLASK_DEBUG: 'false',
+        FLASK_PORT: '{flask_config['port']}',
+        FLASK_HOST: '{flask_config['host']}'
+      }},
+      env_staging: {{
+        NODE_ENV: 'staging',
+        FLASK_ENV: 'staging',
+        FLASK_DEBUG: 'true',
+        FLASK_PORT: '{flask_config['port']}',
+        FLASK_HOST: '{flask_config['host']}'
+      }},
+      error_file: './logs/nasa-space-app-error.log',
+      out_file: './logs/nasa-space-app-out.log',
+      log_file: './logs/nasa-space-app-combined.log',
+      time: true,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      min_uptime: '10s',
+      max_restarts: 10
+    }},
+    {{
+      name: 'terrapulse-team-website',
+      script: 'app.py',
+      cwd: '{TEAM_FLASK_APP_DIR}',
+      interpreter: '{TEAM_FLASK_APP_DIR}/venv/bin/python',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {{
+        NODE_ENV: 'production',
+        FLASK_ENV: 'production',
+        FLASK_DEBUG: 'false',
+        FLASK_PORT: '{team_config['port']}',
+        FLASK_HOST: '{team_config['host']}'
+      }},
+      env_staging: {{
+        NODE_ENV: 'staging',
+        FLASK_ENV: 'staging',
+        FLASK_DEBUG: 'true',
+        FLASK_PORT: '{team_config['port']}',
+        FLASK_HOST: '{team_config['host']}'
+      }},
+      error_file: './logs/team-website-error.log',
+      out_file: './logs/team-website-out.log',
+      log_file: './logs/team-website-combined.log',
+      time: true,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '512M',
+      min_uptime: '10s',
+      max_restarts: 10
+    }}
+  ]
+}};"""
+        
+        with open(self.ecosystem_file, 'w') as f:
+            f.write(ecosystem_config)
+        
+        Logger.success(f"PM2 ecosystem config generated: {self.ecosystem_file}")
+        return True
+    
+    def setup_production_environment(self):
+        """Setup production environment for PM2"""
+        Logger.section("Setting up Production Environment")
+        
+        # Create logs directory
+        logs_dir = self.project_dir / "logs"
+        logs_dir.mkdir(exist_ok=True)
+        Logger.info(f"Logs directory ready: {logs_dir}")
+        
+        # Ensure both apps are set up
+        Logger.step(1, 4, "Setting up Flask application")
+        if not self.flask_manager.validate_setup():
+            Logger.error("Flask app setup validation failed")
+            return False
+        
+        Logger.step(2, 4, "Setting up Team website")
+        if not self.team_manager.validate_setup():
+            Logger.error("Team website setup validation failed")
+            return False
+        
+        # Install PM2 if needed
+        Logger.step(3, 4, "Checking PM2 installation")
+        if not self.install_pm2():
+            Logger.error("Failed to install PM2")
+            return False
+        
+        # Generate ecosystem config
+        Logger.step(4, 4, "Generating PM2 configuration")
+        if not self.generate_ecosystem_config():
+            Logger.error("Failed to generate PM2 configuration")
+            return False
+        
+        Logger.success("Production environment setup complete! 🚀")
+        self._show_production_summary()
+        return True
+    
+    def start_applications(self, app='all', env='production'):
+        """Start applications with PM2"""
+        Logger.section(f"Starting Applications in {env.title()} Mode")
+        
+        if not self.check_pm2_installed():
+            Logger.error("PM2 is not installed. Run 'python3 manage.py pm2 setup' first.")
+            return False
+        
+        if not self.ecosystem_file.exists():
+            Logger.error("PM2 ecosystem config not found. Run 'python3 manage.py pm2 setup' first.")
+            return False
+        
+        # Determine which apps to start
+        if app == 'all':
+            apps_to_start = ['nasa-space-app', 'terrapulse-team-website']
+        elif app == 'flask':
+            apps_to_start = ['nasa-space-app']
+        elif app == 'team':
+            apps_to_start = ['terrapulse-team-website']
+        
+        success = True
+        for app_name in apps_to_start:
+            Logger.info(f"Starting {app_name}...")
+            result = subprocess.run([
+                "pm2", "start", str(self.ecosystem_file),
+                "--only", app_name,
+                "--env", env
+            ], capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                Logger.success(f"{app_name} started successfully")
+            else:
+                Logger.error(f"Failed to start {app_name}: {result.stderr}")
+                success = False
+        
+        if success:
+            self._show_running_status()
+        
+        return success
+    
+    def stop_applications(self, app='all'):
+        """Stop PM2 applications"""
+        Logger.section("Stopping Applications")
+        
+        if app == 'all':
+            result = subprocess.run(["pm2", "stop", "all"], capture_output=True, text=True)
+        elif app == 'flask':
+            result = subprocess.run(["pm2", "stop", "nasa-space-app"], capture_output=True, text=True)
+        elif app == 'team':
+            result = subprocess.run(["pm2", "stop", "terrapulse-team-website"], capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            Logger.success("Applications stopped successfully")
+            return True
+        else:
+            Logger.error(f"Failed to stop applications: {result.stderr}")
+            return False
+    
+    def restart_applications(self, app='all'):
+        """Restart PM2 applications"""
+        Logger.section("Restarting Applications")
+        
+        if app == 'all':
+            result = subprocess.run(["pm2", "restart", "all"], capture_output=True, text=True)
+        elif app == 'flask':
+            result = subprocess.run(["pm2", "restart", "nasa-space-app"], capture_output=True, text=True)
+        elif app == 'team':
+            result = subprocess.run(["pm2", "restart", "terrapulse-team-website"], capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            Logger.success("Applications restarted successfully")
+            self._show_running_status()
+            return True
+        else:
+            Logger.error(f"Failed to restart applications: {result.stderr}")
+            return False
+    
+    def delete_applications(self, app='all'):
+        """Delete PM2 applications (only NASA Space App ones)"""
+        Logger.section("Deleting NASA Space App Applications")
+        
+        # Define our specific applications to avoid deleting others
+        if app == 'all':
+            apps_to_delete = ['nasa-space-app', 'terrapulse-team-website']
+        elif app == 'flask':
+            apps_to_delete = ['nasa-space-app']
+        elif app == 'team':
+            apps_to_delete = ['terrapulse-team-website']
+        else:
+            apps_to_delete = []
+        
+        success = True
+        
+        for app_name in apps_to_delete:
+            Logger.info(f"Deleting {app_name}...")
+            result = subprocess.run(["pm2", "delete", app_name], capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                Logger.success(f"✅ {app_name} deleted successfully")
+            else:
+                # Check if the app doesn't exist (which is not an error)
+                if "Process or Namespace" in result.stderr and "not found" in result.stderr:
+                    Logger.info(f"ℹ️  {app_name} was not running (already deleted)")
+                else:
+                    Logger.error(f"❌ Failed to delete {app_name}: {result.stderr}")
+                    success = False
+        
+        if success:
+            Logger.success("🎉 NASA Space App applications deleted successfully")
+            Logger.info("✋ Other PM2 applications were left untouched")
+        else:
+            Logger.error("Some deletions failed")
+        
+        return success
+    
+    def show_status(self):
+        """Show PM2 application status"""
+        Logger.section("PM2 Application Status")
+        
+        if not self.check_pm2_installed():
+            Logger.error("PM2 is not installed")
+            return False
+        
+        result = subprocess.run(["pm2", "status"], capture_output=True, text=True)
+        if result.returncode == 0:
+            print(result.stdout)
+            return True
+        else:
+            Logger.error(f"Failed to get PM2 status: {result.stderr}")
+            return False
+    
+    def show_logs(self, app='all', lines=50):
+        """Show PM2 application logs"""
+        Logger.section(f"PM2 Application Logs (last {lines} lines)")
+        
+        if not self.check_pm2_installed():
+            Logger.error("PM2 is not installed")
+            return False
+        
+        if app == 'all':
+            cmd = ["pm2", "logs", "--lines", str(lines)]
+        elif app == 'flask':
+            cmd = ["pm2", "logs", "nasa-space-app", "--lines", str(lines)]
+        elif app == 'team':
+            cmd = ["pm2", "logs", "terrapulse-team-website", "--lines", str(lines)]
+        
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(result.stdout)
+            return True
+        else:
+            Logger.error(f"Failed to get PM2 logs: {result.stderr}")
+            return False
+    
+    def _show_production_summary(self):
+        """Show production setup summary"""
+        flask_config = config.get_flask_config()
+        team_config = config.get_team_website_config()
+        
+        summary = [
+            "🚀 Production Environment Ready!",
+            "",
+            "Applications configured:",
+            f"  • NASA Space App: http://localhost:{flask_config['port']}",
+            f"  • TerraPulse Team Website: http://localhost:{team_config['port']}",
+            "",
+            "PM2 Commands:",
+            "  • Start all: python3 manage.py pm2 start",
+            "  • Stop all: python3 manage.py pm2 stop",
+            "  • Restart all: python3 manage.py pm2 restart",
+            "  • View status: python3 manage.py pm2 status",
+            "  • View logs: python3 manage.py pm2 logs",
+            "",
+            "Individual app control:",
+            "  • Start Flask: python3 manage.py pm2 start --app flask",
+            "  • Start Team: python3 manage.py pm2 start --app team",
+            "",
+            "Ready for production deployment! 🌟"
+        ]
+        
+        box = BoxDrawer.draw_box(summary, title="Production Ready", width=65)
+        print(f"\n{Colors.GREEN}{box}{Colors.ENDC}")
+    
+    def _show_running_status(self):
+        """Show running applications status"""
+        flask_config = config.get_flask_config()
+        team_config = config.get_team_website_config()
+        
+        status_info = [
+            "🟢 Applications Running",
+            "",
+            "Access your applications:",
+            f"  🌐 NASA Space App: http://localhost:{flask_config['port']}",
+            f"  👥 TerraPulse Team: http://localhost:{team_config['port']}",
+            "",
+            "Monitor with:",
+            "  • pm2 status",
+            "  • pm2 logs",
+            "  • pm2 monit"
+        ]
+        
+        box = BoxDrawer.draw_box(status_info, title="Applications Running", width=55)
+        print(f"\n{Colors.GREEN}{box}{Colors.ENDC}")
+
 class GitManager:
     """Git repository management"""
     
@@ -984,6 +1753,7 @@ class ProjectStatusChecker:
     
     def __init__(self):
         self.flask_manager = FlaskManager()
+        self.team_flask_manager = TeamFlaskManager()
         self.ml_manager = MLManager()
         self.dataset_manager = DatasetManager()
         self.git_manager = GitManager()
@@ -997,6 +1767,9 @@ class ProjectStatusChecker:
         
         # Flask App Status
         self._show_flask_status()
+        
+        # Team Website Status
+        self._show_team_status()
         
         # ML Project Status  
         self._show_ml_status()
@@ -1034,6 +1807,24 @@ class ProjectStatusChecker:
             for table in flask_status['database_tables']:
                 count = flask_status.get('table_counts', {}).get(table, 0)
                 print(f"    • {table}: {count} records")
+    
+    def _show_team_status(self):
+        """Show team website status"""
+        Logger.section("Team Website")
+        team_status = self.team_flask_manager.get_status()
+        
+        status_items = [
+            ("Virtual Environment", team_status['venv_exists']),
+            ("Dependencies", team_status['requirements_installed']),
+            ("Flask App File", team_status['app_file_exists']),
+            ("Website HTML", team_status['index_file_exists']),
+            ("Port 5000 Available", team_status.get('port_available', True))
+        ]
+        
+        for item, status in status_items:
+            icon = "✅" if status else "❌"
+            color = Colors.GREEN if status else Colors.FAIL
+            print(f"  {color}{icon} {item}{Colors.ENDC}")
     
     def _show_ml_status(self):
         """Show ML project status"""
@@ -1098,12 +1889,13 @@ class ProjectStatusChecker:
     def _show_health_score(self):
         """Calculate and show overall project health"""
         flask_status = self.flask_manager.get_status()
+        team_status = self.team_flask_manager.get_status()
         ml_status = self.ml_manager.get_status()
         dataset_status = self.dataset_manager.get_status()
         git_status = self.git_manager.get_status()
         
         # Calculate health score
-        max_score = 10
+        max_score = 12  # Increased for team website
         score = 0
         
         # Flask checks (4 points)
@@ -1111,6 +1903,10 @@ class ProjectStatusChecker:
         if flask_status['requirements_installed']: score += 1
         if flask_status['database_exists']: score += 1
         if flask_status['app_file_exists']: score += 1
+        
+        # Team website checks (2 points)
+        if team_status['venv_exists']: score += 1
+        if team_status['index_file_exists']: score += 1
         
         # ML checks (2 points)
         if ml_status['venv_exists']: score += 1
@@ -1158,6 +1954,8 @@ class ProjectStatusChecker:
             health_info.append("  • Run: python3 manage.py flask setup")
         if not flask_status['database_exists']:
             health_info.append("  • Run: python3 manage.py flask init-db")
+        if not team_status['venv_exists']:
+            health_info.append("  • Run: python3 manage.py team setup")
         if git_status['files_changed'] > 0:
             health_info.append("  • Run: python3 manage.py git add && python3 manage.py git commit")
         
@@ -1189,26 +1987,44 @@ class ProjectStatusChecker:
             {
                 'key': '3',
                 'text': 'Start Flask Server',
-                'desc': 'Launch the web application (port 6767)',
+                'desc': f'Launch the main application (port {config.get_int("FLASK_APP_PORT", 6767)})',
                 'icon': '🌐'
             },
             {
                 'key': '4',
+                'text': 'Start Team Website',
+                'desc': f'Launch the team promotion website (port {config.get_int("TEAM_WEBSITE_PORT", 8080)})',
+                'icon': '👥'
+            },
+            {
+                'key': '5',
                 'text': 'Initialize Database',
                 'desc': 'Setup database with NASA sample data',
                 'icon': '🗄️'
             },
             {
-                'key': '5',
+                'key': '6',
                 'text': 'Start Jupyter Lab',
-                'desc': 'Launch ML development environment',
+                'desc': f'Launch ML development environment (port {config.get_int("JUPYTER_PORT", 8888)})',
                 'icon': '📓'
             },
             {
-                'key': '6',
+                'key': '7',
+                'text': 'View Configuration',
+                'desc': 'Show current application configuration',
+                'icon': '⚙️'
+            },
+            {
+                'key': '8',
                 'text': 'Git Operations',
                 'desc': 'Manage version control',
                 'icon': '📦'
+            },
+            {
+                'key': '9',
+                'text': 'PM2 Production',
+                'desc': 'Production deployment with PM2',
+                'icon': '🚀'
             },
             {
                 'key': 'q',
@@ -1240,11 +2056,13 @@ def main():
                     # Setup everything
                     Logger.header("Complete Project Setup")
                     flask_manager = FlaskManager()
+                    team_flask_manager = TeamFlaskManager()
                     ml_manager = MLManager()
                     dataset_manager = DatasetManager()
                     
                     with spinner_context("Setting up all components", "Setup completed successfully"):
                         flask_manager.setup()
+                        team_flask_manager.setup()
                         ml_manager.setup()
                         dataset_manager.validate_structure()
                 elif choice == '3':
@@ -1252,14 +2070,21 @@ def main():
                     flask_manager = FlaskManager()
                     flask_manager.run_server()
                 elif choice == '4':
+                    # Start team website
+                    team_flask_manager = TeamFlaskManager()
+                    team_flask_manager.run_server()
+                elif choice == '5':
                     # Initialize database
                     flask_manager = FlaskManager()
                     flask_manager.init_database()
-                elif choice == '5':
+                elif choice == '6':
                     # Start Jupyter
                     ml_manager = MLManager()
                     ml_manager.start_jupyter()
-                elif choice == '6':
+                elif choice == '7':
+                    # View Configuration
+                    config.show_config_summary()
+                elif choice == '8':
                     # Git operations submenu
                     git_menu = InteractiveMenu("Git Operations", [
                         {'key': '1', 'text': 'Show Status', 'icon': '📊'},
@@ -1278,6 +2103,45 @@ def main():
                         message = input(f"{Colors.CYAN}Enter commit message: {Colors.ENDC}")
                         if message.strip():
                             git_manager.commit_changes(message)
+                
+                elif choice == '9':
+                    # PM2 Production submenu
+                    pm2_menu = InteractiveMenu("PM2 Production Management", [
+                        {'key': '1', 'text': 'Setup Production Environment', 'desc': 'Configure PM2 for production', 'icon': '⚙️'},
+                        {'key': '2', 'text': 'Start All Applications', 'desc': 'Start both Flask app and team website', 'icon': '🚀'},
+                        {'key': '3', 'text': 'Start Flask App Only', 'desc': 'Start main application only', 'icon': '🌐'},
+                        {'key': '4', 'text': 'Start Team Website Only', 'desc': 'Start team website only', 'icon': '👥'},
+                        {'key': '5', 'text': 'Stop All Applications', 'desc': 'Stop all running apps', 'icon': '🛑'},
+                        {'key': '6', 'text': 'Restart All Applications', 'desc': 'Restart all apps', 'icon': '🔄'},
+                        {'key': '7', 'text': 'View PM2 Status', 'desc': 'Show application status', 'icon': '📊'},
+                        {'key': '8', 'text': 'View Application Logs', 'desc': 'Show recent logs', 'icon': '📝'},
+                        {'key': '9', 'text': 'Delete All Applications', 'desc': 'Remove apps from PM2', 'icon': '🗑️'},
+                        {'key': 'b', 'text': 'Back to Main Menu', 'icon': '↩️'}
+                    ])
+                    pm2_choice = pm2_menu.display()
+                    
+                    pm2_manager = PM2Manager()
+                    if pm2_choice == '1':
+                        pm2_manager.setup_production_environment()
+                    elif pm2_choice == '2':
+                        pm2_manager.start_applications('all', 'production')
+                    elif pm2_choice == '3':
+                        pm2_manager.start_applications('flask', 'production')
+                    elif pm2_choice == '4':
+                        pm2_manager.start_applications('team', 'production')
+                    elif pm2_choice == '5':
+                        pm2_manager.stop_applications('all')
+                    elif pm2_choice == '6':
+                        pm2_manager.restart_applications('all')
+                    elif pm2_choice == '7':
+                        pm2_manager.show_status()
+                    elif pm2_choice == '8':
+                        lines = input(f"{Colors.CYAN}Number of log lines to show (default 50): {Colors.ENDC}") or "50"
+                        pm2_manager.show_logs('all', int(lines))
+                    elif pm2_choice == '9':
+                        confirm = input(f"{Colors.WARNING}Are you sure you want to delete all PM2 apps? (y/N): {Colors.ENDC}")
+                        if confirm.lower() == 'y':
+                            pm2_manager.delete_applications('all')
                 elif choice == 'q' or choice is None:
                     print(f"\n{Colors.GREEN}Thanks for using NASA Space App Manager! 🚀{Colors.ENDC}")
                     break
@@ -1314,8 +2178,18 @@ Examples:
     
     # Setup command
     setup_parser = subparsers.add_parser('setup', help='Complete project setup')
-    setup_parser.add_argument('--component', choices=['flask', 'ml', 'dataset', 'all'], 
+    setup_parser.add_argument('--component', choices=['flask', 'team', 'ml', 'dataset', 'all'], 
                              default='all', help='Component to setup')
+    
+    # Team commands
+    team_parser = subparsers.add_parser('team', help='Team website operations')
+    team_subparsers = team_parser.add_subparsers(dest='team_action')
+    
+    team_setup = team_subparsers.add_parser('setup', help='Setup team website')
+    team_run = team_subparsers.add_parser('run', help='Run team website server')
+    team_run.add_argument('--port', type=int, default=None, help='Server port (default: from .env config)')
+    team_run.add_argument('--host', default=None, help='Server host (default: from .env config)')
+    team_run.add_argument('--no-debug', action='store_true', help='Disable debug mode')
     
     # Flask commands
     flask_parser = subparsers.add_parser('flask', help='Flask application operations')
@@ -1329,8 +2203,8 @@ Examples:
     flask_migrate.add_argument('--message', default='Auto migration', help='Migration message')
     
     flask_run = flask_subparsers.add_parser('run', help='Run development server')
-    flask_run.add_argument('--port', type=int, default=6767, help='Server port')
-    flask_run.add_argument('--host', default='0.0.0.0', help='Server host')
+    flask_run.add_argument('--port', type=int, default=None, help='Server port (default: from .env config)')
+    flask_run.add_argument('--host', default=None, help='Server host (default: from .env config)')
     flask_run.add_argument('--no-debug', action='store_true', help='Disable debug mode')
     
     flask_test = flask_subparsers.add_parser('test', help='Run tests')
@@ -1341,7 +2215,7 @@ Examples:
     
     ml_setup = ml_subparsers.add_parser('setup', help='Setup ML project')
     ml_jupyter = ml_subparsers.add_parser('jupyter', help='Start Jupyter notebook')
-    ml_jupyter.add_argument('--port', type=int, default=8888, help='Jupyter port')
+    ml_jupyter.add_argument('--port', type=int, default=None, help='Jupyter port (default: from .env config)')
     
     ml_train = ml_subparsers.add_parser('train', help='Run training script')
     ml_train.add_argument('script', help='Training script name')
@@ -1356,6 +2230,38 @@ Examples:
     # Status command
     status_parser = subparsers.add_parser('status', help='Check project status')
     
+    # Config command
+    config_parser = subparsers.add_parser('config', help='Configuration management')
+    config_subparsers = config_parser.add_subparsers(dest='config_action')
+    
+    config_show = config_subparsers.add_parser('show', help='Show configuration')
+    config_set = config_subparsers.add_parser('set', help='Set configuration value')
+    config_set.add_argument('key', help='Configuration key')
+    config_set.add_argument('value', help='Configuration value')
+    
+    # PM2 production commands
+    pm2_parser = subparsers.add_parser('pm2', help='PM2 production management')
+    pm2_subparsers = pm2_parser.add_subparsers(dest='pm2_action')
+    
+    pm2_start = pm2_subparsers.add_parser('start', help='Start applications with PM2')
+    pm2_start.add_argument('--app', choices=['flask', 'team', 'all'], default='all', help='Application to start')
+    pm2_start.add_argument('--env', choices=['production', 'staging'], default='production', help='Environment')
+    
+    pm2_stop = pm2_subparsers.add_parser('stop', help='Stop PM2 applications')
+    pm2_stop.add_argument('--app', choices=['flask', 'team', 'all'], default='all', help='Application to stop')
+    
+    pm2_restart = pm2_subparsers.add_parser('restart', help='Restart PM2 applications')
+    pm2_restart.add_argument('--app', choices=['flask', 'team', 'all'], default='all', help='Application to restart')
+    
+    pm2_status = pm2_subparsers.add_parser('status', help='Show PM2 application status')
+    pm2_logs = pm2_subparsers.add_parser('logs', help='Show PM2 application logs')
+    pm2_logs.add_argument('--app', choices=['flask', 'team', 'all'], default='all', help='Application logs to show')
+    pm2_logs.add_argument('--lines', type=int, default=50, help='Number of lines to show')
+    
+    pm2_setup = pm2_subparsers.add_parser('setup', help='Setup PM2 configuration')
+    pm2_delete = pm2_subparsers.add_parser('delete', help='Delete PM2 applications')
+    pm2_delete.add_argument('--app', choices=['flask', 'team', 'all'], default='all', help='Application to delete')
+    
     # Git commands
     git_parser = subparsers.add_parser('git', help='Git repository operations')
     git_subparsers = git_parser.add_subparsers(dest='git_action')
@@ -1368,7 +2274,7 @@ Examples:
     
     # Clean command
     clean_parser = subparsers.add_parser('clean', help='Clean project files')
-    clean_parser.add_argument('--component', choices=['flask', 'ml', 'all'], 
+    clean_parser.add_argument('--component', choices=['flask', 'team', 'ml', 'all'], 
                              default='all', help='Component to clean')
     clean_parser.add_argument('--force', action='store_true', help='Force cleanup without confirmation')
     
@@ -1391,6 +2297,7 @@ Examples:
         
         components = {
             'flask': ('Flask Application', FlaskManager()),
+            'team': ('Team Website', TeamFlaskManager()),
             'ml': ('Machine Learning Project', MLManager()),
             'dataset': ('Dataset Management', DatasetManager())
         }
@@ -1420,13 +2327,17 @@ Examples:
                 "1. Initialize database:",
                 "   python3 manage.py flask init-db",
                 "",
-                "2. Start development server:",
+                "2. Start main application:",
                 "   python3 manage.py flask run",
                 "",
-                "3. Open your browser:",
-                "   http://localhost:6767",
+                "3. Start team website:",
+                "   python3 manage.py team run",
                 "",
-                "4. Start Jupyter for ML work:",
+                "4. Open browsers:",
+                "   Main App: http://localhost:6767",
+                "   Team Site: http://localhost:5000",
+                "",
+                "5. Start Jupyter for ML work:",
                 "   python3 manage.py ml jupyter"
             ]
             
@@ -1449,6 +2360,17 @@ Examples:
                     Logger.error(f"❌ {comp_title} setup failed!")
             else:
                 Logger.error(f"Unknown component: {args.component}")
+    
+    elif args.command == 'team':
+        team_flask_manager = TeamFlaskManager()
+        
+        if args.team_action == 'setup':
+            team_flask_manager.setup()
+        elif args.team_action == 'run':
+            team_flask_manager.run_server(port=args.port, host=args.host, 
+                                        debug=not args.no_debug)
+        else:
+            team_parser.print_help()
     
     elif args.command == 'flask':
         flask_manager = FlaskManager()
@@ -1493,6 +2415,36 @@ Examples:
         status_checker = ProjectStatusChecker()
         status_checker.check_all()
     
+    elif args.command == 'config':
+        if args.config_action == 'show':
+            config.show_config_summary()
+        elif args.config_action == 'set':
+            config.update(args.key, args.value)
+            config.save_config()
+            Logger.success(f"Configuration updated: {args.key} = {args.value}")
+        else:
+            config_parser.print_help()
+    
+    elif args.command == 'pm2':
+        pm2_manager = PM2Manager()
+        
+        if args.pm2_action == 'setup':
+            pm2_manager.setup_production_environment()
+        elif args.pm2_action == 'start':
+            pm2_manager.start_applications(args.app, args.env)
+        elif args.pm2_action == 'stop':
+            pm2_manager.stop_applications(args.app)
+        elif args.pm2_action == 'restart':
+            pm2_manager.restart_applications(args.app)
+        elif args.pm2_action == 'delete':
+            pm2_manager.delete_applications(args.app)
+        elif args.pm2_action == 'status':
+            pm2_manager.show_status()
+        elif args.pm2_action == 'logs':
+            pm2_manager.show_logs(args.app, args.lines)
+        else:
+            pm2_parser.print_help()
+    
     elif args.command == 'clean':
         Logger.header("Project Cleanup")
         
@@ -1503,6 +2455,7 @@ Examples:
                 "",
                 "Components to clean:",
                 f"  • Flask virtual environment" if args.component in ['flask', 'all'] else "",
+                f"  • Team website virtual environment" if args.component in ['team', 'all'] else "",
                 f"  • ML virtual environment" if args.component in ['ml', 'all'] else "",
                 "",
                 "Continue? (y/N)"
@@ -1527,6 +2480,14 @@ Examples:
                 with spinner_context("Removing Flask virtual environment"):
                     shutil.rmtree(venv_path)
                 components_cleaned.append("Flask")
+        
+        if args.component in ['team', 'all']:
+            team_flask_manager = TeamFlaskManager()
+            venv_path = team_flask_manager.venv_dir
+            if venv_path.exists():
+                with spinner_context("Removing Team website virtual environment"):
+                    shutil.rmtree(venv_path)
+                components_cleaned.append("Team Website")
         
         if args.component in ['ml', 'all']:
             ml_manager = MLManager()
