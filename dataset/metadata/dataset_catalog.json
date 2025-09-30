@@ -1,0 +1,51 @@
+{
+  "dataset_info": {
+    "name": "NASA Space App Dataset",
+    "version": "1.0.0",
+    "created_date": "2025-09-30",
+    "description": "Comprehensive dataset for NASA space applications and analysis",
+    "total_size": "0 MB",
+    "file_count": 0
+  },
+  "data_sources": [
+    {
+      "name": "NASA Open Data Portal",
+      "url": "https://data.nasa.gov/",
+      "description": "Official NASA data repository",
+      "access_type": "public"
+    },
+    {
+      "name": "NASA APIs",
+      "url": "https://api.nasa.gov/",
+      "description": "NASA API services",
+      "access_type": "api_key_required"
+    }
+  ],
+  "categories": [
+    {
+      "category": "earth_data",
+      "description": "Earth observation and climate data",
+      "file_count": 0,
+      "formats": ["csv", "json", "netcdf"]
+    },
+    {
+      "category": "space_missions",
+      "description": "Data from various space missions",
+      "file_count": 0,
+      "formats": ["csv", "json"]
+    },
+    {
+      "category": "astronomical_data",
+      "description": "Astronomical observations and measurements",
+      "file_count": 0,
+      "formats": ["fits", "csv", "json"]
+    }
+  ],
+  "quality_metrics": {
+    "completeness": "N/A",
+    "accuracy": "N/A",
+    "consistency": "N/A",
+    "timeliness": "N/A"
+  },
+  "last_updated": "2025-09-30"
+}

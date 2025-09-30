@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Space App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 NASA Space App</h1>
+            <p>Welcome to the NASA Space Application</p>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2>Project Overview</h2>
+                <p>This is a minimalist Flask application designed for NASA space-related data and analysis.</p>
+            </div>
+            
+            <div class="card">
+                <h2>API Endpoints</h2>
+                <ul>
+                    <li><code>/api/health</code> - Health check endpoint</li>
+                    <li><code>/api/data</code> - NASA data endpoint</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
