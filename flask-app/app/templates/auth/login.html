@@ -109,14 +109,17 @@
                 </form>
 
                 <div class="mt-6 pt-6 border-t border-gray-100">
-                    <p class="text-center text-xs text-gray-500 mb-3">
+                    <p class="text-center text-xs text-gray-500 mb-4">
                         Don't have an account?
                     </p>
                     <a href="{{ url_for('auth.register') }}" 
-                       class="btn-primary flex items-center justify-center w-full rounded-xl border-2 border-green-600 bg-white px-4 py-3 text-sm font-semibold text-green-600 hover:bg-green-50">
+                       class="btn-primary flex items-center justify-center w-full rounded-xl border-2 border-green-600 bg-green-50 px-4 py-3.5 text-sm font-semibold text-green-600 hover:bg-green-100 hover:border-green-700 hover:text-green-700 transition-all duration-200">
                         <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
                         Create Free Account
                     </a>
+                    <p class="text-center text-xs text-gray-400 mt-3">
+                        Join TerraPulse today for free environmental insights
+                    </p>
                 </div>
             </div>
         </div>
@@ -187,6 +190,14 @@
                 const result = await response.json();
                 
                 if (result.success) {
+                    // Set session storage to prevent onboarding redirect issues
+                    if (result.user) {
+                        sessionStorage.setItem('onboardingCompleted', result.user.onboarding_completed ? 'true' : 'false');
+                        if (result.user.profile_type) {
+                            sessionStorage.setItem('userProfile', result.user.profile_type);
+                        }
+                    }
+                    
                     successText.textContent = result.message;
                     successDiv.classList.remove('hidden');
                     

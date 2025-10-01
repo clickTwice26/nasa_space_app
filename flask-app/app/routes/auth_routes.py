@@ -97,6 +97,75 @@ def logout():
 
 
 # API Routes for authentication
+@auth_bp.route('/api/register/complete-wizard', methods=['POST'])
+def api_register_complete_wizard():
+    """Complete registration wizard - handles all data in one request"""
+    try:
+        data = request.get_json() or {}
+        
+        # Validate required fields
+        required_fields = ['email', 'username', 'password', 'role', 'location_type']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'success': False, 'message': f'{field.capitalize()} is required'}), 400
+        
+        # Validate location data based on type
+        if data['location_type'] == 'fixed':
+            if not data.get('latitude') or not data.get('longitude'):
+                return jsonify({'success': False, 'message': 'Fixed location coordinates are required'}), 400
+        elif data['location_type'] == 'journey':
+            if not all([data.get('start_latitude'), data.get('start_longitude'), 
+                       data.get('end_latitude'), data.get('end_longitude')]):
+                return jsonify({'success': False, 'message': 'Journey start and end coordinates are required'}), 400
+        
+        # Check if user already exists
+        if AuthService.get_user_by_email(data['email']):
+            return jsonify({'success': False, 'message': 'Email already registered'}), 400
+        if AuthService.get_user_by_username(data['username']):
+            return jsonify({'success': False, 'message': 'Username already taken'}), 400
+        
+        # Create user with all data
+        user_data = {
+            'email': data['email'],
+            'username': data['username'],
+            'password': data['password'],
+            'profile_type': data['role'],
+            'location_type': data['location_type'],
+            'onboarding_completed': True
+        }
+        
+        # Add location coordinates
+        if data['location_type'] == 'fixed':
+            user_data['latitude'] = float(data['latitude'])
+            user_data['longitude'] = float(data['longitude'])
+        else:  # journey
+            user_data['start_latitude'] = float(data['start_latitude'])
+            user_data['start_longitude'] = float(data['start_longitude'])
+            user_data['end_latitude'] = float(data['end_latitude'])
+            user_data['end_longitude'] = float(data['end_longitude'])
+        
+        # Create user
+        result = AuthService.create_complete_user(user_data)
+        
+        if result['success']:
+            # Auto-login the new user
+            user = result['user']
+            session_result = AuthService.create_session(user_id=user['id'], expires_hours=24)
+            if session_result['success']:
+                session['session_id'] = session_result['session_id']
+                session['user_id'] = user['id']
+                result['session_id'] = session_result['session_id']
+            
+            logger.info(f"Complete registration successful: {data['email']}")
+            return jsonify(result), 201
+        
+        return jsonify(result), 400
+        
+    except Exception as e:
+        logger.error(f"Complete wizard registration error: {str(e)}")
+        return jsonify({'success': False, 'message': 'Server error during registration'}), 500
+
+
 @auth_bp.route('/api/register/start', methods=['POST'])
 def api_register_start():
     """Start multi-step registration (creates user record and auto-login)"""

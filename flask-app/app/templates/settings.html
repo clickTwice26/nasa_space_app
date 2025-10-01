@@ -306,7 +306,7 @@
 
     <!-- Sign Out -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <button class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center space-x-2">
+        <button id="logout-btn" class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center space-x-2">
             <i data-lucide="log-out" class="w-5 h-5"></i>
             <span>Sign Out</span>
         </button>
@@ -331,6 +331,34 @@
     document.querySelector('button[type="button"]').addEventListener('click', function() {
         // Show success message or handle location save
         alert('Location settings saved successfully!');
+    });
+    
+    // Logout functionality
+    document.getElementById('logout-btn').addEventListener('click', async function() {
+        try {
+            const response = await fetch('/auth/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            
+            // Clear session storage regardless of API response
+            sessionStorage.clear();
+            
+            if (response.ok) {
+                window.location.href = '/auth/login';
+            } else {
+                // Even if logout fails on server, redirect to login
+                window.location.href = '/auth/login';
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Clear session storage and redirect anyway
+            sessionStorage.clear();
+            window.location.href = '/auth/login';
+        }
     });
 </script>
 {% endblock %}

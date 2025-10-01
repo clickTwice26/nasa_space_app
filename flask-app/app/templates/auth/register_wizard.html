@@ -170,22 +170,196 @@
 <script>
   const stepTitles=['Account Info','Select Role','Location Type','Set Location'];
   const steps=[1,2,3,4];let currentStep=1;let selectedRole=null;let locationType=null;let map,marker,startMarker,endMarker,journeyPhase=0;let coords={};
+  // Store all registration data locally
+  let registrationData = {
+    email: '',
+    username: '',
+    password: '',
+    role: '',
+    location_type: '',
+    latitude: null,
+    longitude: null,
+    start_latitude: null,
+    start_longitude: null,
+    end_latitude: null,
+    end_longitude: null
+  };
+  
   function setAlert(msg,type='info'){const box=document.getElementById('alert');box.innerHTML=`<div class="flex items-start gap-2 p-3 rounded-xl ${type==='error'?'bg-red-50':'bg-green-50'}"><i data-lucide="${type==='error'?'alert-circle':'check-circle'}" class="w-4 h-4 ${type==='error'?'text-red-600':'text-green-600'} mt-0.5 flex-shrink-0"></i><span class="text-xs ${type==='error'?'text-red-800':'text-green-800'} leading-relaxed">${msg}</span></div>`;box.classList.remove('hidden');lucide.createIcons();}
   function clearAlert(){document.getElementById('alert').classList.add('hidden');}
   function go(step){steps.forEach(s=>document.getElementById('step-'+s).classList.add('hidden'));const el=document.getElementById('step-'+step);el.classList.remove('hidden');el.classList.add('step-enter');requestAnimationFrame(()=>{el.classList.add('step-enter-active');setTimeout(()=>{el.classList.remove('step-enter','step-enter-active')},300)});currentStep=step;updateBars();document.getElementById('step-label').textContent=`Step ${step} of 4`;document.getElementById('step-title').textContent=stepTitles[step-1];}
   function updateBars(){steps.forEach((s,i)=>{document.getElementById('bar-'+s).style.width=(currentStep>i?'100%':'0')});}
-  document.getElementById('step-1').addEventListener('submit',async e=>{e.preventDefault();clearAlert();const fd=new FormData(e.target);const payload={email:fd.get('email'),username:fd.get('username'),password:fd.get('password')};try{const r=await fetch('/auth/api/register/start',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(payload)});const data=await r.json();if(!data.success)return setAlert(data.message,'error');go(2);}catch(err){setAlert('Network error. Try again.','error');}});
+  
+  // Step 1: Validate and store account info locally
+  document.getElementById('step-1').addEventListener('submit', e => {
+    e.preventDefault();
+    clearAlert();
+    const fd = new FormData(e.target);
+    const email = fd.get('email').trim();
+    const username = fd.get('username').trim();
+    const password = fd.get('password');
+    
+    // Basic validation
+    if (!email || !username || !password) {
+      return setAlert('All fields are required', 'error');
+    }
+    if (password.length < 8) {
+      return setAlert('Password must be at least 8 characters', 'error');
+    }
+    if (!email.includes('@')) {
+      return setAlert('Please enter a valid email address', 'error');
+    }
+    
+    // Store data locally
+    registrationData.email = email;
+    registrationData.username = username;
+    registrationData.password = password;
+    
+    setAlert('Account details saved. Continue with role selection.', 'info');
+    go(2);
+  });
+  
+  // Step 2: Role selection
   document.querySelectorAll('.role-card').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();selectedRole=btn.dataset.role;document.querySelectorAll('.role-card').forEach(b=>b.classList.remove('border-green-500','bg-green-50','ring-2','ring-green-500'));btn.classList.add('border-green-500','bg-green-50','ring-2','ring-green-500');document.getElementById('next-2').disabled=false;}));
   document.getElementById('back-2').onclick=()=>go(1);
-  document.getElementById('next-2').onclick=async()=>{clearAlert();try{const r=await fetch('/auth/api/register/role',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({role:selectedRole})});const data=await r.json();if(!data.success)return setAlert(data.message,'error');go(3);}catch(e){setAlert('Error saving role','error')}};
+  document.getElementById('next-2').onclick=()=>{
+    clearAlert();
+    if (!selectedRole) {
+      return setAlert('Please select your role', 'error');
+    }
+    registrationData.role = selectedRole;
+    setAlert('Role selected. Choose location type.', 'info');
+    go(3);
+  };
+  
+  // Step 3: Location type
   document.querySelectorAll('.loc-card').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();locationType=btn.dataset.type;document.querySelectorAll('.loc-card').forEach(b=>b.classList.remove('border-green-500','bg-green-50','ring-2','ring-green-500'));btn.classList.add('border-green-500','bg-green-50','ring-2','ring-green-500');document.getElementById('next-3').disabled=false;}));
   document.getElementById('back-3').onclick=()=>go(2);
-  document.getElementById('next-3').onclick=()=>{go(4);setTimeout(initMap,100);};
+  document.getElementById('next-3').onclick=()=>{
+    clearAlert();
+    if (!locationType) {
+      return setAlert('Please select location type', 'error');
+    }
+    registrationData.location_type = locationType;
+    go(4);
+    setTimeout(initMap,100);
+  };
+  
+  // Step 4: Map
   function initMap(){if(map)return;map=L.map('map').setView([23.8103,90.4125],7);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OSM'}).addTo(map);map.on('click',onMapClick);} 
-  function onMapClick(e){if(locationType==='fixed'){if(!marker){marker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateFixed);}marker.setLatLng(e.latlng);coords.latitude=e.latlng.lat;coords.longitude=e.latlng.lng;updateFixed();}else{if(journeyPhase===0){if(startMarker)map.removeLayer(startMarker);if(endMarker){map.removeLayer(endMarker);endMarker=null;}startMarker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateJourney);coords.start_latitude=e.latlng.lat;coords.start_longitude=e.latlng.lng;journeyPhase=1;document.getElementById('journey-hint').textContent='Now tap to set end point';document.getElementById('journey-hint').classList.remove('hidden');document.getElementById('map-hint').classList.add('hidden');}else{if(endMarker)map.removeLayer(endMarker);endMarker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateJourney);coords.end_latitude=e.latlng.lat;coords.end_longitude=e.latlng.lng;journeyPhase=0;}updateJourney();}}
-  function updateFixed(){const ll=marker.getLatLng();coords.latitude=ll.lat;coords.longitude=ll.lng;document.getElementById('coord-display').innerHTML=`<div class="text-center">Lat: ${ll.lat.toFixed(5)}, Lng: ${ll.lng.toFixed(5)}</div>`;document.getElementById('finish').disabled=false;}
-  function updateJourney(){let html='';if(startMarker){const ll=startMarker.getLatLng();coords.start_latitude=ll.lat;coords.start_longitude=ll.lng;html+=`Start: ${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}<br>`;}if(endMarker){const ll2=endMarker.getLatLng();coords.end_latitude=ll2.lat;coords.end_longitude=ll2.lng;html+=`End: ${ll2.lat.toFixed(5)}, ${ll2.lng.toFixed(5)}`;document.getElementById('finish').disabled=false;}document.getElementById('coord-display').innerHTML=html||'<div class="text-center text-gray-400">Tap map to mark points</div>';}
+  function onMapClick(e){
+    if(locationType==='fixed'){
+      if(!marker){marker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateFixed);}
+      marker.setLatLng(e.latlng);
+      coords.latitude=e.latlng.lat;
+      coords.longitude=e.latlng.lng;
+      updateFixed();
+    } else {
+      if(journeyPhase===0){
+        if(startMarker)map.removeLayer(startMarker);
+        if(endMarker){map.removeLayer(endMarker);endMarker=null;}
+        startMarker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateJourney);
+        coords.start_latitude=e.latlng.lat;
+        coords.start_longitude=e.latlng.lng;
+        journeyPhase=1;
+        document.getElementById('journey-hint').textContent='Now tap to set end point';
+        document.getElementById('journey-hint').classList.remove('hidden');
+        document.getElementById('map-hint').classList.add('hidden');
+      } else {
+        if(endMarker)map.removeLayer(endMarker);
+        endMarker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateJourney);
+        coords.end_latitude=e.latlng.lat;
+        coords.end_longitude=e.latlng.lng;
+        journeyPhase=0;
+      }
+      updateJourney();
+    }
+  }
+  
+  function updateFixed(){
+    const ll=marker.getLatLng();
+    coords.latitude=ll.lat;
+    coords.longitude=ll.lng;
+    registrationData.latitude = ll.lat;
+    registrationData.longitude = ll.lng;
+    document.getElementById('coord-display').innerHTML=`<div class="text-center">Lat: ${ll.lat.toFixed(5)}, Lng: ${ll.lng.toFixed(5)}</div>`;
+    document.getElementById('finish').disabled=false;
+  }
+  
+  function updateJourney(){
+    let html='';
+    if(startMarker){
+      const ll=startMarker.getLatLng();
+      coords.start_latitude=ll.lat;
+      coords.start_longitude=ll.lng;
+      registrationData.start_latitude = ll.lat;
+      registrationData.start_longitude = ll.lng;
+      html+=`Start: ${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}<br>`;
+    }
+    if(endMarker){
+      const ll2=endMarker.getLatLng();
+      coords.end_latitude=ll2.lat;
+      coords.end_longitude=ll2.lng;
+      registrationData.end_latitude = ll2.lat;
+      registrationData.end_longitude = ll2.lng;
+      html+=`End: ${ll2.lat.toFixed(5)}, ${ll2.lng.toFixed(5)}`;
+      document.getElementById('finish').disabled=false;
+    }
+    document.getElementById('coord-display').innerHTML=html||'<div class="text-center text-gray-400">Tap map to mark points</div>';
+  }
+  
   document.getElementById('back-4').onclick=()=>go(3);
-  document.getElementById('finish').onclick=async()=>{clearAlert();const btn=document.getElementById('finish');btn.disabled=true;btn.textContent='Finishing...';const payload={location_type:locationType,...coords};try{const r=await fetch('/auth/api/register/location',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(payload)});const data=await r.json();if(!data.success){btn.disabled=false;btn.textContent='Finish';return setAlert(data.message,'error');}const c=await fetch('/auth/api/register/complete',{method:'POST',credentials:'include'});const cd=await c.json();if(!cd.success){btn.disabled=false;btn.textContent='Finish';return setAlert(cd.message,'error');}setAlert('Success! Redirecting...','info');setTimeout(()=>{window.location.href='/dashboard';},600);}catch(e){btn.disabled=false;btn.textContent='Finish';setAlert('Error completing registration','error');}};
+  
+  // Final submission - send all data at once
+  document.getElementById('finish').onclick=async()=>{
+    clearAlert();
+    const btn=document.getElementById('finish');
+    btn.disabled=true;
+    btn.textContent='Creating Account...';
+    
+    // Validate final data
+    if (locationType === 'fixed' && (!registrationData.latitude || !registrationData.longitude)) {
+      btn.disabled=false;
+      btn.textContent='Finish';
+      return setAlert('Please mark your location on the map', 'error');
+    }
+    if (locationType === 'journey' && (!registrationData.start_latitude || !registrationData.end_latitude)) {
+      btn.disabled=false;
+      btn.textContent='Finish';
+      return setAlert('Please mark both start and end points on the map', 'error');
+    }
+    
+    try {
+      // Send all registration data in one request
+      const response = await fetch('/auth/api/register/complete-wizard', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify(registrationData)
+      });
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        btn.disabled=false;
+        btn.textContent='Finish';
+        return setAlert(data.message, 'error');
+      }
+      
+      // Set session storage to prevent onboarding redirect
+      sessionStorage.setItem('onboardingCompleted', 'true');
+      sessionStorage.setItem('userProfile', registrationData.role);
+      
+      setAlert('Registration complete! Redirecting...', 'info');
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
+      
+    } catch (e) {
+      btn.disabled=false;
+      btn.textContent='Finish';
+      setAlert('Network error. Please try again.', 'error');
+    }
+  };
 </script>
 {% endblock %}

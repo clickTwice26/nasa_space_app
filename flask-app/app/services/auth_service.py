@@ -6,6 +6,9 @@ from datetime import datetime, timedelta, timezone
 import secrets
 import uuid
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AuthService:
@@ -17,6 +20,41 @@ class AuthService:
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return re.match(pattern, email) is not None
     
+    @staticmethod
+    def get_user_profile(user_id):
+        """Get user profile information"""
+        try:
+            user = User.query.get(user_id)
+            
+            if not user:
+                return {'success': False, 'message': 'User not found'}
+            
+            return {
+                'success': True,
+                'user': user.to_dict()
+            }
+            
+        except Exception as e:
+            return {'success': False, 'message': f'Failed to get profile: {str(e)}'}
+    
+    @staticmethod
+    def get_user_by_email(email):
+        """Get user by email address"""
+        try:
+            user = User.query.filter_by(email=email.lower()).first()
+            return user.to_dict() if user else None
+        except Exception:
+            return None
+    
+    @staticmethod 
+    def get_user_by_username(username):
+        """Get user by username"""
+        try:
+            user = User.query.filter_by(username=username.lower()).first()
+            return user.to_dict() if user else None
+        except Exception:
+            return None
+
     @staticmethod
     def validate_password(password):
         """Validate password strength"""
@@ -135,6 +173,56 @@ class AuthService:
                 raise ValueError('Start and end coordinates are required for journey location')
         db.session.commit()
         return user
+
+    @staticmethod
+    def create_complete_user(user_data):
+        """Create a complete user with all information in one step"""
+        try:
+            # Validate required fields
+            required_fields = ['email', 'username', 'password', 'profile_type', 'location_type']
+            for field in required_fields:
+                if not user_data.get(field):
+                    return {'success': False, 'message': f'{field} is required'}
+            
+            # Check if user already exists
+            if AuthService.get_user_by_email(user_data['email']):
+                return {'success': False, 'message': 'Email already registered'}
+            if AuthService.get_user_by_username(user_data['username']):
+                return {'success': False, 'message': 'Username already taken'}
+            
+            # Create user
+            user = User(
+                email=user_data['email'],
+                username=user_data['username'],
+                password=user_data['password'],
+                profile_type=user_data['profile_type'],
+                location_type=user_data['location_type'],
+                onboarding_completed=user_data.get('onboarding_completed', True)
+            )
+            
+            # Add location data
+            if user_data['location_type'] == 'fixed':
+                user.latitude = user_data.get('latitude')
+                user.longitude = user_data.get('longitude')
+            elif user_data['location_type'] == 'journey':
+                user.start_latitude = user_data.get('start_latitude')
+                user.start_longitude = user_data.get('start_longitude')
+                user.end_latitude = user_data.get('end_latitude')
+                user.end_longitude = user_data.get('end_longitude')
+            
+            db.session.add(user)
+            db.session.commit()
+            
+            return {
+                'success': True,
+                'message': 'Registration completed successfully',
+                'user': user.to_dict()
+            }
+            
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error creating complete user: {str(e)}")
+            return {'success': False, 'message': 'Registration failed'}
 
     @staticmethod
     def complete_registration(user: User):

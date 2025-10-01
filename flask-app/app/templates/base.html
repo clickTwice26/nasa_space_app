@@ -167,8 +167,12 @@
             const userProfile = sessionStorage.getItem('userProfile');
             const onboardingCompleted = sessionStorage.getItem('onboardingCompleted');
             
-            // Redirect to onboarding if not completed
-            if (!onboardingCompleted && window.location.pathname !== '/onboarding') {
+            // Don't redirect to onboarding if on auth pages or already on onboarding
+            const isAuthPage = window.location.pathname.startsWith('/auth/');
+            const isOnboardingPage = window.location.pathname === '/onboarding';
+            
+            // Redirect to onboarding if not completed (but not from auth pages)
+            if (!onboardingCompleted && !isAuthPage && !isOnboardingPage) {
                 window.location.href = '/onboarding';
                 return;
             }

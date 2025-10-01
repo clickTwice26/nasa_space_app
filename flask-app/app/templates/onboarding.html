@@ -534,6 +534,11 @@
                   .then(data => {
                       if (data.success) {
                           console.log('Onboarding completed:', data);
+                          
+                          // Set session storage to prevent redirect issues
+                          sessionStorage.setItem('onboardingCompleted', 'true');
+                          sessionStorage.setItem('userProfile', selectedProfile);
+                          
                           // Redirect to dashboard
                           window.location.href = '/dashboard';
                       } else {
