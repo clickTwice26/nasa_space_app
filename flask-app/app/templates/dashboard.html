@@ -32,39 +32,71 @@
         </div>
     </div>
 
-    <!-- Risk Score Card -->
-    <div class="card-light bg-white p-6">
+    <!-- Agricultural Risk Engine Card -->
+    <div class="card-light bg-white p-6" id="riskEngineCard">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Current Risk Score</h3>
+            <div class="flex items-center gap-3">
+                <h3 class="text-lg font-semibold text-gray-900">🌾 Crop Risk Analysis</h3>
+                <button id="refreshRiskBtn" class="px-3 py-1 text-xs bg-terra-primary-100 text-terra-primary-700 rounded-full hover:bg-terra-primary-200 transition-colors">
+                    🔄 Refresh
+                </button>
+            </div>
             <i data-lucide="shield-alert" class="w-5 h-5 text-terra-earth"></i>
         </div>
-        <div class="flex items-center gap-8">
-            <div class="flex-1">
-                <div class="flex items-baseline gap-3">
-                    <span class="text-4xl font-bold text-terra-earth">6.7</span>
-                    <span class="text-sm text-gray-500 font-medium">/ 10</span>
-                </div>
-                <div class="mt-3">
-                    <span class="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                        Moderate Risk
-                    </span>
-                </div>
-            </div>
-            <div style="width: 64px; height: 64px; position: relative;">
-                <svg style="width: 64px; height: 64px; transform: rotate(-90deg);" viewBox="0 0 36 36">
-                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-                          fill="none" stroke="var(--border-subtle)" stroke-width="3"/>
-                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-                          fill="none" stroke="var(--warning)" stroke-width="3" 
-                          stroke-dasharray="67, 100"/>
-                </svg>
-                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-                    <span style="font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--warning);">67%</span>
-                </div>
-            </div>
+        
+        <!-- Loading State -->
+        <div id="riskLoading" class="text-center py-8 hidden">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-terra-primary-500 mx-auto mb-3"></div>
+            <p class="text-sm text-gray-500">Analyzing crop risks using NASA satellite data...</p>
         </div>
-        <div style="margin-top: var(--space-xl); font-size: var(--text-sm); color: var(--text-muted); line-height: 1.5;">
-            Based on soil pH, rainfall patterns, and satellite data from your {{ user.primary_crop.lower() if user.primary_crop else 'crop' }} fields in {{ user.district or user.location or 'your area' }}.
+        
+        <!-- Error State -->
+        <div id="riskError" class="bg-red-50 border border-red-200 rounded-lg p-4 hidden">
+            <div class="flex items-center gap-2 text-red-700">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="font-medium">Unable to fetch risk data</span>
+            </div>
+            <p class="text-sm text-red-600 mt-1" id="riskErrorMessage">Please try again later</p>
+        </div>
+        
+        <!-- Risk Analysis Results -->
+        <div id="riskResults" class="space-y-4">
+            <div class="flex items-center gap-8">
+                <div class="flex-1">
+                    <div class="flex items-baseline gap-3">
+                        <span id="riskLevelText" class="text-4xl font-bold text-terra-earth">--</span>
+                        <span class="text-sm text-gray-500 font-medium">Risk Level</span>
+                    </div>
+                    <div class="mt-3">
+                        <span id="riskBadge" class="px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-600">
+                            Analyzing...
+                        </span>
+                    </div>
+                </div>
+                <div class="w-16 h-16 relative">
+                    <div id="riskGauge" class="w-full h-full">
+                        <!-- Risk gauge will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Risk Summary -->
+            <div id="riskSummary" class="bg-gray-50 rounded-lg p-4">
+                <p class="text-sm text-gray-600">Loading crop risk analysis...</p>
+            </div>
+            
+            <!-- Quick Alerts -->
+            <div id="riskAlerts" class="space-y-2">
+                <!-- Risk alerts will be populated by JavaScript -->
+            </div>
+            
+            <!-- View Full Report Button -->
+            <div class="pt-2">
+                <a href="/risk-dashboard" class="inline-flex items-center gap-2 text-sm font-medium text-terra-primary-600 hover:text-terra-primary-700 transition-colors">
+                    <i class="fas fa-chart-line"></i>
+                    View Full Risk Report
+                </a>
+            </div>
         </div>
     </div>
 

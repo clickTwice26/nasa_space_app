@@ -28,6 +28,11 @@ def onboarding():
         return redirect(url_for('main.dashboard'))
     return render_template('onboarding.html')
 
+@main_bp.route('/risk-dashboard')
+def risk_dashboard():
+    """Agricultural Risk Dashboard - Public demo page"""
+    return render_template('risk_dashboard.html')
+
 @main_bp.route('/dashboard')
 @onboarding_required
 def dashboard():
