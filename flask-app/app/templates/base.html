@@ -10,45 +10,68 @@
     <!-- TerraPulse Global CSS -->
     <link rel="stylesheet" href="/static/css/terrapulse.css">
     
-    <!-- Tailwind CSS (for additional utilities) -->
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- TODO: Replace with proper Tailwind CSS build for production -->
+    <!-- Temporarily using CDN for development - should implement PostCSS build -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Tailwind Config -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'terra-green': {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            200: '#bbf7d0',
-                            300: '#86efac',
-                            400: '#4ade80',
-                            500: '#22c55e',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                            950: '#022c22'
+        // Suppress production warning for now
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'terra-green': {
+                                50: '#f7fdf9',
+                                100: '#e8f9f0',
+                                200: '#d1f2e1',
+                                300: '#a7e5c8',
+                                400: '#75d4a8',
+                                500: '#48c085',
+                                600: '#359968',
+                                700: '#2d7a55',
+                                800: '#275f45',
+                                900: '#234e3a',
+                                950: '#0f2419'
+                            },
+                            'terra-blue': {
+                                50: '#f0f8ff',
+                                100: '#e0f0fe',
+                                200: '#b8e2fc',
+                                300: '#7ccbf8',
+                                400: '#38b2f2',
+                                500: '#0e96e3',
+                                600: '#0278c2',
+                                700: '#03619d',
+                                800: '#075382',
+                                900: '#0c446b',
+                                950: '#082b47'
+                            },
+                            'terra-earth': {
+                                50: '#fdf8f3',
+                                100: '#faefe4',
+                                200: '#f4dcc8',
+                                300: '#ecc2a1',
+                                400: '#e19d70',
+                                500: '#d97f4c',
+                                600: '#cb6634',
+                                700: '#a85129',
+                                800: '#864228',
+                                900: '#6d3823',
+                                950: '#3a1c11'
+                            },
+                            'terra-orange': '#ea580c',
+                            'terra-yellow': '#eab308',
                         },
-                        'terra-blue': {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e'
-                        },
-                        'terra-orange': '#ea580c',
-                        'terra-yellow': '#eab308',
-                    },
-                    fontFamily: {
-                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        fontFamily: {
+                            'sans': ['Montserrat', 'system-ui', 'sans-serif'],
+                            'display': ['Montserrat', 'system-ui', 'sans-serif'],
+                            'brand': ['Montserrat', 'system-ui', 'sans-serif'],
+                        }
                     }
                 }
             }
@@ -58,7 +81,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -70,16 +93,62 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <style>
-        /* Fix iOS Safari scrolling */
+        /* Light Mode Optimizations */
         html, body {
             height: 100%;
             overflow: hidden;
+            background-color: #ffffff;
+            color: #0f172a;
         }
         
         .main-container {
             position: relative;
             height: 100vh;
             overflow: hidden;
+            background-color: #f8fafc;
+        }
+        
+        /* Enhanced Scrolling */
+        .scrollable-content {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+        
+        .scrollable-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Light Mode Navigation */
+        .bottom-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        /* Enhanced Text Contrast */
+        .text-enhanced {
+            color: #0f172a;
+            font-weight: 500;
+        }
+        
+        .text-enhanced-muted {
+            color: #475569;
+            font-weight: 400;
         }
     </style>
     {% block head_extra %}{% endblock %}
@@ -102,13 +171,13 @@
                     </div>
                     <div class="flex items-center space-x-2">
                         <!-- Notification Bell -->
-                        <button class="relative p-2 text-gray-500 hover:text-terra-green transition-colors">
+                        <button class="notification-btn relative">
                             <i data-lucide="bell" class="w-5 h-5"></i>
                             <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
                         </button>
                         <!-- Profile -->
                         <button class="w-8 h-8 bg-terra-green rounded-full flex items-center justify-center">
-                            <span class="text-white text-sm font-medium">A</span>
+                            <span class="text-white text-sm font-medium">{{ user.full_name[0].upper() if user and user.full_name else user.username[0].upper() if user and user.username else 'U' }}</span>
                         </button>
                     </div>
                 </div>
@@ -131,25 +200,25 @@
 
         <!-- Bottom Navigation (hidden if not authenticated) -->
         {% if session.get('session_id') %}
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40" id="bottom-nav">
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 z-40 shadow-lg" id="bottom-nav">
             <div class="grid h-16" id="nav-grid">
-                <a href="/dashboard" class="nav-item {% if request.endpoint == 'dashboard' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1">
+                <a href="/dashboard" class="nav-item nav-light {% if request.endpoint == 'dashboard' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="home" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Dashboard</span>
                 </a>
-                <a href="/predictions" class="nav-item {% if request.endpoint == 'predictions' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 farming-feature">
+                <a href="/predictions" class="nav-item nav-light {% if request.endpoint == 'predictions' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 farming-feature text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="trending-up" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Predict</span>
                 </a>
-                <a href="/data" class="nav-item {% if request.endpoint == 'data' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1">
+                <a href="/data" class="nav-item nav-light {% if request.endpoint == 'data' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Data</span>
                 </a>
-                <a href="/community" class="nav-item {% if request.endpoint == 'community' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1">
+                <a href="/community" class="nav-item nav-light {% if request.endpoint == 'community' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="users" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Community</span>
                 </a>
-                <a href="/settings" class="nav-item {% if request.endpoint == 'settings' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1">
+                <a href="/settings" class="nav-item nav-light {% if request.endpoint == 'settings' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="settings" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Settings</span>
                 </a>

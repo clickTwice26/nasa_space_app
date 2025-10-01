@@ -1,763 +1,330 @@
 {% extends "base.html" %}
+{% from "components/header_stats.html" import header_stats %}
+{% from "components/community_card.html" import community_card %}
+{% from "components/post_creation.html" import post_creation %}
+{% from "components/filter_tabs.html" import filter_tabs %}
+{% from "components/post_card.html" import post_card %}
 
 {% block title %}TerraPulse - Community{% endblock %}
 {% block subtitle %}Community Hub{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-xl p-6 text-white">
-        <div class="flex items-center space-x-3 mb-4">
-            <i data-lucide="users" class="w-8 h-8"></i>
-            <div>
-                <h1 class="text-2xl font-bold">Community Hub</h1>
-                <p class="text-green-100">Connect with fellow farmers and agricultural experts</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-3 gap-4 mt-6">
-            <div class="text-center">
-                <p class="text-3xl font-bold">2,847</p>
-                <p class="text-green-100 text-sm">Members</p>
-            </div>
-            <div class="text-center">
-                <p class="text-3xl font-bold">156</p>
-                <p class="text-green-100 text-sm">Groups</p>
-            </div>
-            <div class="text-center">
-                <p class="text-3xl font-bold">94</p>
-                <p class="text-green-100 text-sm">Active Today</p>
-            </div>
-        </div>
+<div class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+    
+    <!-- Clean Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Community Feed</h1>
+        <p class="text-gray-600">Connect with farmers and share your agricultural knowledge</p>
     </div>
 
-    <!-- Community Discovery Section -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Discover Communities</h2>
-            <div class="flex items-center space-x-3">
-                <span class="text-sm text-gray-600">Based on your profile:</span>
-                <span id="user-profile-badge" class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full border border-green-200"></span>
+    <!-- Quick Stats & Actions -->
+    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 mb-6">
+        <div class="grid grid-cols-3 gap-4 text-center mb-4">
+            <div>
+                <div class="text-2xl font-bold text-green-600">125K+</div>
+                <div class="text-sm text-gray-600">Active Farmers</div>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-blue-600">45</div>
+                <div class="text-sm text-gray-600">Communities</div>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-purple-600">2.3K</div>
+                <div class="text-sm text-gray-600">Daily Posts</div>
             </div>
         </div>
         
-        <!-- Student Communities -->
-        <div id="student-communities" class="community-section hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Agricultural Science Students</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Learn and discuss agricultural concepts, share research papers, and connect with peers</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    1,284 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="book" class="w-3 h-3 mr-1"></i>
-                                    Educational
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="graduation-cap" class="w-8 h-8 text-blue-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors" data-community="agricultural-science-students">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Sustainable Agriculture Club</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Explore sustainable farming practices, environmental conservation, and green technologies</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    892 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="leaf" class="w-3 h-3 mr-1"></i>
-                                    Sustainability
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="leaf" class="w-8 h-8 text-green-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors" data-community="sustainable-agriculture-club">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Future Farmers Network</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Student-led initiatives in modern agriculture, innovation projects, and career guidance</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    567 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="rocket" class="w-3 h-3 mr-1"></i>
-                                    Innovation
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="rocket" class="w-8 h-8 text-purple-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors" data-community="future-farmers-network">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Study Groups & Tutorials</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Form study groups, share tutorials, and get help with agricultural coursework</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    743 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="book-open" class="w-3 h-3 mr-1"></i>
-                                    Study Support
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="book-open" class="w-8 h-8 text-orange-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors" data-community="study-groups-tutorials">
-                        Join Community
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Farmer Communities -->
-        <div id="farmer-communities" class="community-section hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Rice Farmers United</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Share rice cultivation tips, discuss varieties, market prices, and seasonal challenges</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    2,156 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="wheat" class="w-3 h-3 mr-1"></i>
-                                    Rice
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="wheat" class="w-8 h-8 text-emerald-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors" data-community="rice-farmers-united">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Vegetable Growers Hub</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Vegetable farming techniques, pest control, greenhouse management, and market updates</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    1,834 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="carrot" class="w-3 h-3 mr-1"></i>
-                                    Vegetables
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="carrot" class="w-8 h-8 text-orange-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors" data-community="vegetable-growers-hub">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Smart Farming Technology</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Discuss IoT sensors, precision agriculture, drones, and modern farming equipment</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    976 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="cpu" class="w-3 h-3 mr-1"></i>
-                                    Technology
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="cpu" class="w-8 h-8 text-blue-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors" data-community="smart-farming-technology">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Market & Trade Network</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Real-time market prices, trading opportunities, supply chain discussions</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    1,543 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i>
-                                    Trading
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="trending-up" class="w-8 h-8 text-yellow-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-lg hover:bg-yellow-700 transition-colors" data-community="market-trade-network">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Organic Farming Circle</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Organic certification, natural pest control, soil health, and sustainable practices</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    1,267 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="heart" class="w-3 h-3 mr-1"></i>
-                                    Organic
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="heart" class="w-8 h-8 text-teal-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors" data-community="organic-farming-circle">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Weather & Climate Network</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Weather forecasts, climate adaptation strategies, and seasonal planning</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    2,089 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="cloud-rain" class="w-3 h-3 mr-1"></i>
-                                    Weather
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="cloud-rain" class="w-8 h-8 text-red-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors" data-community="weather-climate-network">
-                        Join Community
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Researcher Communities -->
-        <div id="researcher-communities" class="community-section hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Agricultural Research Network</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Share research findings, collaborate on projects, and discuss methodology</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    456 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="microscope" class="w-3 h-3 mr-1"></i>
-                                    Research
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="microscope" class="w-8 h-8 text-indigo-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors" data-community="agricultural-research-network">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Data Science in Agriculture</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Machine learning, satellite data analysis, predictive modeling, and analytics</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    324 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="bar-chart" class="w-3 h-3 mr-1"></i>
-                                    Data Science
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="bar-chart" class="w-8 h-8 text-cyan-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-cyan-600 text-white text-sm font-medium rounded-lg hover:bg-cyan-700 transition-colors" data-community="data-science-agriculture">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Climate Change Research</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Climate impact studies, adaptation strategies, and environmental research</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    267 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="thermometer" class="w-3 h-3 mr-1"></i>
-                                    Climate
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="thermometer" class="w-8 h-8 text-emerald-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors" data-community="climate-change-research">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Biotechnology & Genetics</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Crop genetics, biotechnology applications, and molecular agriculture research</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    189 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="dna" class="w-3 h-3 mr-1"></i>
-                                    Biotech
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="dna" class="w-8 h-8 text-violet-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors" data-community="biotechnology-genetics">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Publication & Peer Review</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Academic publishing, peer review process, grant applications, and conferences</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    298 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="file-text" class="w-3 h-3 mr-1"></i>
-                                    Publishing
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="file-text" class="w-8 h-8 text-orange-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors" data-community="publication-peer-review">
-                        Join Community
-                    </button>
-                </div>
-
-                <div class="bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">International Collaboration</h3>
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">Global research partnerships, cross-border studies, and international funding</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
-                                    156 members
-                                </span>
-                                <span class="flex items-center">
-                                    <i data-lucide="globe" class="w-3 h-3 mr-1"></i>
-                                    Global
-                                </span>
-                            </div>
-                        </div>
-                        <i data-lucide="globe" class="w-8 h-8 text-pink-600 flex-shrink-0"></i>
-                    </div>
-                    <button class="join-btn w-full px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition-colors" data-community="international-collaboration">
-                        Join Community
-                    </button>
-                </div>
-            </div>
+        <div class="flex gap-3">
+            <a href="/discover" class="flex-1 bg-green-600 text-white text-center py-3 rounded-lg font-medium hover:bg-green-700 transition-colors">
+                <i class="fas fa-search mr-2"></i>Discover Communities
+            </a>
+            <button onclick="showCreatePostModal()" class="flex-1 bg-blue-600 text-white text-center py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>Create Post
+            </button>
         </div>
     </div>
 
-
-    <!-- My Communities Section -->
-    <div id="my-communities" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hidden">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">My Communities</h2>
-        <div id="joined-communities-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Joined communities will be populated here -->
-        </div>
-    </div>
-
-    <!-- Post Creation -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="flex items-center space-x-4 mb-6">
-            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-                <span class="text-white text-lg font-semibold">A</span>
+    <!-- Simple Post Creation -->
+    <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="flex items-center space-x-3 mb-3">
+            <div class="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-semibold">{{ user.full_name[0].upper() if user.full_name else 'U' }}</span>
             </div>
-            <div class="flex-1">
-                <input type="text" placeholder="Share your farming experience or ask a question..." 
-                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-base placeholder-gray-500">
-            </div>
+            <input type="text" 
+                   placeholder="Share your farming experience or ask a question..." 
+                   onclick="showCreatePostModal()"
+                   readonly
+                   class="flex-1 bg-gray-100 rounded-full px-4 py-2 cursor-pointer hover:bg-gray-200 transition-colors">
         </div>
         <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-6">
-                <button class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
-                    <i data-lucide="camera" class="w-5 h-5"></i>
-                    <span class="text-sm font-medium">Photo</span>
+            <div class="flex items-center space-x-4">
+                <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
+                    <i class="fas fa-camera"></i>
+                    <span class="text-sm">Photo</span>
                 </button>
-                <button class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
-                    <i data-lucide="map-pin" class="w-5 h-5"></i>
-                    <span class="text-sm font-medium">Location</span>
+                <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span class="text-sm">Location</span>
                 </button>
-                <button class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
-                    <i data-lucide="tag" class="w-5 h-5"></i>
-                    <span class="text-sm font-medium">Topic</span>
+                <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors">
+                    <i class="fas fa-tags"></i>
+                    <span class="text-sm">Topic</span>
                 </button>
             </div>
-            <button class="px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg font-medium text-sm hover:from-green-700 hover:to-blue-700 transition-all duration-200">
+            <button onclick="showCreatePostModal()" class="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition-colors font-medium">
                 Post
             </button>
         </div>
     </div>
 
-    <!-- Activity Filter -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Community Feed</h3>
-            <button class="text-sm text-green-600 font-medium hover:text-green-700 transition-colors">Filter</button>
-        </div>
-        <div class="flex space-x-3 overflow-x-auto pb-2">
-            <button class="px-4 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white text-sm font-medium rounded-full whitespace-nowrap">
-                All Posts
-            </button>
-            <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-full whitespace-nowrap hover:bg-gray-200 transition-colors">
-                Questions
-            </button>
-            <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-full whitespace-nowrap hover:bg-gray-200 transition-colors">
-                Success Stories
-            </button>
-            <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-full whitespace-nowrap hover:bg-gray-200 transition-colors">
-                Weather Alerts
-            </button>
-            <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-full whitespace-nowrap hover:bg-gray-200 transition-colors">
-                Market Prices
-            </button>
-            <button class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-full whitespace-nowrap hover:bg-gray-200 transition-colors">
-                Tips & Advice
-            </button>
-        </div>
+    <!-- Simple Filter -->
+    <div class="flex gap-2 overflow-x-auto pb-2">
+        <button class="px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium whitespace-nowrap" data-filter="all">
+            All Posts
+        </button>
+        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 whitespace-nowrap" data-filter="questions">
+            Questions
+        </button>
+        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 whitespace-nowrap" data-filter="tips">
+            Tips
+        </button>
+        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 whitespace-nowrap" data-filter="market">
+            Market
+        </button>
+        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 whitespace-nowrap" data-filter="alerts">
+            Alerts
+        </button>
     </div>
 
-    <!-- Community Posts -->
-    <div class="space-y-6">
-        <!-- Expert Alert Post -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-start space-x-4">
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="shield-check" class="w-6 h-6 text-blue-600"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <span class="font-semibold text-gray-900">Dr. Rashida Rahman</span>
-                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">Expert</span>
-                        <span class="text-xs text-gray-500">•</span>
-                        <span class="text-xs text-gray-500">2 hours ago</span>
-                        <span class="text-xs text-gray-500">•</span>
-                        <span class="text-xs text-green-600 font-medium">Agricultural Science</span>
-                    </div>
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                        <div class="flex items-center space-x-2 mb-2">
-                            <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-600"></i>
-                            <span class="text-sm font-semibold text-yellow-900">Weather Alert</span>
-                        </div>
-                        <p class="text-sm text-gray-700 leading-relaxed">Heavy rainfall expected in Sylhet and Chittagong divisions over the next 72 hours. Farmers should protect young seedlings and ensure proper drainage in rice fields.</p>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-6">
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors">
-                                <i data-lucide="heart" class="w-4 h-4"></i>
-                                <span class="text-sm">48</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                                <span class="text-sm">12</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
-                                <i data-lucide="share-2" class="w-4 h-4"></i>
-                                <span class="text-sm">Share</span>
-                            </button>
-                        </div>
-                        <button class="text-sm text-green-600 font-medium hover:text-green-700 transition-colors">View Details</button>
-                    </div>
-                </div>
+    <!-- Community Feed -->
+    <div class="space-y-4" id="community-feed">
+        <!-- Loading State -->
+        <div class="text-center py-12" id="loading-state">
+            <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-green-100 rounded-full">
+                <div class="animate-spin rounded-full h-8 w-8 border-2 border-green-600 border-t-transparent"></div>
             </div>
-        </div>
-
-        <!-- Success Story Post -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-start space-x-4">
-                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="text-white text-sm font-semibold">KA</span>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <span class="font-semibold text-gray-900">Karim Ahmed</span>
-                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Farmer</span>
-                        <span class="text-xs text-gray-500">•</span>
-                        <span class="text-xs text-gray-500">4 hours ago</span>
-                        <span class="text-xs text-gray-500">•</span>
-                        <span class="text-xs text-gray-500">Comilla</span>
-                    </div>
-                    <p class="text-sm text-gray-700 mb-4 leading-relaxed">
-                        🎉 Great news! Following TerraPulse predictions and implementing drip irrigation, my potato yield increased by 35% this season! The soil moisture monitoring really helped optimize water usage.
-                    </p>
-                    <!-- Image placeholder -->
-                    <div class="bg-gradient-to-br from-green-100 to-yellow-100 rounded-lg h-48 flex items-center justify-center mb-4">
-                        <div class="text-center">
-                            <i data-lucide="image" class="w-12 h-12 text-gray-400 mx-auto mb-2"></i>
-                            <p class="text-sm text-gray-500">Potato field harvest photo</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-6">
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors">
-                                <i data-lucide="heart" class="w-4 h-4"></i>
-                                <span class="text-sm">127</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                                <span class="text-sm">23</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
-                                <i data-lucide="share-2" class="w-4 h-4"></i>
-                                <span class="text-sm">Share</span>
-                            </button>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">#SuccessStory</span>
-                            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">#Potato</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Question Post -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-start space-x-4">
-                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="text-white text-sm font-semibold">FA</span>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <span class="font-semibold text-gray-900">Fatima Ali</span>
-                        <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">New Farmer</span>
-                        <span class="text-xs text-gray-500">•</span>
-                        <span class="text-xs text-gray-500">6 hours ago</span>
-                        <span class="text-xs text-gray-500">•</span>
-                        <span class="text-xs text-gray-500">Rangpur</span>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <div class="flex items-center space-x-2 mb-2">
-                            <i data-lucide="help-circle" class="w-5 h-5 text-blue-600"></i>
-                            <span class="text-sm font-semibold text-blue-900">Question</span>
-                        </div>
-                        <p class="text-sm text-gray-700 leading-relaxed">My rice plants are showing yellow leaves in some patches. Soil pH is 6.8, moisture is good. Any ideas what might be causing this? Should I be worried about the upcoming harvest?</p>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-6">
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors">
-                                <i data-lucide="heart" class="w-4 h-4"></i>
-                                <span class="text-sm">8</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                                <span class="text-sm">15</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
-                                <i data-lucide="share-2" class="w-4 h-4"></i>
-                                <span class="text-sm">Share</span>
-                            </button>
-                        </div>
-                        <button class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                            Answer
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Market Price Update -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-start space-x-4">
-                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="trending-up" class="w-6 h-6 text-orange-600"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <span class="font-semibold text-gray-900">Market Price Bot</span>
-                        <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">Automated</span>
-                        <span class="text-xs text-gray-500">•</span>
-                        <span class="text-xs text-gray-500">8 hours ago</span>
-                    </div>
-                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-                        <div class="flex items-center space-x-2 mb-4">
-                            <i data-lucide="dollar-sign" class="w-5 h-5 text-orange-600"></i>
-                            <span class="text-sm font-semibold text-orange-900">Today's Market Prices</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-white p-3 rounded-lg border">
-                                <p class="text-xs text-gray-600 mb-1">Rice (per kg)</p>
-                                <p class="text-sm font-bold text-gray-900">৳45</p>
-                                <p class="text-xs text-green-600 font-medium">+2% ↗</p>
-                            </div>
-                            <div class="bg-white p-3 rounded-lg border">
-                                <p class="text-xs text-gray-600 mb-1">Wheat (per kg)</p>
-                                <p class="text-sm font-bold text-gray-900">৳38</p>
-                                <p class="text-xs text-red-600 font-medium">-1% ↘</p>
-                            </div>
-                            <div class="bg-white p-3 rounded-lg border">
-                                <p class="text-xs text-gray-600 mb-1">Potato (per kg)</p>
-                                <p class="text-sm font-bold text-gray-900">৳25</p>
-                                <p class="text-xs text-green-600 font-medium">+5% ↗</p>
-                            </div>
-                            <div class="bg-white p-3 rounded-lg border">
-                                <p class="text-xs text-gray-600 mb-1">Tomato (per kg)</p>
-                                <p class="text-sm font-bold text-gray-900">৳60</p>
-                                <p class="text-xs text-orange-600 font-medium">No change</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-6">
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors">
-                                <i data-lucide="heart" class="w-4 h-4"></i>
-                                <span class="text-sm">34</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                                <span class="text-sm">7</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
-                                <i data-lucide="share-2" class="w-4 h-4"></i>
-                                <span class="text-sm">Share</span>
-                            </button>
-                        </div>
-                        <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">#MarketUpdate</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Training Workshop Post -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-start space-x-4">
-                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="calendar" class="w-6 h-6 text-indigo-600"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <span class="font-semibold text-gray-900">Agricultural Extension Office</span>
-                        <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full">Official</span>
-                        <span class="text-xs text-gray-500">•</span>
-                        <span class="text-xs text-gray-500">12 hours ago</span>
-                    </div>
-                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-4">
-                        <div class="flex items-center space-x-2 mb-3">
-                            <i data-lucide="calendar" class="w-5 h-5 text-indigo-600"></i>
-                            <span class="text-sm font-semibold text-indigo-900">Training Workshop</span>
-                        </div>
-                        <h4 class="font-semibold text-gray-900 mb-2 text-base">Modern Rice Cultivation Techniques</h4>
-                        <p class="text-sm text-gray-700 mb-3 leading-relaxed">Learn about high-yield varieties, proper fertilization, and integrated pest management.</p>
-                        <div class="flex flex-wrap gap-4 text-xs text-gray-600">
-                            <span class="flex items-center">
-                                <i data-lucide="calendar" class="w-3 h-3 mr-1"></i>
-                                October 15-16, 2025
-                            </span>
-                            <span class="flex items-center">
-                                <i data-lucide="map-pin" class="w-3 h-3 mr-1"></i>
-                                Dhaka Agricultural Training Center
-                            </span>
-                            <span class="flex items-center">
-                                <i data-lucide="ticket" class="w-3 h-3 mr-1"></i>
-                                Free Registration
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-6">
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors">
-                                <i data-lucide="heart" class="w-4 h-4"></i>
-                                <span class="text-sm">56</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
-                                <i data-lucide="message-circle" class="w-4 h-4"></i>
-                                <span class="text-sm">18</span>
-                            </button>
-                            <button class="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
-                                <i data-lucide="share-2" class="w-4 h-4"></i>
-                                <span class="text-sm">Share</span>
-                            </button>
-                        </div>
-                        <button class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
-                            Register
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Loading Community Posts</h3>
+            <p class="text-gray-600">Getting the latest updates from your community...</p>
         </div>
     </div>
 
     <!-- Load More -->
-    <div class="text-center py-8">
-        <button class="px-8 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+    <div class="text-center py-6">
+        <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+            <i class="fas fa-refresh mr-2"></i>
             Load More Posts
         </button>
+    </div>
+</div>
+
+<!-- Create Post Modal -->
+<div id="createPostModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-4 border-b">
+            <h3 class="text-lg font-semibold">Create Post</h3>
+            <button onclick="hideCreatePostModal()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <form id="createPostForm" enctype="multipart/form-data" class="p-4 space-y-4">
+            <!-- User Info -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center">
+                    <span class="text-white text-sm font-semibold">{{ user.full_name[0].upper() if user.full_name else 'U' }}</span>
+                </div>
+                <div>
+                    <p class="font-medium">{{ user.full_name or user.username or 'User' }}</p>
+                    <select id="postCommunity" name="community_id" class="text-sm bg-gray-100 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                        <option value="">Select community...</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Post Content -->
+            <textarea id="modalPostContent" 
+                     name="content" 
+                     placeholder="What's happening in your farm?" 
+                     class="w-full h-32 p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                     maxlength="5000"
+                     required></textarea>
+            
+            <!-- Post Type Selection -->
+            <div class="border-t pt-4">
+                <label class="block text-sm font-medium mb-2">Post Type</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50 post-type-option" data-type="text">
+                        <input type="radio" name="post_type" value="text" checked class="text-green-600">
+                        <i class="fas fa-align-left text-gray-600"></i>
+                        <span class="text-sm">Text</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50 post-type-option" data-type="image">
+                        <input type="radio" name="post_type" value="image" class="text-green-600">
+                        <i class="fas fa-image text-gray-600"></i>
+                        <span class="text-sm">Photo</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50 post-type-option" data-type="alert">
+                        <input type="radio" name="post_type" value="alert" class="text-green-600">
+                        <i class="fas fa-exclamation-triangle text-orange-500"></i>
+                        <span class="text-sm">Alert</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50 post-type-option" data-type="market">
+                        <input type="radio" name="post_type" value="market" class="text-green-600">
+                        <i class="fas fa-chart-line text-blue-500"></i>
+                        <span class="text-sm">Market</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Topic Selection -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Topic</label>
+                <select id="postTopic" name="topic" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="">Select a topic...</option>
+                </select>
+            </div>
+            
+            <!-- Photo Upload -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Photo (optional)</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <input type="file" 
+                           id="postImage" 
+                           name="image" 
+                           accept="image/*" 
+                           class="hidden" 
+                           onchange="handleImageUpload(event)">
+                    <div id="imageUploadArea" class="text-center cursor-pointer" onclick="document.getElementById('postImage').click()">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-600">Click to upload a photo</p>
+                        <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB</p>
+                    </div>
+                    <div id="imagePreview" class="hidden mt-3">
+                        <img id="previewImg" src="" alt="Preview" class="max-w-full h-48 object-cover rounded">
+                        <button type="button" onclick="removeImage()" class="mt-2 text-red-600 text-sm hover:underline">
+                            <i class="fas fa-times"></i> Remove image
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Location -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Location (optional)</label>
+                <div class="flex space-x-2">
+                    <select id="postLocation" name="location" class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Select district...</option>
+                    </select>
+                    <button type="button" onclick="getCurrentLocation()" class="px-3 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tags -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Tags (optional)</label>
+                <input type="text" 
+                       id="postTags" 
+                       name="tags" 
+                       placeholder="Add tags separated by commas..." 
+                       class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <p class="text-xs text-gray-500 mt-1">e.g., rice, irrigation, pest-control</p>
+            </div>
+            
+            <!-- Alert-specific fields -->
+            <div id="alertFields" class="hidden space-y-3">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Alert Type</label>
+                    <select name="alert_type" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="general">General Alert</option>
+                        <option value="weather">Weather Alert</option>
+                        <option value="pest">Pest Alert</option>
+                        <option value="disease">Disease Alert</option>
+                        <option value="market">Market Alert</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Severity</label>
+                    <select name="alert_severity" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Market-specific fields -->
+            <div id="marketFields" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Crop</label>
+                        <input type="text" name="market_crop" placeholder="e.g., Rice, Wheat" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Price (BDT)</label>
+                        <input type="number" name="market_price" placeholder="0.00" step="0.01" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Unit</label>
+                        <select name="market_unit" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="kg">Per kg</option>
+                            <option value="maund">Per maund</option>
+                            <option value="ton">Per ton</option>
+                            <option value="piece">Per piece</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Market Location</label>
+                        <input type="text" name="market_location" placeholder="Market name" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Character count -->
+            <div class="text-right">
+                <span id="charCount" class="text-sm text-gray-500">0/5000</span>
+            </div>
+            
+            <!-- Submit buttons -->
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                <button type="button" onclick="hideCreatePostModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                    Cancel
+                </button>
+                <button type="submit" id="submitPostBtn" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="submitBtnText">Post</span>
+                    <i id="submitBtnLoader" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Custom Notification Modal -->
+<div id="customNotificationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all duration-300 scale-95 opacity-0" id="customModalContent">
+        <div class="p-6 text-center">
+            <!-- Icon -->
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4" id="modalIcon">
+                <i class="w-6 h-6" id="modalIconElement"></i>
+            </div>
+            
+            <!-- Title -->
+            <h3 class="text-lg font-medium text-gray-900 mb-2" id="modalTitle">Notification</h3>
+            
+            <!-- Message -->
+            <p class="text-sm text-gray-500 mb-6" id="modalMessage">Message content</p>
+            
+            <!-- Button -->
+            <button type="button" onclick="hideCustomModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm transition-colors" id="modalButton">
+                OK
+            </button>
+        </div>
     </div>
 </div>
 
@@ -765,220 +332,1695 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Community functionality
     const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
-    const userProfile = sessionStorage.getItem('userProfile') || 'farmer'; // Default to farmer
+    const userProfile = '{{ user.profile_type if user.profile_type else "farmer" }}'; // Get from server
     
-    // Display user profile and communities based on profile
+    // Initialize community page for the current cleaned layout
     function initializeCommunities() {
-        const profileBadge = document.getElementById('user-profile-badge');
-        const studentCommunities = document.getElementById('student-communities');
-        const farmerCommunities = document.getElementById('farmer-communities');
-        const researcherCommunities = document.getElementById('researcher-communities');
+        // Simply initialize the community manager for the feed
+        console.log('Initializing community page for profile:', userProfile);
         
-        // Hide all community sections first
-        document.querySelectorAll('.community-section').forEach(section => {
-            section.classList.add('hidden');
-        });
-        
-        // Set profile badge and show relevant communities
-        switch(userProfile.toLowerCase()) {
-            case 'student':
-                profileBadge.textContent = 'Student';
-                profileBadge.className = 'px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded border';
-                studentCommunities.classList.remove('hidden');
-                break;
-            case 'farmer':
-                profileBadge.textContent = 'Farmer';
-                profileBadge.className = 'px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded border';
-                farmerCommunities.classList.remove('hidden');
-                break;
-            case 'researcher':
-                profileBadge.textContent = 'Researcher';
-                profileBadge.className = 'px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded border';
-                researcherCommunities.classList.remove('hidden');
-                break;
-            default:
-                profileBadge.textContent = 'Farmer';
-                profileBadge.className = 'px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded border';
-                farmerCommunities.classList.remove('hidden');
+        // Initialize community feed
+        if (typeof communityManager !== 'undefined') {
+            communityManager.loadCommunityFeed();
         }
-        
-        updateJoinButtonStates();
-        updateMyCommunities();
     }
-    
-    // Update join button states based on joined communities
-    function updateJoinButtonStates() {
-        document.querySelectorAll('.join-btn').forEach(button => {
-            const communityId = button.getAttribute('data-community');
-            if (joinedCommunities.includes(communityId)) {
-                button.textContent = 'Joined ✓';
-                button.classList.remove('bg-blue-600', 'bg-green-600', 'bg-orange-600', 'bg-purple-600', 
-                                       'bg-yellow-600', 'bg-teal-600', 'bg-red-600', 'bg-indigo-600', 
-                                       'bg-cyan-600', 'bg-emerald-600', 'bg-violet-600', 'bg-pink-600');
-                button.classList.add('bg-gray-600');
-                button.classList.remove('hover:bg-blue-700', 'hover:bg-green-700', 'hover:bg-orange-700', 
-                                       'hover:bg-purple-700', 'hover:bg-yellow-700', 'hover:bg-teal-700', 
-                                       'hover:bg-red-700', 'hover:bg-indigo-700', 'hover:bg-cyan-700', 
-                                       'hover:bg-emerald-700', 'hover:bg-violet-700', 'hover:bg-pink-700');
-                button.classList.add('hover:bg-gray-700');
-            }
-        });
-    }
-    
-    // Handle join/leave community
-    function handleCommunityJoin(communityId, button) {
-        const communityCard = button.closest('.community-card');
-        const communityName = communityCard.querySelector('h3').textContent;
-        
-        if (joinedCommunities.includes(communityId)) {
-            // Leave community
-            const index = joinedCommunities.indexOf(communityId);
-            joinedCommunities.splice(index, 1);
-            button.textContent = 'Join Community';
-            
-            // Restore original button styling
-            const originalClasses = getOriginalButtonClasses(communityId);
-            button.className = `join-btn w-full px-4 py-2 text-white text-sm font-medium rounded transition-colors ${originalClasses}`;
-            
-            showNotification(`Left ${communityName}`, 'info');
-        } else {
-            // Join community
+
+    // Join community functionality
+    function joinCommunity(communityId) {
+        if (!joinedCommunities.includes(communityId)) {
             joinedCommunities.push(communityId);
-            button.textContent = 'Joined ✓';
-            button.className = 'join-btn w-full px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded hover:bg-gray-700 transition-colors';
+            localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
             
-            showNotification(`Joined ${communityName}!`, 'success');
+            // Update button text
+            const button = document.querySelector(`[data-community="${communityId}"]`);
+            if (button) {
+                button.textContent = 'Joined';
+                button.className = button.className.replace(/bg-\w+-600/, 'bg-green-600');
+                button.disabled = true;
+            }
+            
+            updateMyCommunities();
         }
-        
-        localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
-        updateMyCommunities();
     }
-    
-    // Get original button styling based on community type
-    function getOriginalButtonClasses(communityId) {
-        const colorMap = {
-            'agricultural-science-students': 'bg-blue-600 hover:bg-blue-700',
-            'sustainable-agriculture-club': 'bg-green-600 hover:bg-green-700',
-            'future-farmers-network': 'bg-purple-600 hover:bg-purple-700',
-            'study-groups-tutorials': 'bg-orange-600 hover:bg-orange-700',
-            'rice-farmers-united': 'bg-green-600 hover:bg-green-700',
-            'vegetable-growers-hub': 'bg-orange-600 hover:bg-orange-700',
-            'smart-farming-technology': 'bg-blue-600 hover:bg-blue-700',
-            'market-trade-network': 'bg-yellow-600 hover:bg-yellow-700',
-            'organic-farming-circle': 'bg-teal-600 hover:bg-teal-700',
-            'weather-climate-network': 'bg-red-600 hover:bg-red-700',
-            'agricultural-research-network': 'bg-indigo-600 hover:bg-indigo-700',
-            'data-science-agriculture': 'bg-cyan-600 hover:bg-cyan-700',
-            'climate-change-research': 'bg-emerald-600 hover:bg-emerald-700',
-            'biotechnology-genetics': 'bg-violet-600 hover:bg-violet-700',
-            'publication-peer-review': 'bg-orange-600 hover:bg-orange-700',
-            'international-collaboration': 'bg-pink-600 hover:bg-pink-700'
-        };
-        return colorMap[communityId] || 'bg-blue-600 hover:bg-blue-700';
-    }
-    
-    // Update My Communities section
+
+    // Update my communities section - simplified for clean layout
     function updateMyCommunities() {
-        const myCommunitiesSection = document.getElementById('my-communities');
-        const joinedCommunitiesList = document.getElementById('joined-communities-list');
+        // This function can be simplified since we moved discovery to separate page
+        console.log('User has joined communities:', joinedCommunities);
+        // The joined communities are now handled in the main feed
+    }
+
+    // Filter functionality for the clean layout
+    function initializeFilters() {
+        const filterButtons = document.querySelectorAll('[data-filter]');
         
-        if (joinedCommunities.length === 0) {
-            myCommunitiesSection.classList.add('hidden');
-            return;
-        }
-        
-        myCommunitiesSection.classList.remove('hidden');
-        
-        // Get community details
-        const communityDetails = {
-            'agricultural-science-students': { name: 'Agricultural Science Students', icon: '🎓', color: 'blue' },
-            'sustainable-agriculture-club': { name: 'Sustainable Agriculture Club', icon: '🌱', color: 'green' },
-            'future-farmers-network': { name: 'Future Farmers Network', icon: '🚀', color: 'purple' },
-            'study-groups-tutorials': { name: 'Study Groups & Tutorials', icon: '📖', color: 'orange' },
-            'rice-farmers-united': { name: 'Rice Farmers United', icon: '🌾', color: 'green' },
-            'vegetable-growers-hub': { name: 'Vegetable Growers Hub', icon: '🥕', color: 'orange' },
-            'smart-farming-technology': { name: 'Smart Farming Technology', icon: '🤖', color: 'blue' },
-            'market-trade-network': { name: 'Market & Trade Network', icon: '💰', color: 'yellow' },
-            'organic-farming-circle': { name: 'Organic Farming Circle', icon: '🌿', color: 'teal' },
-            'weather-climate-network': { name: 'Weather & Climate Network', icon: '🌤️', color: 'red' },
-            'agricultural-research-network': { name: 'Agricultural Research Network', icon: '🔬', color: 'indigo' },
-            'data-science-agriculture': { name: 'Data Science in Agriculture', icon: '📊', color: 'cyan' },
-            'climate-change-research': { name: 'Climate Change Research', icon: '🌍', color: 'emerald' },
-            'biotechnology-genetics': { name: 'Biotechnology & Genetics', icon: '🧬', color: 'violet' },
-            'publication-peer-review': { name: 'Publication & Peer Review', icon: '📄', color: 'orange' },
-            'international-collaboration': { name: 'International Collaboration', icon: '🌐', color: 'pink' }
-        };
-        
-        const html = joinedCommunities.map(communityId => {
-            const details = communityDetails[communityId];
-            if (!details) return '';
-            
-            return `
-                <div class="bg-gradient-to-r from-${details.color}-50 to-${details.color}-100 border border-${details.color}-200 rounded-lg p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-2xl">${details.icon}</span>
-                            <h3 class="font-semibold text-gray-900 text-sm">${details.name}</h3>
-                        </div>
-                        <button class="leave-btn text-gray-500 hover:text-red-500 transition-colors" data-community="${communityId}">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                    <p class="text-xs text-gray-600">Member since today</p>
-                </div>
-            `;
-        }).join('');
-        
-        joinedCommunitiesList.innerHTML = html;
-        
-        // Re-initialize Lucide icons for the new content
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-        
-        // Add event listeners for leave buttons
-        document.querySelectorAll('.leave-btn').forEach(button => {
+        filterButtons.forEach(button => {
             button.addEventListener('click', function() {
-                const communityId = this.getAttribute('data-community');
-                const index = joinedCommunities.indexOf(communityId);
-                if (index > -1) {
-                    joinedCommunities.splice(index, 1);
-                    localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
-                    updateJoinButtonStates();
-                    updateMyCommunities();
-                    showNotification('Left community', 'info');
+                const filter = this.dataset.filter;
+                
+                // Update active filter
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('bg-green-600', 'text-white');
+                    btn.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+                });
+                
+                this.classList.remove('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+                this.classList.add('bg-green-600', 'text-white');
+                
+                // Filter posts
+                console.log(`Filtering posts by: ${filter}`);
+                if (typeof communityManager !== 'undefined') {
+                    communityManager.filterPosts(filter);
                 }
             });
         });
     }
+
+    // Event listeners
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('join-btn')) {
+            const communityId = e.target.dataset.community;
+            joinCommunity(communityId);
+        }
+    });
+
+    // Initialize everything
+    initializeCommunities();
+    updateMyCommunities();
+    initializeFilters();
     
-    // Show notification
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 ${
-            type === 'success' ? 'bg-green-500 text-white' : 
-            type === 'error' ? 'bg-red-500 text-white' : 
-            'bg-blue-500 text-white'
-        }`;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
     }
+});
+
+// Mobile responsive utilities
+function initializeMobileFeatures() {
+    // Touch gestures for mobile
+    let startX = 0;
+    let startY = 0;
     
-    // Add event listeners for join buttons
-    document.querySelectorAll('.join-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const communityId = this.getAttribute('data-community');
-            handleCommunityJoin(communityId, this);
-        });
+    document.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
     });
     
-    // Initialize communities on page load
-    initializeCommunities();
+    document.addEventListener('touchend', function(e) {
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        
+        // Simple swipe detection for future enhancements
+        const diffX = startX - endX;
+        const diffY = startY - endY;
+        
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            // Horizontal swipe detected
+            console.log(diffX > 0 ? 'Swiped left' : 'Swiped right');
+        }
+    });
+}
+
+// Initialize mobile features when DOM is ready
+document.addEventListener('DOMContentLoaded', initializeMobileFeatures);
+</script>
+
+<style>
+/* Mobile-first responsive enhancements */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Enhanced mobile touch targets */
+@media (max-width: 640px) {
+    .community-card {
+        min-height: 180px;
+    }
+    
+    .post-card {
+        margin-bottom: 1rem;
+    }
+    
+    button, .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Improved spacing for small screens */
+    .space-y-4 > * + * {
+        margin-top: 1rem;
+    }
+    
+    .space-y-6 > * + * {
+        margin-top: 1.5rem;
+    }
+}
+
+/* Enhanced hover states for better interaction feedback */
+.community-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.post-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Modal styles */
+.modal-backdrop {
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.post-type-option.selected {
+    border-color: #059669;
+    background-color: #f0fdf4;
+}
+
+.image-upload-area:hover {
+    border-color: #059669;
+    background-color: #f9fafb;
+}
+
+/* File upload styling */
+.file-upload-preview {
+    position: relative;
+}
+
+.file-upload-preview img {
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Form field styling */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+/* Character counter styling */
+.char-counter {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.char-counter.warning {
+    color: #f59e0b;
+}
+
+.char-counter.danger {
+    color: #ef4444;
+}
+
+/* Button loading state */
+.btn-loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+/* Location button styling */
+.location-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    background-color: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.location-btn:hover {
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+}
+
+/* Grid responsive adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 1rem;
+        max-height: calc(100vh - 2rem);
+    }
+    
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .md\\:grid-cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Smooth transitions for better UX */
+* {
+    transition: all 0.2s ease;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #059669;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Fix gradient backgrounds that were not displaying properly */
+.bg-gradient-nature {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    color: white;
+}
+
+.bg-gradient-nature * {
+    color: white !important;
+}
+
+.bg-terra-gradient {
+    background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+    color: white;
+}
+
+.bg-blue-gradient {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+    color: white;
+}
+
+.bg-emerald-gradient {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    color: white;
+}
+
+.bg-indigo-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+    color: white;
+}
+
+.bg-purple-gradient {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+    color: white;
+}
+
+.bg-red-gradient {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+    color: white;
+}
+
+.bg-yellow-gradient {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+    color: white;
+}
+
+/* Ensure text is visible on gradient backgrounds */
+.bg-gradient-nature *,
+.bg-terra-gradient *,
+.bg-blue-gradient *,
+.bg-emerald-gradient *,
+.bg-indigo-gradient *,
+.bg-purple-gradient *,
+.bg-red-gradient *,
+.bg-yellow-gradient * {
+    color: white !important;
+}
+
+/* Post card styling */
+.post-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #f3f4f6;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+}
+
+.post-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+}
+
+/* Badge styling */
+.badge-light {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.badge-gray {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.badge-blue {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-green {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+.badge-red {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-purple {
+    background-color: #ede9fe;
+    color: #7c2d12;
+}
+
+.badge-yellow {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.badge-terra {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+/* Card light styling */
+.card-light {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #f3f4f6;
+}
+
+/* Profile picture styling */
+.profile-pic {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #f3f4f6;
+}
+
+.profile-pic-fallback {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    color: white;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    border: 2px solid #f3f4f6;
+}
+
+@media (max-width: 640px) {
+    .profile-pic,
+    .profile-pic-fallback {
+        width: 40px;
+        height: 40px;
+        font-size: 0.875rem;
+    }
+}
+
+/* Post interaction buttons */
+.post-interaction {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    color: #6b7280;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.post-interaction:hover {
+    color: #059669;
+    background-color: #f0fdf4;
+}
+
+.post-interaction.liked {
+    color: #dc2626;
+}
+
+.post-interaction.liked:hover {
+    color: #b91c1c;
+}
+</style>
+
+<script>
+class CommunityManager {
+    constructor() {
+        console.log('CommunityManager constructor called');
+        this.currentFilter = 'all';
+        this.posts = [];
+        this.communities = [];
+        this.loading = false;
+        this.init();
+    }
+
+    init() {
+        console.log('CommunityManager init called');
+        this.setupEventListeners();
+        this.loadInitialData();
+        this.setupProfileBasedView();
+    }
+
+    setupEventListeners() {
+        // Filter tabs
+        document.querySelectorAll('[data-filter]').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const filter = tab.getAttribute('data-filter');
+                this.setActiveFilter(filter);
+                this.filterPosts(filter);
+            });
+        });
+
+        // Community join/leave buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('[data-join-community]')) {
+                e.preventDefault();
+                const communityId = e.target.closest('[data-join-community]').getAttribute('data-join-community');
+                this.joinCommunity(communityId);
+            }
+            
+            if (e.target.closest('[data-leave-community]')) {
+                e.preventDefault();
+                const communityId = e.target.closest('[data-leave-community]').getAttribute('data-leave-community');
+                this.leaveCommunity(communityId);
+            }
+        });
+
+        // Post interactions
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('[data-like-post]')) {
+                e.preventDefault();
+                const postId = e.target.closest('[data-like-post]').getAttribute('data-like-post');
+                this.likePost(postId);
+            }
+            
+            if (e.target.closest('[data-comment-post]')) {
+                e.preventDefault();
+                const postId = e.target.closest('[data-comment-post]').getAttribute('data-comment-post');
+                this.toggleCommentSection(postId);
+            }
+        });
+
+        // Post creation
+        document.getElementById('create-post-btn')?.addEventListener('click', () => {
+            this.showCreatePostModal();
+        });
+
+        // Search communities - simplified for clean layout
+        const searchInput = document.querySelector('input[placeholder*="search"]');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    this.searchCommunities(e.target.value);
+                }, 300);
+            });
+        }
+    }
+
+    setupProfileBasedView() {
+        // Simplified profile setup for clean layout
+        const userProfile = '{{ user.profile_type if user.profile_type else "general" }}';
+        console.log('Setting up profile-based view for:', userProfile);
+        
+        // No specific sections to toggle in the clean layout
+        // The feed is universal and profile-based filtering happens server-side
+    }
+
+    async loadInitialData() {
+        try {
+            console.log('Starting to load initial data...');
+            this.setLoading(true);
+            
+            // Load feed data
+            await Promise.all([
+                this.loadCommunityFeed(),
+                this.loadUserCommunities(),
+                this.loadSuggestedCommunities(),
+                this.loadCommunityStats()
+            ]);
+            
+            console.log('All initial data loaded successfully');
+        } catch (error) {
+            console.error('Error loading initial data:', error);
+            this.showError('Failed to load community data');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    async loadCommunityFeed(filter = 'all') {
+        try {
+            console.log('Loading community feed with filter:', filter);
+            const response = await fetch(`/api/community/feed?type=${filter}&limit=20`);
+            console.log('Feed response status:', response.status);
+            const data = await response.json();
+            console.log('Feed data received:', data);
+            
+            if (data.success) {
+                this.posts = data.posts;
+                this.renderFeed(data.posts);
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Error loading feed:', error);
+            this.showError('Failed to load community feed');
+        }
+    }
+
+    async loadUserCommunities() {
+        try {
+            const response = await fetch('/api/community/my-communities');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.communities = data.communities;
+                this.renderUserCommunities(data.communities);
+            }
+        } catch (error) {
+            console.error('Error loading user communities:', error);
+        }
+    }
+
+    async loadSuggestedCommunities() {
+        try {
+            const response = await fetch('/api/community/suggested');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.renderSuggestedCommunities(data.communities);
+            }
+        } catch (error) {
+            console.error('Error loading suggested communities:', error);
+        }
+    }
+
+    async loadCommunityStats() {
+        try {
+            const response = await fetch('/api/community/stats');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateStats(data.stats);
+            }
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    async joinCommunity(communityId) {
+        try {
+            const response = await fetch('/api/community/join', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ community_id: parseInt(communityId) })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showSuccess('Successfully joined community!');
+                this.updateCommunityButton(communityId, 'joined');
+                await this.loadUserCommunities(); // Refresh communities
+            } else {
+                this.showError(data.message || 'Failed to join community');
+            }
+        } catch (error) {
+            console.error('Error joining community:', error);
+            this.showError('Failed to join community');
+        }
+    }
+
+    async leaveCommunity(communityId) {
+        try {
+            const response = await fetch('/api/community/leave', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ community_id: parseInt(communityId) })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showSuccess('Successfully left community');
+                this.updateCommunityButton(communityId, 'left');
+                await this.loadUserCommunities(); // Refresh communities
+            } else {
+                this.showError(data.message || 'Failed to leave community');
+            }
+        } catch (error) {
+            console.error('Error leaving community:', error);
+            this.showError('Failed to leave community');
+        }
+    }
+
+    async likePost(postId) {
+        try {
+            const response = await fetch(`/api/community/post/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updatePostLike(postId, data.is_liked, data.likes_count);
+            } else {
+                this.showError(data.message || 'Failed to like post');
+            }
+        } catch (error) {
+            console.error('Error liking post:', error);
+            this.showError('Failed to like post');
+        }
+    }
+
+    async searchCommunities(query) {
+        if (!query.trim()) {
+            this.renderSuggestedCommunities([]);
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/community/search?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.renderSearchResults(data.communities);
+            }
+        } catch (error) {
+            console.error('Error searching communities:', error);
+        }
+    }
+
+    setActiveFilter(filter) {
+        this.currentFilter = filter;
+        
+        // Update UI
+        document.querySelectorAll('[data-filter]').forEach(tab => {
+            tab.classList.remove('active', 'bg-terra-600', 'text-white');
+            tab.classList.add('text-gray-600', 'hover:text-gray-900');
+        });
+        
+        document.querySelector(`[data-filter="${filter}"]`)?.classList.add('active', 'bg-terra-600', 'text-white');
+    }
+
+    filterPosts(filter) {
+        this.loadCommunityFeed(filter);
+    }
+
+    renderFeed(posts) {
+        const feedContainer = document.getElementById('community-feed');
+        if (!feedContainer) return;
+
+        if (posts.length === 0) {
+            feedContainer.innerHTML = `
+                <div class="text-center py-16">
+                    <div class="inline-flex items-center justify-center w-20 h-20 mb-6 bg-gray-100 rounded-full">
+                        <i class="fas fa-comments text-3xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">No posts yet</h3>
+                    <p class="text-gray-600 mb-6 max-w-md mx-auto">
+                        Be the first to share something with the community! Start a conversation, ask a question, or share your farming experiences.
+                    </p>
+                    <button id="create-post-btn" class="inline-flex items-center px-6 py-3 bg-terra-600 text-white font-medium rounded-lg hover:bg-terra-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Create First Post
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        feedContainer.innerHTML = posts.map(post => this.createPostHTML(post)).join('');
+    }
+
+    createPostHTML(post) {
+        const timeAgo = this.formatTimeAgo(post.created_at);
+        const postTypeIcon = this.getPostTypeIcon(post.post_type);
+        const postTypeColor = this.getPostTypeColor(post.post_type);
+        const authorName = post.author.full_name || post.author.username || 'Unknown User';
+        const authorInitials = this.getAuthorInitials(authorName);
+        const profilePicUrl = this.getProfilePictureUrl(post.author);
+        
+        return `
+            <div class="post-card p-4 sm:p-6" data-post-id="${post.id}">
+                <div class="flex items-start space-x-3 sm:space-x-4">
+                    <!-- Profile Picture -->
+                    <div class="flex-shrink-0">
+                        <img src="${profilePicUrl}" 
+                             alt="${authorName}" 
+                             class="profile-pic"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="profile-pic-fallback" style="display: none;">
+                            <span>${authorInitials}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Post Content -->
+                    <div class="flex-1 min-w-0">
+                        <!-- Post Header -->
+                        <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+                            <div class="flex items-center space-x-2 flex-wrap">
+                                <h4 class="text-sm sm:text-base font-semibold text-gray-900">
+                                    ${authorName}
+                                </h4>
+                                <span class="badge-light badge-${postTypeColor}">
+                                    <i class="${postTypeIcon} mr-1"></i>
+                                    ${post.post_type.charAt(0).toUpperCase() + post.post_type.slice(1)}
+                                </span>
+                                ${this.getUserTypeBadge(post.author)}
+                            </div>
+                            <div class="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
+                                <i class="fas fa-clock"></i>
+                                <span>${timeAgo}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Post Title -->
+                        ${post.title ? `<h5 class="text-lg font-semibold text-gray-900 mb-3">${this.escapeHtml(post.title)}</h5>` : ''}
+                        
+                        <!-- Post Content -->
+                        <div class="mb-4">
+                            <p class="text-gray-700 text-sm sm:text-base leading-relaxed">${this.escapeHtml(post.content)}</p>
+                        </div>
+                        
+                        <!-- Post Metadata (alerts, market info, events) -->
+                        ${this.createPostMetadata(post)}
+                        
+                        <!-- Post Actions -->
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                            <div class="flex items-center space-x-1">
+                                <button data-like-post="${post.id}" class="post-interaction ${post.is_liked ? 'liked' : ''}">
+                                    <i class="fas fa-heart"></i>
+                                    <span>${post.likes_count || 0}</span>
+                                </button>
+                                <button data-comment-post="${post.id}" class="post-interaction">
+                                    <i class="fas fa-comment"></i>
+                                    <span>${post.comments_count || 0}</span>
+                                </button>
+                                <button class="post-interaction">
+                                    <i class="fas fa-share"></i>
+                                    <span>Share</span>
+                                </button>
+                            </div>
+                            ${post.location ? `
+                                <div class="flex items-center text-xs text-gray-500">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    <span>${this.escapeHtml(post.location)}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    createPostMetadata(post) {
+        let metadata = '';
+        
+        if (post.post_type === 'alert' && post.alert_type) {
+            const severityColors = {
+                'low': { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', icon: 'text-green-600' },
+                'medium': { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-800', icon: 'text-yellow-600' },
+                'high': { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', icon: 'text-orange-600' },
+                'critical': { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-800', icon: 'text-red-600' }
+            };
+            
+            const colors = severityColors[post.alert_severity] || severityColors['medium'];
+            
+            metadata += `
+                <div class="mb-4 p-3 ${colors.bg} ${colors.border} border rounded-lg">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fas fa-exclamation-triangle ${colors.icon}"></i>
+                        <span class="font-semibold ${colors.text}">
+                            ${post.alert_type.charAt(0).toUpperCase() + post.alert_type.slice(1)} Alert
+                        </span>
+                        <span class="badge-light badge-${post.alert_severity === 'critical' ? 'red' : post.alert_severity === 'high' ? 'yellow' : 'green'}">${post.alert_severity.toUpperCase()}</span>
+                    </div>
+                    ${post.alert_expires_at ? `
+                        <p class="text-sm ${colors.text}">
+                            <i class="fas fa-clock mr-1"></i>
+                            Expires: ${new Date(post.alert_expires_at).toLocaleDateString()}
+                        </p>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        if (post.post_type === 'market' && post.market_price) {
+            metadata += `
+                <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-store text-blue-600"></i>
+                            <span class="font-semibold text-blue-800">${post.market_crop || 'Product'}</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-blue-900">৳${post.market_price}</div>
+                            <div class="text-sm text-blue-700">per ${post.market_unit || 'unit'}</div>
+                        </div>
+                    </div>
+                    ${post.market_location ? `
+                        <p class="text-sm text-blue-700 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            ${this.escapeHtml(post.market_location)}
+                        </p>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        if (post.post_type === 'event' && post.event_date) {
+            const eventDate = new Date(post.event_date);
+            const formattedDate = eventDate.toLocaleDateString('en-GB', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            });
+            const formattedTime = eventDate.toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            metadata += `
+                <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-calendar-alt text-purple-600 mt-1"></i>
+                        <div class="flex-1">
+                            <div class="font-semibold text-purple-800 mb-1">
+                                ${post.event_type ? post.event_type.charAt(0).toUpperCase() + post.event_type.slice(1) : 'Event'}
+                            </div>
+                            <div class="space-y-1 text-sm text-purple-700">
+                                <p class="flex items-center">
+                                    <i class="fas fa-clock mr-2"></i>
+                                    ${formattedDate} at ${formattedTime}
+                                </p>
+                                ${post.event_location ? `
+                                    <p class="flex items-center">
+                                        <i class="fas fa-map-marker-alt mr-2"></i>
+                                        ${this.escapeHtml(post.event_location)}
+                                    </p>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        return metadata;
+    }
+
+    getPostTypeIcon(type) {
+        const icons = {
+            'text': 'fas fa-comment',
+            'image': 'fas fa-image',
+            'alert': 'fas fa-exclamation-triangle',
+            'market': 'fas fa-store',
+            'event': 'fas fa-calendar'
+        };
+        return icons[type] || 'fas fa-comment';
+    }
+
+    getPostTypeColor(type) {
+        const colors = {
+            'text': 'gray',
+            'image': 'blue',
+            'alert': 'red',
+            'market': 'green',
+            'event': 'purple'
+        };
+        return colors[type] || 'gray';
+    }
+
+    formatTimeAgo(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+        
+        if (diffInSeconds < 60) return 'Just now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+        if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+        
+        return date.toLocaleDateString();
+    }
+
+    updateCommunityButton(communityId, action) {
+        const button = document.querySelector(`[data-join-community="${communityId}"], [data-leave-community="${communityId}"]`);
+        if (!button) return;
+
+        if (action === 'joined') {
+            button.textContent = 'Leave';
+            button.setAttribute('data-leave-community', communityId);
+            button.removeAttribute('data-join-community');
+            button.className = button.className.replace('btn-terra', 'btn-outline');
+        } else if (action === 'left') {
+            button.textContent = 'Join';
+            button.setAttribute('data-join-community', communityId);
+            button.removeAttribute('data-leave-community');
+            button.className = button.className.replace('btn-outline', 'btn-terra');
+        }
+    }
+
+    updatePostLike(postId, isLiked, likesCount) {
+        const likeButton = document.querySelector(`[data-like-post="${postId}"]`);
+        if (!likeButton) return;
+
+        const icon = likeButton.querySelector('i');
+        const count = likeButton.querySelector('span');
+        
+        if (isLiked) {
+            likeButton.classList.add('text-terra-600');
+            likeButton.classList.remove('text-gray-500');
+            icon.classList.add('fas');
+            icon.classList.remove('far');
+        } else {
+            likeButton.classList.remove('text-terra-600');
+            likeButton.classList.add('text-gray-500');
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+        }
+        
+        count.textContent = likesCount;
+    }
+
+    updateStats(stats) {
+        // Update header stats if available
+        const statsElements = {
+            'members': document.querySelector('[data-stat="members"]'),
+            'groups': document.querySelector('[data-stat="groups"]'),
+            'active': document.querySelector('[data-stat="active"]')
+        };
+
+        if (statsElements.members) {
+            statsElements.members.textContent = this.formatNumber(stats.total_members || 0);
+        }
+        if (statsElements.groups) {
+            statsElements.groups.textContent = this.formatNumber(stats.total_communities || 0);
+        }
+    }
+
+    formatNumber(num) {
+        if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'k';
+        }
+        return num.toString();
+    }
+
+    getAuthorInitials(name) {
+        if (!name) return 'U';
+        const words = name.trim().split(' ');
+        if (words.length >= 2) {
+            return (words[0][0] + words[1][0]).toUpperCase();
+        }
+        return name.slice(0, 2).toUpperCase();
+    }
+
+    getProfilePictureUrl(author) {
+        // If user has a profile picture, use it
+        if (author.profile_picture) {
+            return author.profile_picture;
+        }
+        
+        // Generate a consistent avatar based on user ID
+        const avatarServices = [
+            'avataaars',
+            'bottts',
+            'identicon',
+            'initials',
+            'personas'
+        ];
+        
+        const service = avatarServices[author.id % avatarServices.length];
+        const seed = encodeURIComponent(author.username || author.email || author.id);
+        
+        return `https://api.dicebear.com/7.x/${service}/svg?seed=${seed}&backgroundColor=059669,047857,065f46&size=96`;
+    }
+
+    getUserTypeBadge(author) {
+        const profileType = author.profile_type;
+        if (!profileType) return '';
+        
+        const badges = {
+            'farmer': '<span class="badge-light badge-green"><i class="fas fa-seedling mr-1"></i>Farmer</span>',
+            'student': '<span class="badge-light badge-purple"><i class="fas fa-graduation-cap mr-1"></i>Student</span>',
+            'researcher': '<span class="badge-light badge-blue"><i class="fas fa-microscope mr-1"></i>Researcher</span>',
+            'expert': '<span class="badge-light badge-yellow"><i class="fas fa-star mr-1"></i>Expert</span>'
+        };
+        
+        return badges[profileType] || '';
+    }
+
+    escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    setLoading(loading) {
+        this.loading = loading;
+        const feedContainer = document.getElementById('community-feed');
+        if (feedContainer) {
+            feedContainer.classList.toggle('loading', loading);
+        }
+    }
+
+    showSuccess(message) {
+        showCustomModalWithAutoHide(message, 'success', 'Success', 3000);
+    }
+
+    showError(message) {
+        showCustomModal(message, 'error', 'Error');
+    }
+
+    showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `
+            fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm w-full
+            ${type === 'success' ? 'bg-green-500 text-white' : 
+              type === 'error' ? 'bg-red-500 text-white' : 
+              'bg-blue-500 text-white'}
+        `;
+        notification.innerHTML = `
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium">${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    renderUserCommunities(communities) {
+        // This would update the user communities section
+        console.log('User communities loaded:', communities);
+    }
+
+    renderSuggestedCommunities(communities) {
+        // This would update the suggested communities section
+        console.log('Suggested communities loaded:', communities);
+    }
+
+    renderSearchResults(communities) {
+        // This would update the search results
+        console.log('Search results:', communities);
+    }
+
+    showCreatePostModal() {
+        const modal = document.getElementById('createPostModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            this.loadModalData();
+        }
+    }
+
+    hideCreatePostModal() {
+        try {
+            const modal = document.getElementById('createPostModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                this.resetPostForm();
+            }
+        } catch (error) {
+            console.error('Error in hideCreatePostModal:', error);
+            // At minimum, hide the modal
+            const modal = document.getElementById('createPostModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+    }
+
+    async loadModalData() {
+        try {
+            // Load communities, topics, and districts
+            const [communitiesRes, topicsRes, districtsRes] = await Promise.all([
+                fetch('/api/community/my-communities'),
+                fetch('/api/community/post/topics'),
+                fetch('/api/community/districts')
+            ]);
+
+            if (communitiesRes.ok) {
+                const communitiesData = await communitiesRes.json();
+                console.log('Communities response:', communitiesData);
+                if (communitiesData.success && communitiesData.communities) {
+                    this.populateCommunityDropdown(communitiesData.communities);
+                } else {
+                    console.warn('No communities data or unsuccessful response:', communitiesData);
+                    this.populateCommunityDropdown([]);
+                }
+            } else {
+                console.error('Failed to fetch communities:', communitiesRes.status);
+                this.populateCommunityDropdown([]);
+            }
+
+            if (topicsRes.ok) {
+                const topicsData = await topicsRes.json();
+                if (topicsData.success && topicsData.topics) {
+                    this.populateTopicsDropdown(topicsData.topics);
+                } else {
+                    this.populateTopicsDropdown([]);
+                }
+            } else {
+                console.error('Failed to fetch topics:', topicsRes.status);
+                this.populateTopicsDropdown([]);
+            }
+
+            if (districtsRes.ok) {
+                const districtsData = await districtsRes.json();
+                if (districtsData.success && districtsData.districts) {
+                    this.populateDistrictsDropdown(districtsData.districts);
+                } else {
+                    this.populateDistrictsDropdown([]);
+                }
+            } else {
+                console.error('Failed to fetch districts:', districtsRes.status);
+                this.populateDistrictsDropdown([]);
+            }
+        } catch (error) {
+            console.error('Error loading modal data:', error);
+            // Populate with empty arrays as fallback
+            this.populateCommunityDropdown([]);
+            this.populateTopicsDropdown([]);
+            this.populateDistrictsDropdown([]);
+        }
+    }
+
+    populateCommunityDropdown(communities) {
+        const select = document.getElementById('postCommunity');
+        if (!select) return;
+
+        // Clear existing options except the first one
+        select.innerHTML = '<option value="">Select community...</option>';
+        
+        // Safety check for communities array
+        if (!communities || !Array.isArray(communities)) {
+            console.warn('Communities data is not a valid array:', communities);
+            return;
+        }
+        
+        communities.forEach(community => {
+            const option = document.createElement('option');
+            option.value = community.id;
+            option.textContent = community.name;
+            select.appendChild(option);
+        });
+    }
+
+    populateTopicsDropdown(topics) {
+        const select = document.getElementById('postTopic');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Select a topic...</option>';
+        
+        // Safety check for topics array
+        if (!topics || !Array.isArray(topics)) {
+            console.warn('Topics data is not a valid array:', topics);
+            return;
+        }
+        
+        topics.forEach(topic => {
+            const option = document.createElement('option');
+            option.value = topic.value;
+            option.innerHTML = `<i class="${topic.icon}"></i> ${topic.label}`;
+            option.textContent = topic.label;
+            select.appendChild(option);
+        });
+    }
+
+    populateDistrictsDropdown(districts) {
+        const select = document.getElementById('postLocation');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Select district...</option>';
+        
+        // Safety check for districts array
+        if (!districts || !Array.isArray(districts)) {
+            console.warn('Districts data is not a valid array:', districts);
+            return;
+        }
+        
+        districts.forEach(district => {
+            const option = document.createElement('option');
+            option.value = district;
+            option.textContent = district;
+            select.appendChild(option);
+        });
+    }
+
+    resetPostForm() {
+        try {
+            const form = document.getElementById('createPostForm');
+            if (form) {
+                form.reset();
+                
+                // Reset specific elements safely
+                if (typeof removeImage === 'function') {
+                    removeImage(); // Call global function, not class method
+                }
+                
+                if (typeof this.hideConditionalFields === 'function') {
+                    this.hideConditionalFields();
+                }
+                
+                if (typeof this.updateCharCount === 'function') {
+                    this.updateCharCount();
+                }
+                
+                // Reset post type to text
+                const textRadio = form.querySelector('input[name="post_type"][value="text"]');
+                if (textRadio) {
+                    textRadio.checked = true;
+                }
+            }
+        } catch (error) {
+            console.error('Error in resetPostForm:', error);
+            // Even if reset fails, try to reset the form manually
+            const form = document.getElementById('createPostForm');
+            if (form) {
+                form.reset();
+            }
+        }
+    }
+
+    hideConditionalFields() {
+        const alertFields = document.getElementById('alertFields');
+        const marketFields = document.getElementById('marketFields');
+        const titleField = document.getElementById('titleField');
+        
+        if (alertFields) alertFields.classList.add('hidden');
+        if (marketFields) marketFields.classList.add('hidden');
+        if (titleField) titleField.classList.add('hidden');
+    }
+
+    updateCharCount() {
+        const textarea = document.getElementById('postContent');
+        const charCount = document.getElementById('charCount');
+        
+        if (textarea && charCount) {
+            const count = textarea.value.length;
+            charCount.textContent = `${count}/5000`;
+            charCount.className = count > 4500 ? 'text-sm text-red-500' : 'text-sm text-gray-500';
+        }
+    }
+
+    toggleCommentSection(postId) {
+        // This would toggle the comment section for a post
+        console.log('Toggle comments for post:', postId);
+    }
+}
+
+// Global functions for the modal
+function showCreatePostModal() {
+    if (window.communityManager) {
+        window.communityManager.showCreatePostModal();
+    }
+}
+
+function hideCreatePostModal() {
+    if (window.communityManager) {
+        window.communityManager.hideCreatePostModal();
+    }
+}
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File size too large. Maximum 5MB allowed.');
+        event.target.value = '';
+        return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Invalid file type. Please select a PNG, JPG, GIF, or WebP image.');
+        event.target.value = '';
+        return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const uploadArea = document.getElementById('imageUploadArea');
+        const preview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        
+        if (uploadArea && preview && previewImg) {
+            uploadArea.classList.add('hidden');
+            preview.classList.remove('hidden');
+            previewImg.src = e.target.result;
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeImage() {
+    const uploadArea = document.getElementById('imageUploadArea');
+    const preview = document.getElementById('imagePreview');
+    const fileInput = document.getElementById('postImage');
+    const previewImg = document.getElementById('previewImg');
+    
+    if (uploadArea) uploadArea.classList.remove('hidden');
+    if (preview) preview.classList.add('hidden');
+    if (fileInput) fileInput.value = '';
+    if (previewImg) previewImg.src = '';
+}
+
+function getCurrentLocation() {
+    if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                // For now, just show success message
+                // In a real app, you'd reverse geocode to get district
+                alert('Location detected! Please select your district from the dropdown.');
+            },
+            function(error) {
+                alert('Unable to get your location. Please select your district manually.');
+            }
+        );
+    } else {
+        alert('Geolocation is not supported by this browser. Please select your district manually.');
+    }
+}
+
+// Initialize modal functionality when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Handle post type changes
+    document.addEventListener('change', function(e) {
+        if (e.target.name === 'post_type') {
+            const postType = e.target.value;
+            const alertFields = document.getElementById('alertFields');
+            const marketFields = document.getElementById('marketFields');
+            const titleField = document.getElementById('titleField');
+            
+            // Hide all conditional fields first
+            if (alertFields) alertFields.classList.add('hidden');
+            if (marketFields) marketFields.classList.add('hidden');
+            if (titleField) titleField.classList.add('hidden');
+            
+            // Show relevant fields
+            if (postType === 'alert' && alertFields) {
+                alertFields.classList.remove('hidden');
+                titleField.classList.remove('hidden');
+            } else if (postType === 'market' && marketFields) {
+                marketFields.classList.remove('hidden');
+                titleField.classList.remove('hidden');
+            } else if ((postType === 'image' || postType === 'event') && titleField) {
+                titleField.classList.remove('hidden');
+            }
+        }
+    });
+
+    // Handle character count
+    const contentTextarea = document.getElementById('modalPostContent');
+    if (contentTextarea) {
+        contentTextarea.addEventListener('input', function() {
+            const charCount = document.getElementById('charCount');
+            if (charCount) {
+                const count = this.value.length;
+                charCount.textContent = `${count}/5000`;
+                charCount.className = count > 4500 ? 'text-sm text-red-500' : 'text-sm text-gray-500';
+            }
+        });
+    }
+
+    // Handle form submission
+    const createPostForm = document.getElementById('createPostForm');
+    if (createPostForm) {
+        createPostForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitPostBtn');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const submitBtnLoader = document.getElementById('submitBtnLoader');
+            
+            // Show loading state
+            if (submitBtn) submitBtn.disabled = true;
+            if (submitBtnText) submitBtnText.textContent = 'Posting...';
+            if (submitBtnLoader) submitBtnLoader.classList.remove('hidden');
+            
+            try {
+                const formData = new FormData(this);
+                
+                const response = await fetch('/api/community/post/create', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log('Post creation response:', result);
+                
+                if (response.ok && result.success) {
+                    try {
+                        hideCreatePostModal();
+                        if (window.communityManager) {
+                            window.communityManager.showSuccess('Post created successfully!');
+                            window.communityManager.loadFeed();
+                        } else {
+                            showCustomModalWithAutoHide('Post created successfully!', 'success', 'Success', 3000);
+                            setTimeout(() => window.location.reload(), 2000);
+                        }
+                    } catch (modalError) {
+                        console.error('Error in success handling:', modalError);
+                        // Even if modal close fails, the post was created successfully
+                        showCustomModalWithAutoHide('Post created successfully!', 'success', 'Success', 3000);
+                        setTimeout(() => window.location.reload(), 2000);
+                    }
+                } else {
+                    const errorMessage = result.message || `Failed to create post (Status: ${response.status})`;
+                    console.error('Post creation failed:', errorMessage, result);
+                    showCustomModal(errorMessage, 'error');
+                }
+            } catch (error) {
+                console.error('Error creating post:', error);
+                showCustomModal('Failed to create post. Please try again.', 'error');
+            } finally {
+                // Reset loading state
+                if (submitBtn) submitBtn.disabled = false;
+                if (submitBtnText) submitBtnText.textContent = 'Post';
+                if (submitBtnLoader) submitBtnLoader.classList.add('hidden');
+            }
+        });
+    }
+
+    // Close modal when clicking outside
+    const modal = document.getElementById('createPostModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideCreatePostModal();
+            }
+        });
+    }
+});
+
+// Initialize the community manager when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM content loaded, initializing CommunityManager...');
+    window.communityManager = new CommunityManager();
+    
+    // Test direct API call
+    setTimeout(() => {
+        console.log('Testing direct feed API call...');
+        fetch('/api/community/feed?type=all&limit=20')
+            .then(response => {
+                console.log('Direct API call response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Direct API call data:', data);
+            })
+            .catch(error => {
+                console.error('Direct API call error:', error);
+            });
+    }, 2000);
+});
+
+// Custom Modal Functions
+function showCustomModal(message, type = 'info', title = null) {
+    const modal = document.getElementById('customNotificationModal');
+    const content = document.getElementById('customModalContent');
+    const icon = document.getElementById('modalIcon');
+    const iconElement = document.getElementById('modalIconElement');
+    const titleElement = document.getElementById('modalTitle');
+    const messageElement = document.getElementById('modalMessage');
+    const button = document.getElementById('modalButton');
+    
+    if (!modal || !content) return;
+    
+    // Set content
+    messageElement.textContent = message;
+    titleElement.textContent = title || (type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Notification');
+    
+    // Set styling based on type
+    if (type === 'success') {
+        icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-green-100';
+        iconElement.className = 'w-6 h-6 text-green-600 fas fa-check';
+        button.className = 'w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm transition-colors';
+    } else if (type === 'error') {
+        icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-red-100';
+        iconElement.className = 'w-6 h-6 text-red-600 fas fa-times';
+        button.className = 'w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm transition-colors';
+    } else {
+        icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-blue-100';
+        iconElement.className = 'w-6 h-6 text-blue-600 fas fa-info';
+        button.className = 'w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm transition-colors';
+    }
+    
+    // Show modal with animation
+    modal.classList.remove('hidden');
+    
+    // Trigger animation
+    setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function hideCustomModal() {
+    const modal = document.getElementById('customNotificationModal');
+    const content = document.getElementById('customModalContent');
+    
+    if (!modal || !content) return;
+    
+    // Animate out
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    
+    // Hide modal after animation
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+// Auto-hide success modals after 3 seconds
+function showCustomModalWithAutoHide(message, type = 'info', title = null, autoHideTime = 3000) {
+    showCustomModal(message, type, title);
+    
+    if (type === 'success' && autoHideTime > 0) {
+        setTimeout(() => {
+            hideCustomModal();
+        }, autoHideTime);
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('customNotificationModal');
+    if (e.target === modal) {
+        hideCustomModal();
+    }
 });
 </script>
 {% endblock %}

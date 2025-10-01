@@ -1,106 +1,385 @@
 from flask import Blueprint, jsonify, request
 from app.services.data_service import DataService
+from app.services.power_api import PowerAPIService
+from app.services.gpm_api import get_gpm_data
+from app.services.modis_api import get_modis_air_quality
+from app.services.worldview_api import get_worldview_image, get_available_layers
+import logging
+
+logger = logging.getLogger(__name__)
 
 api_bp = Blueprint('api', __name__)
 
-@api_bp.route('/health')
-def health_check():
-    """API health check endpoint"""
-    return jsonify({
-        'status': 'healthy',
-        'message': 'NASA Space App API is running!',
-        'version': '1.0.0'
-    })
-
 @api_bp.route('/data')
 def get_data():
-    """Get data records with pagination"""
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 50, type=int)
-    
-    # Limit per_page to prevent abuse
-    per_page = min(per_page, 100)
-    
-    data, error = DataService.get_all_data_records(page, per_page)
-    
-    if error:
-        return jsonify({'error': error}), 500
-    
-    return jsonify(data)
-
-@api_bp.route('/data/mission/<int:mission_id>')
-def get_data_by_mission(mission_id):
-    """Get data records for a specific mission"""
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 50, type=int)
-    per_page = min(per_page, 100)
-    
-    data, error = DataService.get_data_by_mission(mission_id, page, per_page)
-    
-    if error:
-        return jsonify({'error': error}), 500
-    
-    return jsonify(data)
-
-@api_bp.route('/data/type/<string:record_type>')
-def get_data_by_type(record_type):
-    """Get data records by type"""
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 50, type=int)
-    per_page = min(per_page, 100)
-    
-    data, error = DataService.get_data_by_type(record_type, page, per_page)
-    
-    if error:
-        return jsonify({'error': error}), 500
-    
-    return jsonify(data)
-
-@api_bp.route('/data/location')
-def get_data_by_location():
-    """Get data records by geographic bounds"""
+    """Get general data endpoint"""
     try:
-        lat_min = float(request.args.get('lat_min', -90))
-        lat_max = float(request.args.get('lat_max', 90))
-        lon_min = float(request.args.get('lon_min', -180))
-        lon_max = float(request.args.get('lon_max', 180))
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 50, type=int)
-        per_page = min(per_page, 100)
-        
-        data, error = DataService.get_data_by_location(
-            lat_min, lat_max, lon_min, lon_max, page, per_page
-        )
-        
-        if error:
-            return jsonify({'error': error}), 500
-        
-        return jsonify(data)
-    
-    except ValueError:
-        return jsonify({'error': 'Invalid coordinate parameters'}), 400
+        data_service = DataService()
+        result = data_service.get_sample_data()
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in data endpoint: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
-@api_bp.route('/data', methods=['POST'])
-def create_data_record():
-    """Create a new data record"""
-    data = request.get_json()
+@api_bp.route('/power-data')
+def get_power_data():
+    """
+    Get NASA POWER satellite weather data for specified location and date range.
     
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
+    Query Parameters:
+    - lat (float): Latitude (-90 to 90)
+    - lon (float): Longitude (-180 to 180)
+    - start (string): Start date in YYYYMMDD format
+    - end (string): End date in YYYYMMDD format
+    - parameters (string, optional): Comma-separated list of parameters (default: T2M,PRECTOTCORR)
     
-    result, error = DataService.create_data_record(data)
-    
-    if error:
-        return jsonify({'error': error}), 400
-    
-    return jsonify(result), 201
+    Returns:
+    - JSON with weather data including temperature, precipitation, and metadata
+    """
+    try:
+        # Get required parameters
+        lat = request.args.get('lat')
+        lon = request.args.get('lon')
+        start = request.args.get('start')
+        end = request.args.get('end')
+        parameters = request.args.get('parameters', 'T2M,PRECTOTCORR')
+        
+        # Validate required parameters
+        missing_params = []
+        if not lat:
+            missing_params.append('lat')
+        if not lon:
+            missing_params.append('lon')
+        if not start:
+            missing_params.append('start')
+        if not end:
+            missing_params.append('end')
+        
+        if missing_params:
+            return jsonify({
+                'success': False,
+                'error': f"Missing required parameters: {', '.join(missing_params)}",
+                'data': [],
+                'required_params': {
+                    'lat': 'Latitude (-90 to 90)',
+                    'lon': 'Longitude (-180 to 180)',
+                    'start': 'Start date (YYYYMMDD)',
+                    'end': 'End date (YYYYMMDD)',
+                    'parameters': 'Comma-separated parameters (optional)'
+                }
+            }), 400
+        
+        # Convert coordinates to float
+        try:
+            lat = float(lat)
+            lon = float(lon)
+        except ValueError:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid coordinate values. Latitude and longitude must be numeric.',
+                'data': []
+            }), 400
+        
+        # Log the request
+        logger.info(f"NASA POWER API request: lat={lat}, lon={lon}, start={start}, end={end}, params={parameters}")
+        
+        # Initialize the PowerAPIService and get data
+        power_service = PowerAPIService()
+        result = power_service.get_power_data(lat, lon, start, end, parameters)
+        
+        # Return appropriate HTTP status code
+        if result['success']:
+            return jsonify(result)
+        else:
+            return jsonify(result), 400
+            
+    except Exception as e:
+        logger.error(f"Unexpected error in power-data endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'An unexpected error occurred while processing your request.',
+            'data': []
+        }), 500
 
-@api_bp.route('/stats')
-def get_statistics():
-    """Get basic statistics about the data"""
-    stats, error = DataService.get_data_statistics()
+@api_bp.route('/gpm-data')
+def get_gpm_precipitation_data():
+    """
+    Get NASA GPM IMERG precipitation data for specified location and date range.
     
-    if error:
-        return jsonify({'error': error}), 500
+    Query Parameters:
+    - lat (float): Latitude (-90 to 90)
+    - lon (float): Longitude (-180 to 180)
+    - start (string): Start date in YYYYMMDD format
+    - end (string): End date in YYYYMMDD format
     
-    return jsonify(stats)
+    Returns:
+    - JSON with precipitation data and metadata
+    """
+    try:
+        # Get required parameters
+        lat = request.args.get('lat')
+        lon = request.args.get('lon')
+        start = request.args.get('start')
+        end = request.args.get('end')
+        
+        # Validate required parameters
+        missing_params = []
+        if not lat:
+            missing_params.append('lat')
+        if not lon:
+            missing_params.append('lon')
+        if not start:
+            missing_params.append('start')
+        if not end:
+            missing_params.append('end')
+        
+        if missing_params:
+            return jsonify({
+                'success': False,
+                'error': f"Missing required parameters: {', '.join(missing_params)}",
+                'data': [],
+                'required_params': {
+                    'lat': 'Latitude (-90 to 90)',
+                    'lon': 'Longitude (-180 to 180)',
+                    'start': 'Start date (YYYYMMDD)',
+                    'end': 'End date (YYYYMMDD)'
+                }
+            }), 400
+        
+        # Convert coordinates to float
+        try:
+            lat = float(lat)
+            lon = float(lon)
+        except ValueError:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid coordinate values. Latitude and longitude must be numeric.',
+                'data': []
+            }), 400
+        
+        # Log the request
+        logger.info(f"NASA GPM API request: lat={lat}, lon={lon}, start={start}, end={end}")
+        
+        # Call the GPM precipitation service
+        result = get_gpm_data(lat, lon, start, end)
+        
+        # Return appropriate HTTP status code
+        if result['success']:
+            return jsonify(result)
+        else:
+            return jsonify(result), 400
+            
+    except Exception as e:
+        logger.error(f"Unexpected error in gpm-data endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'An unexpected error occurred while processing your request.',
+            'data': []
+        }), 500
+
+@api_bp.route('/modis-air')
+def get_modis_air_quality_data():
+    """
+    Get NASA MODIS Aerosol Optical Depth (AOD) air quality data for specified location and date range.
+    
+    Query Parameters:
+    - lat (float): Latitude (-90 to 90)
+    - lon (float): Longitude (-180 to 180) 
+    - start (string): Start date in YYYYMMDD format
+    - end (string): End date in YYYYMMDD format
+    
+    Returns:
+    - JSON with air quality data, aerosol index, health advisories, and metadata
+    
+    Air Quality Levels:
+    - Good (AOD 0.0-0.1): Safe for all outdoor activities
+    - Moderate (AOD 0.1-0.3): Acceptable for most people
+    - Unhealthy for Sensitive (AOD 0.3-0.6): Sensitive groups should limit exposure
+    - Unhealthy (AOD 0.6-1.0): Everyone should limit outdoor activities
+    - Very Unhealthy (AOD 1.0-1.5): Health warnings for all
+    - Hazardous (AOD >1.5): Emergency conditions
+    """
+    try:
+        # Get required parameters
+        lat = request.args.get('lat')
+        lon = request.args.get('lon')
+        start = request.args.get('start')
+        end = request.args.get('end')
+        
+        # Validate required parameters
+        missing_params = []
+        if not lat:
+            missing_params.append('lat')
+        if not lon:
+            missing_params.append('lon')
+        if not start:
+            missing_params.append('start')
+        if not end:
+            missing_params.append('end')
+        
+        if missing_params:
+            return jsonify({
+                'success': False,
+                'error': f"Missing required parameters: {', '.join(missing_params)}",
+                'data': [],
+                'required_params': {
+                    'lat': 'Latitude (-90 to 90)',
+                    'lon': 'Longitude (-180 to 180)',
+                    'start': 'Start date (YYYYMMDD)',
+                    'end': 'End date (YYYYMMDD)'
+                }
+            }), 400
+        
+        # Convert coordinates to float
+        try:
+            lat = float(lat)
+            lon = float(lon)
+        except ValueError:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid coordinate values. Latitude and longitude must be numeric.',
+                'data': []
+            }), 400
+        
+        # Log the request
+        logger.info(f"NASA MODIS Air Quality API request: lat={lat}, lon={lon}, start={start}, end={end}")
+        
+        # Call the MODIS air quality service
+        result = get_modis_air_quality(lat, lon, start, end)
+        
+        # Return appropriate HTTP status code
+        if result['success']:
+            return jsonify(result)
+        else:
+            return jsonify(result), 400
+            
+    except Exception as e:
+        logger.error(f"Unexpected error in modis-air endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'An unexpected error occurred while processing your request.',
+            'data': []
+        }), 500
+
+@api_bp.route('/worldview-image')
+def get_worldview_image_data():
+    """
+    Get NASA Worldview satellite imagery for specified location and date.
+    
+    Query Parameters:
+    - lat (float): Latitude (-90 to 90)
+    - lon (float): Longitude (-180 to 180)
+    - date (string): Date in YYYY-MM-DD format
+    - layers (string): Comma-separated layer names (e.g., MODIS_Terra_CorrectedReflectance_TrueColor)
+    - bbox_size (float, optional): Size of bounding box in degrees (default: 0.5)
+    
+    Returns:
+    - JSON with image URL and metadata
+    
+    Common Layers:
+    - MODIS_Terra_CorrectedReflectance_TrueColor: True color satellite imagery
+    - MODIS_Aqua_CorrectedReflectance_TrueColor: Aqua satellite true color
+    - MODIS_Terra_CorrectedReflectance_Bands721: False color (vegetation analysis)
+    - VIIRS_SNPP_CorrectedReflectance_TrueColor: VIIRS true color imagery
+    - MODIS_Terra_Aerosol: Aerosol optical depth visualization
+    """
+    try:
+        # Get required parameters
+        lat = request.args.get('lat')
+        lon = request.args.get('lon')
+        date = request.args.get('date')
+        layers = request.args.get('layers')
+        bbox_size = request.args.get('bbox_size', 0.5)
+        
+        # Validate required parameters
+        missing_params = []
+        if not lat:
+            missing_params.append('lat')
+        if not lon:
+            missing_params.append('lon')
+        if not date:
+            missing_params.append('date')
+        if not layers:
+            missing_params.append('layers')
+        
+        if missing_params:
+            return jsonify({
+                'success': False,
+                'error': f"Missing required parameters: {', '.join(missing_params)}",
+                'image_url': None,
+                'required_params': {
+                    'lat': 'Latitude (-90 to 90)',
+                    'lon': 'Longitude (-180 to 180)',
+                    'date': 'Date (YYYY-MM-DD)',
+                    'layers': 'Comma-separated layer names',
+                    'bbox_size': 'Bounding box size in degrees (optional, default: 0.5)'
+                },
+                'available_layers': get_available_layers()
+            }), 400
+        
+        # Convert coordinates and bbox_size to float
+        try:
+            lat = float(lat)
+            lon = float(lon)
+            bbox_size = float(bbox_size)
+        except ValueError:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid numeric values. Latitude, longitude, and bbox_size must be numeric.',
+                'image_url': None
+            }), 400
+        
+        # Log the request
+        logger.info(f"NASA Worldview API request: lat={lat}, lon={lon}, date={date}, layers={layers}")
+        
+        # Call the Worldview service
+        result = get_worldview_image(lat, lon, date, layers, bbox_size)
+        
+        # Return appropriate HTTP status code
+        if result['success']:
+            return jsonify({
+                'success': True,
+                'date': result['date'],
+                'layers': result['layers'],
+                'image_url': result['image_url'],
+                'location': result['location'],
+                'bbox': result['bbox'],
+                'metadata': result['metadata']
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': result['error'],
+                'image_url': None
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Unexpected error in worldview-image endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'An unexpected error occurred while processing your request.',
+            'image_url': None
+        }), 500
+
+@api_bp.route('/worldview-layers')
+def get_worldview_layers():
+    """
+    Get available NASA Worldview layers.
+    
+    Returns:
+    - JSON with available layer information
+    """
+    try:
+        layers = get_available_layers()
+        return jsonify({
+            'success': True,
+            'layers': layers,
+            'layer_count': len(layers)
+        })
+    except Exception as e:
+        logger.error(f"Error in worldview-layers endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to retrieve available layers',
+            'layers': {}
+        }), 500

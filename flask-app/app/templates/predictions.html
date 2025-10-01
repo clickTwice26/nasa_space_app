@@ -5,20 +5,22 @@
 
 {% block content %}
 <div style="min-height: 100vh;">
-    <div class="p-8 space-y-8 pb-16">
+    <div class="p-6 space-y-6 pb-16 max-w-6xl mx-auto">
         <!-- Header Section -->
-        <div class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg">
+        <div class="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-2xl p-8 text-white shadow-xl">
             <div class="flex items-center gap-6">
-                <i data-lucide="trending-up" class="w-8 h-8 text-white"></i>
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                </div>
                 <div>
-                    <h2 class="text-3xl font-bold">Environmental Predictions</h2>
-                    <p class="text-indigo-100 mt-1">AI-powered risk assessment for your crops</p>
+                    <h2 class="text-3xl font-display font-bold">Environmental Predictions</h2>
+                    <p class="text-purple-100 mt-1 text-lg">AI-powered risk assessment for your crops</p>
                 </div>
             </div>
         </div>
 
     <!-- Prediction Form -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div class="card-light p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-6">Create New Prediction</h3>
         <form class="space-y-6">
             <!-- Location Input -->
@@ -28,52 +30,52 @@
                     Location
                 </label>
                 <div class="relative">
-                    <select class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option>Select District</option>
-                        <option>Dhaka</option>
-                        <option>Chittagong</option>
-                        <option>Sylhet</option>
-                        <option>Rajshahi</option>
-                        <option>Khulna</option>
-                        <option>Barisal</option>
-                        <option>Rangpur</option>
-                        <option>Mymensingh</option>
-                        <option>Comilla</option>
+                    <select class="input-light w-full">
+                        <option value="">Select District</option>
+                        <option value="Dhaka" {{ 'selected' if user.district and 'Dhaka' in user.district else '' }}>Dhaka</option>
+                        <option value="Chittagong" {{ 'selected' if user.district and 'Chittagong' in user.district else '' }}>Chittagong</option>
+                        <option value="Sylhet" {{ 'selected' if user.district and 'Sylhet' in user.district else '' }}>Sylhet</option>
+                        <option value="Rajshahi" {{ 'selected' if user.district and 'Rajshahi' in user.district else '' }}>Rajshahi</option>
+                        <option value="Khulna" {{ 'selected' if user.district and 'Khulna' in user.district else '' }}>Khulna</option>
+                        <option value="Barisal" {{ 'selected' if user.district and 'Barisal' in user.district else '' }}>Barisal</option>
+                        <option value="Rangpur" {{ 'selected' if user.district and 'Rangpur' in user.district else '' }}>Rangpur</option>
+                        <option value="Mymensingh" {{ 'selected' if user.district and 'Mymensingh' in user.district else '' }}>Mymensingh</option>
+                        <option value="Comilla" {{ 'selected' if user.district and 'Comilla' in user.district else '' }}>Comilla</option>
                     </select>
-                    <i data-lucide="chevron-down" style="position: absolute; right: var(--space-lg); top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;"></i>
+                    <i data-lucide="chevron-down" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--terra-slate-400); pointer-events: none;"></i>
                 </div>
             </div>
 
             <!-- Crop Type -->
             <div>
-                <label class="block text-sm font-medium text-text-dark mb-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
                     <i data-lucide="wheat" class="w-4 h-4 inline mr-1"></i>
                     Crop Type
                 </label>
                                 <div class="grid grid-cols-3 gap-2">
-                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
-                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-terra-yellow-600"></i>
-                        <span class="text-xs font-medium">Rice</span>
+                    <button type="button" class="crop-btn btn-light-outline text-center transition-all p-3 {{ 'btn-terra-primary' if user.primary_crop == 'Rice' else '' }}">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 {{ 'text-white' if user.primary_crop == 'Rice' else 'text-terra-yellow' }}"></i>
+                        <span class="text-xs font-medium {{ 'text-white' if user.primary_crop == 'Rice' else '' }}">Rice</span>
                     </button>
-                    <button type="button" class="crop-btn btn btn-primary text-center transition-all">
-                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-white"></i>
-                        <span class="text-xs font-medium text-white">Wheat</span>
+                    <button type="button" class="crop-btn btn-terra-primary text-center transition-all p-3 {{ 'btn-terra-primary' if user.primary_crop == 'Wheat' else 'btn-light-outline' }}">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 {{ 'text-white' if user.primary_crop == 'Wheat' else 'text-terra-yellow' }}"></i>
+                        <span class="text-xs font-medium {{ 'text-white' if user.primary_crop == 'Wheat' else '' }}">Wheat</span>
                     </button>
-                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
-                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-terra-orange-600"></i>
-                        <span class="text-xs font-medium">Potato</span>
+                    <button type="button" class="crop-btn btn-light-outline text-center transition-all p-3 {{ 'btn-terra-primary' if user.primary_crop == 'Potato' else '' }}">
+                        <i data-lucide="circle" class="w-6 h-6 mx-auto mb-1 {{ 'text-white' if user.primary_crop == 'Potato' else 'text-orange-500' }}"></i>
+                        <span class="text-xs font-medium {{ 'text-white' if user.primary_crop == 'Potato' else '' }}">Potato</span>
                     </button>
-                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
-                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-terra-green-600"></i>
-                        <span class="text-xs font-medium">Jute</span>
+                    <button type="button" class="crop-btn btn-light-outline text-center transition-all p-3 {{ 'btn-terra-primary' if user.primary_crop == 'Jute' else '' }}">
+                        <i data-lucide="leaf" class="w-6 h-6 mx-auto mb-1 {{ 'text-white' if user.primary_crop == 'Jute' else 'text-green-500' }}"></i>
+                        <span class="text-xs font-medium {{ 'text-white' if user.primary_crop == 'Jute' else '' }}">Jute</span>
                     </button>
-                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
-                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-terra-yellow-500"></i>
-                        <span class="text-xs font-medium">Maize</span>
+                    <button type="button" class="crop-btn btn-light-outline text-center transition-all p-3 {{ 'btn-terra-primary' if user.primary_crop == 'Maize' else '' }}">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 {{ 'text-white' if user.primary_crop == 'Maize' else 'text-yellow-500' }}"></i>
+                        <span class="text-xs font-medium {{ 'text-white' if user.primary_crop == 'Maize' else '' }}">Maize</span>
                     </button>
-                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
-                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-danger"></i>
-                        <span class="text-xs font-medium">Tomato</span>
+                    <button type="button" class="crop-btn btn-light-outline text-center transition-all p-3 {{ 'btn-terra-primary' if user.primary_crop == 'Tomato' else '' }}">
+                        <i data-lucide="cherry" class="w-6 h-6 mx-auto mb-1 {{ 'text-white' if user.primary_crop == 'Tomato' else 'text-red-500' }}"></i>
+                        <span class="text-xs font-medium {{ 'text-white' if user.primary_crop == 'Tomato' else '' }}">Tomato</span>
                     </button>
                 </div>
             </div>
@@ -158,6 +160,31 @@
                 <span>Generate Prediction</span>
             </button>
         </form>
+    </div>
+
+    <!-- NASA Weather Data Integration -->
+    <div class="card-light p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                    <i data-lucide="satellite" class="w-5 h-5 text-blue-600"></i>
+                    <span>NASA Weather Insights</span>
+                </h3>
+                <p class="text-sm text-gray-500">Real-time satellite weather data for better predictions</p>
+            </div>
+            <button onclick="loadPredictionWeatherData()" class="btn-terra-primary text-sm">
+                <i data-lucide="download" class="w-4 h-4 mr-1"></i>
+                Load Weather Data
+            </button>
+        </div>
+        
+        <div id="prediction-weather-container" class="bg-gray-50 rounded-lg p-4">
+            <div class="text-center py-6 text-gray-500">
+                <i data-lucide="cloud" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
+                <p class="text-sm">Click "Load Weather Data" to fetch NASA POWER weather data</p>
+                <p class="text-xs text-gray-400 mt-1">This will enhance prediction accuracy</p>
+            </div>
+        </div>
     </div>
 
     <!-- Prediction Result Card -->
@@ -324,5 +351,105 @@
             this.querySelector('span:last-child').className = 'text-xs text-terra-green block';
         });
     });
+    
+    // NASA Weather Data Integration
+    async function loadPredictionWeatherData() {
+        const container = document.getElementById('prediction-weather-container');
+        
+        // Default to Dhaka coordinates for demo
+        const lat = 23.7644;
+        const lon = 90.3897;
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 7); // Last 7 days
+        
+        const start = startDate.toISOString().slice(0, 10).replace(/-/g, '');
+        const end = endDate.toISOString().slice(0, 10).replace(/-/g, '');
+        
+        container.innerHTML = `
+            <div class="text-center py-6">
+                <div class="spinner-border text-terra-green mx-auto mb-3"></div>
+                <p class="text-sm text-gray-600">Fetching NASA weather data...</p>
+            </div>
+        `;
+        
+        try {
+            const response = await fetch(`/api/power-data?lat=${lat}&lon=${lon}&start=${start}&end=${end}`);
+            const data = await response.json();
+            
+            if (data.success && data.data.length > 0) {
+                displayPredictionWeatherData(data);
+            } else {
+                throw new Error(data.error || 'No weather data available');
+            }
+        } catch (error) {
+            container.innerHTML = `
+                <div class="text-center py-6 text-red-600">
+                    <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2"></i>
+                    <p class="text-sm">Error loading weather data: ${error.message}</p>
+                    <button onclick="loadPredictionWeatherData()" class="mt-2 btn-terra-primary text-sm">
+                        Try Again
+                    </button>
+                </div>
+            `;
+        }
+    }
+    
+    function displayPredictionWeatherData(data) {
+        const container = document.getElementById('prediction-weather-container');
+        const latest = data.data[data.data.length - 1]; // Most recent data
+        
+        // Calculate averages
+        const temperatures = data.data.filter(d => d.temperature !== null).map(d => d.temperature);
+        const precipitations = data.data.filter(d => d.precipitation !== null).map(d => d.precipitation);
+        
+        const avgTemp = temperatures.length > 0 ? temperatures.reduce((a, b) => a + b) / temperatures.length : 0;
+        const totalPrecip = precipitations.length > 0 ? precipitations.reduce((a, b) => a + b) : 0;
+        
+        container.innerHTML = `
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <i data-lucide="thermometer" class="w-5 h-5 text-blue-600"></i>
+                            <span class="text-sm font-medium text-blue-900">Avg Temperature</span>
+                        </div>
+                        <p class="text-2xl font-bold text-blue-700">${avgTemp.toFixed(1)}°C</p>
+                        <p class="text-xs text-blue-600">Last 7 days</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-cyan-50 to-teal-50 p-4 rounded-lg border border-cyan-200">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <i data-lucide="cloud-rain" class="w-5 h-5 text-cyan-600"></i>
+                            <span class="text-sm font-medium text-cyan-900">Total Rainfall</span>
+                        </div>
+                        <p class="text-2xl font-bold text-cyan-700">${totalPrecip.toFixed(1)}mm</p>
+                        <p class="text-xs text-cyan-600">Last 7 days</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                            <span class="text-sm font-medium text-green-900">Data Quality</span>
+                        </div>
+                        <p class="text-2xl font-bold text-green-700">NASA</p>
+                        <p class="text-xs text-green-600">Satellite-verified</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                        <span class="text-sm font-medium text-blue-900">Weather data integrated for enhanced predictions</span>
+                    </div>
+                    <button onclick="window.location.href='/data'" class="text-xs text-blue-600 hover:text-blue-800">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Re-initialize lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
 </script>
 {% endblock %}

@@ -52,11 +52,25 @@ def create_app(config_name='development'):
     from app.routes.api_routes import api_bp
     from app.routes.mission_routes import mission_bp
     from app.routes.auth_routes import auth_bp
+    from app.routes.community_routes import community_bp
+    from app.routes.risk import risk_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(mission_bp, url_prefix='/missions')
     app.register_blueprint(auth_bp)
+    app.register_blueprint(community_bp)
+    app.register_blueprint(risk_bp, url_prefix='/api')
+    
+    # Context processor to make user data available to all templates
+    @app.context_processor
+    def inject_user():
+        from app.routes.auth_routes import get_current_user
+        try:
+            user = get_current_user()
+            return dict(user=user)
+        except:
+            return dict(user=None)
     
     # Create database tables
     with app.app_context():

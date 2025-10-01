@@ -4,40 +4,42 @@
 {% block subtitle %}App Settings{% endblock %}
 
 {% block content %}
-<div class="p-8 space-y-8">
+<div class="p-6 space-y-6 max-w-4xl mx-auto">
     <!-- Header Section -->
-    <div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-8 text-white shadow-lg">
+    <div class="bg-gradient-to-br from-slate-600 via-slate-700 to-gray-800 rounded-2xl p-8 text-white shadow-xl">
         <div class="flex items-center gap-6">
-            <i data-lucide="settings" class="w-8 h-8 text-white"></i>
+            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <i data-lucide="settings" class="w-6 h-6 text-white"></i>
+            </div>
             <div>
-                <h2 class="text-3xl font-bold">Settings</h2>
-                <p class="text-purple-100 mt-1">Customize your TerraPulse experience</p>
+                <h2 class="text-3xl font-display font-bold">Settings</h2>
+                <p class="text-slate-100 mt-1 text-lg">Customize your TerraPulse experience</p>
             </div>
         </div>
     </div>
 
     <!-- Profile Section -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div class="card-light p-6">
         <div class="flex items-center gap-8 mb-6">
-            <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
-                <span class="text-white text-2xl font-bold">A</span>
+            <div class="w-16 h-16 bg-terra-green rounded-full flex items-center justify-center">
+                <span class="text-white text-2xl font-bold">{{ user.full_name[0].upper() if user.full_name else user.username[0].upper() }}</span>
             </div>
             <div>
-                <h3 class="text-xl font-semibold text-gray-900">Ahmed Rahman</h3>
-                <p class="text-sm text-gray-600 mt-1">Farmer • Comilla District</p>
-                <p class="text-xs text-gray-400 mt-1">Member since August 2025</p>
+                <h3 class="text-xl font-semibold text-gray-900">{{ user.full_name or user.username }}</h3>
+                <p class="text-sm text-gray-600 mt-1">{{ user.profile_type.title() if user.profile_type else 'User' }} • {{ user.district or user.location or 'Location not set' }}</p>
+                <p class="text-xs text-gray-400 mt-1">Member since October 2025</p>
             </div>
         </div>
-        <button class="w-full py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+        <button id="edit-profile-btn" class="btn-light-outline w-full">
             Edit Profile
         </button>
     </div>
 
     <!-- Notification Settings -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div class="card-light p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Notifications</h3>
         <div class="space-y-4">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
                     <p class="text-sm font-medium text-gray-900">Weather Alerts</p>
                     <p class="text-xs text-gray-500">Get notified about severe weather conditions</p>
@@ -188,46 +190,52 @@
     </div>
 
     <!-- Location Settings -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <!-- Location Settings -->
+    <div class="card-light p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Location & Farm Info</h3>
-        <div class="space-y-4">
+        <form id="location-form" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Primary Farm Location</label>
-                <select class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green">
-                    <option>Comilla District</option>
-                    <option>Dhaka District</option>
-                    <option>Chittagong District</option>
-                    <option>Sylhet District</option>
-                    <option>Rajshahi District</option>
-                    <option>Khulna District</option>
-                    <option>Barisal District</option>
-                    <option>Rangpur District</option>
+                <select id="district-select" name="district" class="input-light w-full">
+                    <option value="">Select District</option>
+                    <option value="Dhaka District" {{ 'selected' if user.district == 'Dhaka District' else '' }}>Dhaka District</option>
+                    <option value="Chittagong District" {{ 'selected' if user.district == 'Chittagong District' else '' }}>Chittagong District</option>
+                    <option value="Sylhet District" {{ 'selected' if user.district == 'Sylhet District' else '' }}>Sylhet District</option>
+                    <option value="Rajshahi District" {{ 'selected' if user.district == 'Rajshahi District' else '' }}>Rajshahi District</option>
+                    <option value="Khulna District" {{ 'selected' if user.district == 'Khulna District' else '' }}>Khulna District</option>
+                    <option value="Barisal District" {{ 'selected' if user.district == 'Barisal District' else '' }}>Barisal District</option>
+                    <option value="Rangpur District" {{ 'selected' if user.district == 'Rangpur District' else '' }}>Rangpur District</option>
+                    <option value="Mymensingh District" {{ 'selected' if user.district == 'Mymensingh District' else '' }}>Mymensingh District</option>
                 </select>
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Primary Crop</label>
-                <select class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green">
-                    <option>Rice</option>
-                    <option>Wheat</option>
-                    <option>Potato</option>
-                    <option>Jute</option>
-                    <option>Maize</option>
-                    <option>Tomato</option>
-                    <option>Mixed Crops</option>
+                <select id="crop-select" name="primary_crop" class="input-light w-full">
+                    <option value="">Select Primary Crop</option>
+                    <option value="Rice" {{ 'selected' if user.primary_crop == 'Rice' else '' }}>Rice</option>
+                    <option value="Wheat" {{ 'selected' if user.primary_crop == 'Wheat' else '' }}>Wheat</option>
+                    <option value="Potato" {{ 'selected' if user.primary_crop == 'Potato' else '' }}>Potato</option>
+                    <option value="Jute" {{ 'selected' if user.primary_crop == 'Jute' else '' }}>Jute</option>
+                    <option value="Maize" {{ 'selected' if user.primary_crop == 'Maize' else '' }}>Maize</option>
+                    <option value="Tomato" {{ 'selected' if user.primary_crop == 'Tomato' else '' }}>Tomato</option>
+                    <option value="Mixed Crops" {{ 'selected' if user.primary_crop == 'Mixed Crops' else '' }}>Mixed Crops</option>
                 </select>
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Farm Size (hectares)</label>
                 <input type="number" 
-                       class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green" 
+                       id="farm-size-input"
+                       name="farm_size"
+                       class="input-light w-full" 
                        placeholder="2.5" 
                        step="0.1" 
-                       min="0">
+                       min="0"
+                       value="{{ user.farm_size if user.farm_size else '' }}">
             </div>
-        </div>
-        <button class="w-full mt-4 py-3 bg-terra-green text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+        </form>
+        <button id="save-location-btn" class="btn-terra-primary w-full mt-4">
             Save Location Settings
         </button>
     </div>
@@ -305,7 +313,7 @@
     </div>
 
     <!-- Sign Out -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div class="card-light p-6">
         <button id="logout-btn" class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center space-x-2">
             <i data-lucide="log-out" class="w-5 h-5"></i>
             <span>Sign Out</span>
@@ -328,13 +336,204 @@
     });
     
     // Location save functionality
-    document.querySelector('button[type="button"]').addEventListener('click', function() {
-        // Show success message or handle location save
-        alert('Location settings saved successfully!');
+    document.getElementById('save-location-btn').addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        const button = this;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Saving...';
+        
+        try {
+            const formData = new FormData(document.getElementById('location-form'));
+            const data = Object.fromEntries(formData.entries());
+            
+            const response = await fetch('/api/profile/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                button.textContent = 'Saved!';
+                button.className = 'btn-terra-primary w-full mt-4 bg-green-600';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.className = 'btn-terra-primary w-full mt-4';
+                    button.disabled = false;
+                }, 2000);
+                
+                // Show success notification
+                showNotification('Location settings saved successfully!', 'success');
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            console.error('Save error:', error);
+            button.textContent = 'Error - Try Again';
+            button.className = 'btn-terra-primary w-full mt-4 bg-red-600';
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.className = 'btn-terra-primary w-full mt-4';
+                button.disabled = false;
+            }, 3000);
+            
+            showNotification('Failed to save location settings', 'error');
+        }
     });
     
+    // Edit profile functionality
+    document.getElementById('edit-profile-btn').addEventListener('click', function() {
+        // Create a simple modal for editing profile
+        const modal = createProfileEditModal();
+        document.body.appendChild(modal);
+    });
+    
+    // Toggle switches functionality with backend sync
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', async function() {
+            // Add haptic feedback for mobile
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            const settingName = this.closest('.flex').querySelector('p').textContent;
+            console.log(`Setting ${settingName} changed to:`, this.checked);
+            
+            // Sync notification settings to backend
+            try {
+                const notificationSettings = {};
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    const name = cb.closest('.flex').querySelector('p').textContent.toLowerCase().replace(/\s+/g, '_');
+                    notificationSettings[name] = cb.checked;
+                });
+                
+                await fetch('/api/settings/notifications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(notificationSettings)
+                });
+            } catch (error) {
+                console.error('Failed to sync notification settings:', error);
+            }
+        });
+    });
+    
+    // Helper function to create profile edit modal
+    function createProfileEditModal() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+        modal.innerHTML = `
+            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Edit Profile</h3>
+                    <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <form id="profile-edit-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input type="text" name="full_name" class="input-light w-full" value="{{ user.full_name or '' }}" placeholder="Enter your full name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <input type="text" name="location" class="input-light w-full" value="{{ user.location or '' }}" placeholder="Enter your location">
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" id="cancel-edit" class="btn-light-outline flex-1">Cancel</button>
+                        <button type="submit" class="btn-terra-primary flex-1">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        // Add event listeners
+        modal.querySelector('#close-modal').addEventListener('click', () => modal.remove());
+        modal.querySelector('#cancel-edit').addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+        
+        modal.querySelector('#profile-edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/profile/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showNotification('Profile updated successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showNotification('Failed to update profile', 'error');
+            }
+        });
+        
+        // Initialize Lucide icons for the modal
+        setTimeout(() => lucide.createIcons(), 100);
+        
+        return modal;
+    }
+    
+    // Notification helper
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+        notification.className = `fixed top-4 right-4 ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg z-50 transform transition-transform duration-300 translate-x-full`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('translate-x-full');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
     // Logout functionality
-    document.getElementById('logout-btn').addEventListener('click', async function() {
+    document.getElementById('logout-btn').addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        // Add confirmation dialog
+        const confirmLogout = confirm('Are you sure you want to sign out? You will need to log in again to access your account.');
+        if (!confirmLogout) {
+            return;
+        }
+        
+        // Add loading state
+        const button = this;
+        const originalContent = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i><span>Signing out...</span>';
+        
+        // Reinitialize lucide icons for the new loader icon
+        lucide.createIcons();
+        
         try {
             const response = await fetch('/auth/api/logout', {
                 method: 'POST',
@@ -344,20 +543,53 @@
                 credentials: 'include'
             });
             
-            // Clear session storage regardless of API response
+            // Clear all local storage and session storage
             sessionStorage.clear();
+            localStorage.clear();
+            
+            // Clear any cached data
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
             
             if (response.ok) {
-                window.location.href = '/auth/login';
+                const result = await response.json();
+                console.log('Logout successful:', result.message);
+                
+                // Show success message briefly before redirect
+                button.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i><span>Signed out!</span>';
+                button.className = 'w-full py-3 bg-green-600 text-white rounded-lg font-medium flex items-center justify-center space-x-2';
+                
+                // Reinitialize lucide icons for the check icon
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    window.location.href = '/auth/login';
+                }, 1000);
             } else {
-                // Even if logout fails on server, redirect to login
+                console.warn('Logout response not ok, but redirecting anyway');
                 window.location.href = '/auth/login';
             }
         } catch (error) {
             console.error('Logout error:', error);
-            // Clear session storage and redirect anyway
+            // Clear storage and redirect anyway
             sessionStorage.clear();
+            localStorage.clear();
             window.location.href = '/auth/login';
+        } finally {
+            // Reset button state if still on page
+            setTimeout(() => {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalContent;
+                    button.className = 'w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center space-x-2';
+                    lucide.createIcons();
+                }
+            }, 2000);
         }
     });
 </script>

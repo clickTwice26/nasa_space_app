@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% from "components/community_card.html" import community_card %}
+
+{% block title %}TerraPulse - Discover Communities{% endblock %}
+{% block subtitle %}Discover Communities{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Discover Communities</h1>
+        <p class="text-gray-600 max-w-2xl mx-auto">Find and join agricultural communities that match your interests and expertise</p>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="bg-white rounded-lg p-6 shadow-sm mb-6">
+        <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Search communities..." 
+                           class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <select class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option>All Categories</option>
+                    <option>Rice Farming</option>
+                    <option>Vegetable Growing</option>
+                    <option>Livestock</option>
+                    <option>Organic Farming</option>
+                    <option>Technology</option>
+                </select>
+                <select class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option>All Districts</option>
+                    <option>Dhaka</option>
+                    <option>Chittagong</option>
+                    <option>Sylhet</option>
+                    <option>Rajshahi</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+        <div class="text-center p-4 bg-green-50 rounded-lg hover:bg-green-100 cursor-pointer transition-colors">
+            <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="fas fa-seedling text-white"></i>
+            </div>
+            <span class="text-sm font-medium text-gray-700">Rice & Grains</span>
+        </div>
+        
+        <div class="text-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 cursor-pointer transition-colors">
+            <div class="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="fas fa-carrot text-white"></i>
+            </div>
+            <span class="text-sm font-medium text-gray-700">Vegetables</span>
+        </div>
+        
+        <div class="text-center p-4 bg-red-50 rounded-lg hover:bg-red-100 cursor-pointer transition-colors">
+            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="fas fa-apple-alt text-white"></i>
+            </div>
+            <span class="text-sm font-medium text-gray-700">Fruits</span>
+        </div>
+        
+        <div class="text-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 cursor-pointer transition-colors">
+            <div class="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="fas fa-cow text-white"></i>
+            </div>
+            <span class="text-sm font-medium text-gray-700">Livestock</span>
+        </div>
+        
+        <div class="text-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors">
+            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="fas fa-fish text-white"></i>
+            </div>
+            <span class="text-sm font-medium text-gray-700">Aquaculture</span>
+        </div>
+        
+        <div class="text-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 cursor-pointer transition-colors">
+            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="fas fa-microchip text-white"></i>
+            </div>
+            <span class="text-sm font-medium text-gray-700">AgriTech</span>
+        </div>
+    </div>
+
+    <!-- Popular Communities -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Popular Communities</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Community cards will be loaded here -->
+            <div class="bg-white rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-seedling text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Rice Farmers United</h3>
+                            <p class="text-sm text-gray-500">2,156 members</p>
+                        </div>
+                    </div>
+                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        Join
+                    </button>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">Share rice cultivation tips, discuss varieties, market prices, and seasonal challenges</p>
+                <div class="flex items-center text-sm text-gray-500">
+                    <i class="fas fa-map-marker-alt mr-1"></i>
+                    <span>Dhaka, Rangpur</span>
+                    <span class="mx-2">•</span>
+                    <i class="fas fa-comments mr-1"></i>
+                    <span>45 posts today</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-carrot text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Vegetable Growers Hub</h3>
+                            <p class="text-sm text-gray-500">1,824 members</p>
+                        </div>
+                    </div>
+                    <button class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                        Join
+                    </button>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">Connect with vegetable farmers, share growing techniques and market insights</p>
+                <div class="flex items-center text-sm text-gray-500">
+                    <i class="fas fa-map-marker-alt mr-1"></i>
+                    <span>Chittagong, Sylhet</span>
+                    <span class="mx-2">•</span>
+                    <i class="fas fa-comments mr-1"></i>
+                    <span>32 posts today</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-graduation-cap text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Agri Students Network</h3>
+                            <p class="text-sm text-gray-500">956 members</p>
+                        </div>
+                    </div>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Join
+                    </button>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">Study groups, research sharing, and career guidance for agriculture students</p>
+                <div class="flex items-center text-sm text-gray-500">
+                    <i class="fas fa-map-marker-alt mr-1"></i>
+                    <span>All Bangladesh</span>
+                    <span class="mx-2">•</span>
+                    <i class="fas fa-comments mr-1"></i>
+                    <span>28 posts today</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Communities by District -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Communities Near You</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                <h3 class="font-semibold text-gray-900 mb-2">Dhaka Region</h3>
+                <p class="text-sm text-gray-600 mb-3">15 active communities</p>
+                <a href="#" class="text-green-600 hover:text-green-700 text-sm font-medium">Explore →</a>
+            </div>
+            
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                <h3 class="font-semibold text-gray-900 mb-2">Chittagong Region</h3>
+                <p class="text-sm text-gray-600 mb-3">12 active communities</p>
+                <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Explore →</a>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                <h3 class="font-semibold text-gray-900 mb-2">Sylhet Region</h3>
+                <p class="text-sm text-gray-600 mb-3">8 active communities</p>
+                <a href="#" class="text-purple-600 hover:text-purple-700 text-sm font-medium">Explore →</a>
+            </div>
+            
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200">
+                <h3 class="font-semibold text-gray-900 mb-2">Rajshahi Region</h3>
+                <p class="text-sm text-gray-600 mb-3">10 active communities</p>
+                <a href="#" class="text-orange-600 hover:text-orange-700 text-sm font-medium">Explore →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Community CTA -->
+    <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-8 text-center text-white">
+        <h2 class="text-2xl font-bold mb-2">Can't find what you're looking for?</h2>
+        <p class="mb-6 opacity-90">Start your own community and bring farmers together around your interests</p>
+        <button class="bg-white text-green-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+            <i class="fas fa-plus mr-2"></i>Create Community
+        </button>
+    </div>
+
+</div>
+
+<script>
+// Add interactivity for the discover page
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.querySelector('input[placeholder="Search communities..."]');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            // Implement search logic
+            console.log('Searching for:', this.value);
+        });
+    }
+    
+    // Category filtering
+    const categoryCards = document.querySelectorAll('.text-center.p-4');
+    categoryCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove active class from all
+            categoryCards.forEach(c => c.classList.remove('ring-2', 'ring-green-500'));
+            // Add active class to clicked
+            this.classList.add('ring-2', 'ring-green-500');
+            console.log('Category selected:', this.querySelector('span').textContent);
+        });
+    });
+});
+</script>
+{% endblock %}

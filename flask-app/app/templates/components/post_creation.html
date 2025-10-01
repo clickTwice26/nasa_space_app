@@ -1,0 +1,234 @@
+<!-- Post Creation Component -->
+{% macro post_creation(user_avatar="A", placeholder="Share your farming experience or ask a question...") %}
+<div class="card-light p-4 sm:p-6 mb-4 sm:mb-6">
+    <div class="flex items-start space-x-3 sm:space-x-4 mb-4 sm:mb-6">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <span class="text-white text-sm sm:text-lg font-semibold">{{ user_avatar }}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+            <input type="text" 
+                   placeholder="{{ placeholder }}" 
+                   onclick="showCreatePostModal()"
+                   readonly
+                   class="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base placeholder-gray-500 cursor-pointer">
+        </div>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+        <div class="flex items-center space-x-4 sm:space-x-6 overflow-x-auto">
+            <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors whitespace-nowrap">
+                <i data-lucide="camera" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                <span class="text-xs sm:text-sm font-medium">Photo</span>
+            </button>
+            <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors whitespace-nowrap">
+                <i data-lucide="map-pin" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                <span class="text-xs sm:text-sm font-medium">Location</span>
+            </button>
+            <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors whitespace-nowrap">
+                <i data-lucide="tag" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                <span class="text-xs sm:text-sm font-medium">Topic</span>
+            </button>
+        </div>
+        <button onclick="showCreatePostModal()" class="px-4 py-2 sm:px-6 sm:py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg font-medium text-xs sm:text-sm hover:shadow-lg transition-all duration-200 w-full sm:w-auto">
+            Post
+        </button>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- Create Post Modal -->
+<div id="createPostModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-4 border-b">
+            <h3 class="text-lg font-semibold">Create Post</h3>
+            <button onclick="hideCreatePostModal()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <form id="createPostForm" enctype="multipart/form-data" class="p-4 space-y-4">
+            <!-- User Info -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center">
+                    <span class="text-white text-sm font-semibold">{{ session.username[0].upper() if session.username else 'U' }}</span>
+                </div>
+                <div>
+                    <p class="font-medium">{{ session.username or 'User' }}</p>
+                    <select id="postCommunity" name="community_id" class="text-sm bg-gray-100 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                        <option value="">Select community...</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Post Content -->
+            <textarea id="modalPostContent" 
+                     name="content" 
+                     placeholder="What's happening in your farm?" 
+                     class="w-full h-32 p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                     maxlength="5000"
+                     required></textarea>
+            
+            <!-- Post Type Selection -->
+            <div class="border-t pt-4">
+                <label class="block text-sm font-medium mb-2">Post Type</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50 post-type-option" data-type="text">
+                        <input type="radio" name="post_type" value="text" checked class="text-green-600">
+                        <i class="fas fa-align-left text-gray-600"></i>
+                        <span class="text-sm">Text</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50 post-type-option" data-type="image">
+                        <input type="radio" name="post_type" value="image" class="text-green-600">
+                        <i class="fas fa-image text-gray-600"></i>
+                        <span class="text-sm">Photo</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50 post-type-option" data-type="alert">
+                        <input type="radio" name="post_type" value="alert" class="text-green-600">
+                        <i class="fas fa-exclamation-triangle text-orange-500"></i>
+                        <span class="text-sm">Alert</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50 post-type-option" data-type="market">
+                        <input type="radio" name="post_type" value="market" class="text-green-600">
+                        <i class="fas fa-chart-line text-blue-500"></i>
+                        <span class="text-sm">Market</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Topic Selection -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Topic</label>
+                <select id="postTopic" name="topic" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="">Select a topic...</option>
+                </select>
+            </div>
+            
+            <!-- Title (for certain post types) -->
+            <div id="titleField" class="hidden">
+                <label class="block text-sm font-medium mb-2">Title</label>
+                <input type="text" 
+                       id="postTitle" 
+                       name="title" 
+                       placeholder="Enter a title..." 
+                       class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            
+            <!-- Photo Upload -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Photo (optional)</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <input type="file" 
+                           id="postImage" 
+                           name="image" 
+                           accept="image/*" 
+                           class="hidden" 
+                           onchange="handleImageUpload(event)">
+                    <div id="imageUploadArea" class="text-center cursor-pointer" onclick="document.getElementById('postImage').click()">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-600">Click to upload a photo</p>
+                        <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB</p>
+                    </div>
+                    <div id="imagePreview" class="hidden mt-3">
+                        <img id="previewImg" src="" alt="Preview" class="max-w-full h-48 object-cover rounded">
+                        <button type="button" onclick="removeImage()" class="mt-2 text-red-600 text-sm hover:underline">
+                            <i class="fas fa-times"></i> Remove image
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Location -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Location (optional)</label>
+                <div class="flex space-x-2">
+                    <select id="postLocation" name="location" class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Select district...</option>
+                    </select>
+                    <button type="button" onclick="getCurrentLocation()" class="px-3 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tags -->
+            <div>
+                <label class="block text-sm font-medium mb-2">Tags (optional)</label>
+                <input type="text" 
+                       id="postTags" 
+                       name="tags" 
+                       placeholder="Add tags separated by commas..." 
+                       class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <p class="text-xs text-gray-500 mt-1">e.g., rice, irrigation, pest-control</p>
+            </div>
+            
+            <!-- Alert-specific fields -->
+            <div id="alertFields" class="hidden space-y-3">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Alert Type</label>
+                    <select name="alert_type" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="general">General Alert</option>
+                        <option value="weather">Weather Alert</option>
+                        <option value="pest">Pest Alert</option>
+                        <option value="disease">Disease Alert</option>
+                        <option value="market">Market Alert</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Severity</label>
+                    <select name="alert_severity" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Market-specific fields -->
+            <div id="marketFields" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Crop</label>
+                        <input type="text" name="market_crop" placeholder="e.g., Rice, Wheat" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Price (BDT)</label>
+                        <input type="number" name="market_price" placeholder="0.00" step="0.01" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Unit</label>
+                        <select name="market_unit" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="kg">Per kg</option>
+                            <option value="maund">Per maund</option>
+                            <option value="ton">Per ton</option>
+                            <option value="piece">Per piece</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Market Location</label>
+                        <input type="text" name="market_location" placeholder="Market name" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Character count -->
+            <div class="text-right">
+                <span id="charCount" class="text-sm text-gray-500">0/5000</span>
+            </div>
+            
+            <!-- Submit buttons -->
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                <button type="button" onclick="hideCreatePostModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                    Cancel
+                </button>
+                <button type="submit" id="submitPostBtn" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="submitBtnText">Post</span>
+                    <i id="submitBtnLoader" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

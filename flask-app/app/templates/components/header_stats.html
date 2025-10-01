@@ -1,0 +1,22 @@
+<!-- Header Stats Component -->
+{% macro header_stats(title, subtitle, stats) %}
+<div class="bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 rounded-xl p-4 sm:p-6 lg:p-8 text-white shadow-xl mb-4 sm:mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+            <i data-lucide="users" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+        </div>
+        <div class="min-w-0">
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-display font-bold text-white">{{ title }}</h1>
+            <p class="text-green-100 text-sm sm:text-base lg:text-lg">{{ subtitle }}</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-3 gap-2 sm:gap-4 mt-4 sm:mt-6">
+        {% for stat in stats %}
+        <div class="text-center">
+            <p class="text-lg sm:text-2xl lg:text-3xl font-bold">{{ stat.number }}</p>
+            <p class="text-green-100 text-xs sm:text-sm">{{ stat.label }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}

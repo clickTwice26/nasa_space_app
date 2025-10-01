@@ -155,7 +155,12 @@ class UserSession(db.Model):
     
     def is_expired(self):
         """Check if session is expired"""
-        return datetime.now(timezone.utc) > self.expires_at
+        now = datetime.now(timezone.utc)
+        # Handle both timezone-aware and timezone-naive expires_at
+        expires_at = self.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        return now > expires_at
     
     def extend_session(self, hours=24):
         """Extend session expiration"""
