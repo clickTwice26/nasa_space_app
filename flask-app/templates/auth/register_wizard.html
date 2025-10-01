@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register - Multi-Step Wizard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="min-h-full bg-gray-50 flex items-center justify-center py-10">
+  <div class="w-full max-w-2xl bg-white shadow-sm rounded-xl border border-gray-200 p-6 space-y-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-xl font-semibold text-gray-800">Create your account</h1>
+      <a href="/auth/login" class="text-sm text-indigo-600 hover:underline">Login</a>
+    </div>
+
+    <div id="alert" class="hidden text-sm rounded-md p-3"></div>
+
+    <!-- Progress -->
+    <div class="flex items-center gap-2 text-xs font-medium">
+      <div class="flex-1 h-1 rounded bg-gray-200 overflow-hidden">
+        <div id="bar-1" class="h-full w-0 bg-indigo-500 transition-all"></div>
+      </div>
+      <div class="flex-1 h-1 rounded bg-gray-200 overflow-hidden">
+        <div id="bar-2" class="h-full w-0 bg-indigo-500 transition-all"></div>
+      </div>
+      <div class="flex-1 h-1 rounded bg-gray-200 overflow-hidden">
+        <div id="bar-3" class="h-full w-0 bg-indigo-500 transition-all"></div>
+      </div>
+      <div class="flex-1 h-1 rounded bg-gray-200 overflow-hidden">
+        <div id="bar-4" class="h-full w-0 bg-indigo-500 transition-all"></div>
+      </div>
+    </div>
+
+    <!-- Step containers -->
+    <form id="step-1" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input name="email" type="email" required class="w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+        <input name="username" required class="w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <input name="password" type="password" required minlength="8" class="w-full rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <button type="submit" class="w-full inline-flex justify-center rounded-md bg-indigo-600 text-white text-sm px-4 py-2 font-medium hover:bg-indigo-700">Continue</button>
+    </form>
+
+    <div id="step-2" class="hidden space-y-4">
+      <h2 class="text-sm font-semibold text-gray-700">Select your role</h2>
+      <div class="grid grid-cols-3 gap-3" id="role-options">
+        <button data-role="student" class="role-btn border rounded-md p-3 text-sm font-medium hover:border-indigo-500">Student</button>
+        <button data-role="farmer" class="role-btn border rounded-md p-3 text-sm font-medium hover:border-indigo-500">Farmer</button>
+        <button data-role="researcher" class="role-btn border rounded-md p-3 text-sm font-medium hover:border-indigo-500">Researcher</button>
+      </div>
+      <div class="flex justify-between pt-2">
+        <button id="back-2" class="text-sm text-gray-600 hover:text-gray-800">Back</button>
+        <button id="next-2" disabled class="inline-flex items-center rounded-md bg-indigo-600 text-white text-sm px-4 py-2 font-medium disabled:opacity-40">Next</button>
+      </div>
+    </div>
+
+    <div id="step-3" class="hidden space-y-4">
+      <h2 class="text-sm font-semibold text-gray-700">Location type</h2>
+      <div class="flex gap-3">
+        <button data-type="fixed" class="loc-type-btn flex-1 border rounded-md p-3 text-sm font-medium hover:border-indigo-500">Fixed Point</button>
+        <button data-type="journey" class="loc-type-btn flex-1 border rounded-md p-3 text-sm font-medium hover:border-indigo-500">Journey</button>
+      </div>
+      <div class="flex justify-between pt-2">
+        <button id="back-3" class="text-sm text-gray-600 hover:text-gray-800">Back</button>
+        <button id="next-3" disabled class="inline-flex items-center rounded-md bg-indigo-600 text-white text-sm px-4 py-2 font-medium disabled:opacity-40">Next</button>
+      </div>
+    </div>
+
+    <div id="step-4" class="hidden space-y-4">
+      <h2 class="text-sm font-semibold text-gray-700" id="map-title">Select location</h2>
+      <div id="map" class="h-64 w-full rounded-md border"></div>
+      <p id="map-hint" class="text-xs text-gray-500">Click on the map to set your point.</p>
+      <div id="journey-hint" class="hidden text-xs text-gray-500">Click to set start point, then end point. Click again to change.</div>
+      <div class="text-xs text-gray-600 space-y-1" id="coord-display"></div>
+      <div class="flex justify-between pt-2">
+        <button id="back-4" class="text-sm text-gray-600 hover:text-gray-800">Back</button>
+        <button id="finish" disabled class="inline-flex items-center rounded-md bg-indigo-600 text-white text-sm px-4 py-2 font-medium disabled:opacity-40">Finish</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const steps = [1,2,3,4];
+  let currentStep = 1;
+  let selectedRole = null;
+  let locationType = null;
+  let map, marker, startMarker, endMarker, journeyPhase = 0;
+  let coords = {};
+
+  function setAlert(msg, type='info'){const box=document.getElementById('alert');box.textContent=msg;box.className='text-sm rounded-md p-3 '+(type==='error'?'bg-red-50 text-red-700 border border-red-200':'bg-indigo-50 text-indigo-700 border border-indigo-200');box.classList.remove('hidden');}
+  function clearAlert(){const box=document.getElementById('alert');box.classList.add('hidden');}
+  function go(step){steps.forEach(s=>{document.getElementById('step-'+s).classList.add('hidden')});document.getElementById('step-'+step).classList.remove('hidden');currentStep=step;updateBars();}
+  function updateBars(){steps.forEach((s,i)=>{document.getElementById('bar-'+s).style.width = (currentStep>i? '100%':'0')});}
+
+  // Step 1 submit
+  document.getElementById('step-1').addEventListener('submit', async e=>{
+    e.preventDefault();clearAlert();
+    const fd=new FormData(e.target);
+    const payload={email:fd.get('email'),username:fd.get('username'),password:fd.get('password')};
+    try{const r=await fetch('/auth/api/register/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await r.json();if(!data.success)return setAlert(data.message,'error');setAlert('Account created. Continue with role.','info');go(2);}catch(err){setAlert('Network error starting registration','error');}
+  });
+
+  // Step 2 role selection
+  document.querySelectorAll('.role-btn').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();selectedRole=btn.dataset.role;document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('border-indigo-500','bg-indigo-50'));btn.classList.add('border-indigo-500','bg-indigo-50');document.getElementById('next-2').disabled=false;}));
+  document.getElementById('back-2').onclick=()=>go(1);
+  document.getElementById('next-2').onclick=async()=>{clearAlert();try{const r=await fetch('/auth/api/register/role',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role:selectedRole})});const data=await r.json();if(!data.success)return setAlert(data.message,'error');go(3);}catch(e){setAlert('Error saving role','error')}};
+
+  // Step 3 location type
+  document.querySelectorAll('.loc-type-btn').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();locationType=btn.dataset.type;document.querySelectorAll('.loc-type-btn').forEach(b=>b.classList.remove('border-indigo-500','bg-indigo-50'));btn.classList.add('border-indigo-500','bg-indigo-50');document.getElementById('next-3').disabled=false;}));
+  document.getElementById('back-3').onclick=()=>go(2);
+  document.getElementById('next-3').onclick=()=>{go(4);initMap();};
+
+  function initMap(){ if(map) return; map=L.map('map').setView([20,0],2); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map); map.on('click', onMapClick); }
+  function onMapClick(e){ if(locationType==='fixed'){ if(!marker){ marker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateFixed); } marker.setLatLng(e.latlng); coords.latitude=e.latlng.lat; coords.longitude=e.latlng.lng; updateFixed(); } else { if(journeyPhase===0){ if(startMarker) map.removeLayer(startMarker); if(endMarker) {map.removeLayer(endMarker); endMarker=null;} startMarker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateJourney); coords.start_latitude=e.latlng.lat; coords.start_longitude=e.latlng.lng; journeyPhase=1; document.getElementById('journey-hint').textContent='Now click to set end point'; document.getElementById('journey-hint').classList.remove('hidden'); } else { if(endMarker) map.removeLayer(endMarker); endMarker=L.marker(e.latlng,{draggable:true}).addTo(map).on('dragend',updateJourney); coords.end_latitude=e.latlng.lat; coords.end_longitude=e.latlng.lng; journeyPhase=0; } updateJourney(); } }
+  function updateFixed(){const ll=marker.getLatLng();coords.latitude=ll.lat;coords.longitude=ll.lng;document.getElementById('coord-display').innerHTML=`Lat: ${ll.lat.toFixed(5)}, Lng: ${ll.lng.toFixed(5)}`;document.getElementById('finish').disabled=false;}
+  function updateJourney(){ let html=''; if(startMarker){const ll=startMarker.getLatLng();coords.start_latitude=ll.lat;coords.start_longitude=ll.lng;html+=`Start: ${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}<br>`;} if(endMarker){const ll2=endMarker.getLatLng();coords.end_latitude=ll2.lat;coords.end_longitude=ll2.lng;html+=`End: ${ll2.lat.toFixed(5)}, ${ll2.lng.toFixed(5)}`; document.getElementById('finish').disabled=false;} document.getElementById('coord-display').innerHTML=html; }
+  document.getElementById('back-4').onclick=()=>go(3);
+
+  document.getElementById('finish').onclick=async()=>{ clearAlert(); const payload={location_type:locationType,...coords}; try{ const r=await fetch('/auth/api/register/location',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); const data=await r.json(); if(!data.success){return setAlert(data.message,'error');} const c=await fetch('/auth/api/register/complete',{method:'POST'}); const cd=await c.json(); if(!cd.success){return setAlert(cd.message,'error');} setAlert('Registration complete. Redirecting...','info'); setTimeout(()=>{window.location.href='/dashboard';},800); }catch(e){ setAlert('Error completing registration','error'); }};
+
+  // UI adjustments for map step
+  const observer = new MutationObserver(()=>{ if(currentStep===4){ if(locationType==='journey'){document.getElementById('map-hint').classList.add('hidden');document.getElementById('journey-hint').classList.remove('hidden');} else {document.getElementById('map-hint').classList.remove('hidden');document.getElementById('journey-hint').classList.add('hidden');} } });
+  observer.observe(document.body,{attributes:true,subtree:true,childList:true});
+
+</script>
+</body>
+</html>

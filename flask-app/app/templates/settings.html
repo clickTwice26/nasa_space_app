@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}TerraPulse - Settings{% endblock %}
+{% block subtitle %}App Settings{% endblock %}
+
+{% block content %}
+<div class="p-8 space-y-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-8 text-white shadow-lg">
+        <div class="flex items-center gap-6">
+            <i data-lucide="settings" class="w-8 h-8 text-white"></i>
+            <div>
+                <h2 class="text-3xl font-bold">Settings</h2>
+                <p class="text-purple-100 mt-1">Customize your TerraPulse experience</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center gap-8 mb-6">
+            <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-2xl font-bold">A</span>
+            </div>
+            <div>
+                <h3 class="text-xl font-semibold text-gray-900">Ahmed Rahman</h3>
+                <p class="text-sm text-gray-600 mt-1">Farmer • Comilla District</p>
+                <p class="text-xs text-gray-400 mt-1">Member since August 2025</p>
+            </div>
+        </div>
+        <button class="w-full py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+            Edit Profile
+        </button>
+    </div>
+
+    <!-- Notification Settings -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Notifications</h3>
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Weather Alerts</p>
+                    <p class="text-xs text-gray-500">Get notified about severe weather conditions</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-terra-green peer-focus:ring-opacity-20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-terra-green"></div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Risk Score Updates</p>
+                    <p class="text-xs text-gray-500">Alerts when environmental risk scores change</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-terra-green peer-focus:ring-opacity-20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-terra-green"></div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Community Posts</p>
+                    <p class="text-xs text-gray-500">New posts from agricultural community</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-terra-green peer-focus:ring-opacity-20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-terra-green"></div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Market Price Updates</p>
+                    <p class="text-xs text-gray-500">Daily market price notifications</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-terra-green peer-focus:ring-opacity-20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-terra-green"></div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Training & Workshops</p>
+                    <p class="text-xs text-gray-500">Agricultural training opportunities</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-terra-green peer-focus:ring-opacity-20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-terra-green"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Preferences -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">App Preferences</h3>
+        <div class="space-y-4">
+            <!-- Dark Mode -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Dark Mode</p>
+                    <p class="text-xs text-gray-500">Switch to dark theme</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-terra-green peer-focus:ring-opacity-20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-600"></div>
+                </label>
+            </div>
+
+            <!-- Language -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Language</p>
+                    <p class="text-xs text-gray-500">Choose your preferred language</p>
+                </div>
+                <select class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green text-sm">
+                    <option>English</option>
+                    <option>বাংলা (Bengali)</option>
+                    <option>हिन्दी (Hindi)</option>
+                </select>
+            </div>
+
+            <!-- Units -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Measurement Units</p>
+                    <p class="text-xs text-gray-500">Temperature and measurement preferences</p>
+                </div>
+                <select class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green text-sm">
+                    <option>Metric (°C, km)</option>
+                    <option>Imperial (°F, miles)</option>
+                </select>
+            </div>
+
+            <!-- Auto Sync -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Auto Sync</p>
+                    <p class="text-xs text-gray-500">Automatically sync data when connected</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-terra-green peer-focus:ring-opacity-20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-terra-green"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data & Privacy -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Data & Privacy</h3>
+        <div class="space-y-3">
+            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="download" class="w-5 h-5 text-gray-600"></i>
+                    <span class="text-sm font-medium text-gray-900">Download My Data</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            </button>
+            
+            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="shield" class="w-5 h-5 text-gray-600"></i>
+                    <span class="text-sm font-medium text-gray-900">Privacy Policy</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            </button>
+            
+            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="file-text" class="w-5 h-5 text-gray-600"></i>
+                    <span class="text-sm font-medium text-gray-900">Terms of Service</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            </button>
+            
+            <button class="w-full flex items-center justify-between p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors border border-red-200">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
+                    <span class="text-sm font-medium text-red-700">Delete Account</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-red-400"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Location Settings -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Location & Farm Info</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Farm Location</label>
+                <select class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green">
+                    <option>Comilla District</option>
+                    <option>Dhaka District</option>
+                    <option>Chittagong District</option>
+                    <option>Sylhet District</option>
+                    <option>Rajshahi District</option>
+                    <option>Khulna District</option>
+                    <option>Barisal District</option>
+                    <option>Rangpur District</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Crop</label>
+                <select class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green">
+                    <option>Rice</option>
+                    <option>Wheat</option>
+                    <option>Potato</option>
+                    <option>Jute</option>
+                    <option>Maize</option>
+                    <option>Tomato</option>
+                    <option>Mixed Crops</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Farm Size (hectares)</label>
+                <input type="number" 
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green" 
+                       placeholder="2.5" 
+                       step="0.1" 
+                       min="0">
+            </div>
+        </div>
+        <button class="w-full mt-4 py-3 bg-terra-green text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+            Save Location Settings
+        </button>
+    </div>
+
+    <!-- App Information -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">App Information</h3>
+        <div class="space-y-3">
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-600">App Version</span>
+                <span class="text-sm font-medium text-gray-900">2.1.0</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-600">Last Updated</span>
+                <span class="text-sm font-medium text-gray-900">September 25, 2025</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-600">Data Usage</span>
+                <span class="text-sm font-medium text-gray-900">45.2 MB</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-600">Cache Size</span>
+                <span class="text-sm font-medium text-gray-900">12.8 MB</span>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-100">
+            <button class="flex items-center justify-center space-x-2 py-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-100 transition-colors">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span class="text-sm font-medium">Check Updates</span>
+            </button>
+            <button class="flex items-center justify-center space-x-2 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span class="text-sm font-medium">Clear Cache</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Support -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Support & Feedback</h3>
+        <div class="space-y-3">
+            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="help-circle" class="w-5 h-5 text-gray-600"></i>
+                    <span class="text-sm font-medium text-gray-900">Help Center</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            </button>
+            
+            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="message-circle" class="w-5 h-5 text-gray-600"></i>
+                    <span class="text-sm font-medium text-gray-900">Contact Support</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            </button>
+            
+            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="star" class="w-5 h-5 text-gray-600"></i>
+                    <span class="text-sm font-medium text-gray-900">Rate TerraPulse</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            </button>
+            
+            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="share-2" class="w-5 h-5 text-gray-600"></i>
+                    <span class="text-sm font-medium text-gray-900">Share App</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sign Out -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <button class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center space-x-2">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <span>Sign Out</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    // Toggle switches functionality
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // Add haptic feedback for mobile
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // You can add actual settings save functionality here
+            console.log(`Setting ${this.closest('.flex').querySelector('p').textContent} changed to:`, this.checked);
+        });
+    });
+    
+    // Location save functionality
+    document.querySelector('button[type="button"]').addEventListener('click', function() {
+        // Show success message or handle location save
+        alert('Location settings saved successfully!');
+    });
+</script>
+{% endblock %}

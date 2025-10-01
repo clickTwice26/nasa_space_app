@@ -1,66 +1,296 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Explorer - NASA Space App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>📊 Data Explorer</h1>
-            <nav>
-                <a href="/">Home</a>
-                <a href="/missions">Missions</a>
-                <a href="/data">Data</a>
-                <a href="/about">About</a>
-            </nav>
-        </header>
-        
-        <main>
-            <div class="card">
-                <h2>Data Statistics</h2>
-                <div id="data-stats">
-                    <button onclick="loadDataStats()">Load Statistics</button>
-                </div>
+{% extends "base.html" %}
+
+{% block title %}TerraPulse - Data Insights{% endblock %}
+{% block subtitle %}Environmental Data{% endblock %}
+
+{% block content %}
+<div class="p-8 space-y-8">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg">
+        <div class="flex items-center gap-6 mb-6">
+            <i data-lucide="bar-chart-3" class="w-8 h-8 text-white"></i>
+            <div>
+                <h2 class="text-3xl font-bold">Data Insights</h2>
+                <p class="text-blue-100 mt-1">Real-time environmental monitoring</p>
             </div>
-            
-            <div class="card">
-                <h2>Data Filters</h2>
-                <div class="filter-controls">
-                    <div class="form-group">
-                        <label for="record-type">Record Type:</label>
-                        <select id="record-type">
-                            <option value="">All Types</option>
-                            <option value="telemetry">Telemetry</option>
-                            <option value="image">Image</option>
-                            <option value="sensor">Sensor</option>
-                            <option value="observation">Observation</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="mission-filter">Mission ID:</label>
-                        <input type="number" id="mission-filter" placeholder="Enter mission ID">
-                    </div>
-                    <button onclick="loadFilteredData()">Apply Filters</button>
-                    <button onclick="loadAllData()">Load All Data</button>
-                </div>
+        </div>
+        <div class="grid grid-cols-3 gap-8 mt-8">
+            <div class="text-center">
+                <p class="text-4xl font-bold text-white">1,247</p>
+                <p class="text-xs text-blue-100 mt-1">Data Points</p>
             </div>
-            
-            <div class="card">
-                <h2>Data Records</h2>
-                <div id="data-list">
-                    <p>Use the controls above to load data records</p>
-                </div>
-                <div class="pagination" id="pagination">
-                    <!-- Pagination controls will be inserted here -->
-                </div>
+            <div class="text-center">
+                <p class="text-4xl font-bold text-white">64</p>
+                <p class="text-xs text-blue-100 mt-1">Districts</p>
             </div>
-        </main>
+            <div class="text-center">
+                <p class="text-4xl font-bold text-white">98%</p>
+                <p class="text-xs text-blue-100 mt-1">Accuracy</p>
+            </div>
+        </div>
     </div>
-    
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/data.js') }}"></script>
-</body>
-</html>
+
+    <!-- Data Source Filters -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">Data Sources</h3>
+        <div class="flex flex-wrap gap-3">
+            <button class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                All Sources
+            </button>
+            <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                🌦 Climate
+            </button>
+            <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                🌱 Soil
+            </button>
+            <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                🛰 Satellite
+            </button>
+            <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                🌾 Crop
+            </button>
+        </div>
+    </div>
+
+    <!-- Climate Data Charts -->
+    <div class="space-y-8">
+        <!-- Temperature Trend -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Temperature Trends</h3>
+                    <p class="card-subtitle">Last 30 days across Bangladesh</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--space-lg);">
+                    <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                        <span style="width: 12px; height: 12px; background: var(--danger); border-radius: 50%;"></span>
+                        <span style="font-size: var(--text-xs); color: var(--text-muted);">Max Temp</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                        <span style="width: 12px; height: 12px; background: var(--secondary-color); border-radius: 50%;"></span>
+                        <span style="font-size: var(--text-xs); color: var(--text-muted);">Min Temp</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Chart Placeholder -->
+            <div class="h-48 bg-gradient-to-r from-red-100 via-yellow-100 to-blue-100 rounded-lg flex items-center justify-center relative overflow-hidden">
+                <div class="relative text-center">
+                    <i data-lucide="trending-up" class="w-12 h-12 text-gray-400 mx-auto mb-3"></i>
+                    <p class="text-sm text-gray-500 mb-1">Temperature Chart</p>
+                    <p class="text-xs text-gray-400">Interactive line chart showing daily temperature variations</p>
+                </div>
+            </div>
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-3 gap-8 mt-6 pt-6 border-t border-gray-100">
+                <div class="text-center">
+                    <p class="text-xl font-bold text-red-600">37.2°C</p>
+                    <p class="text-xs text-gray-500 mt-1">Highest</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-xl font-bold text-blue-600">18.5°C</p>
+                    <p class="text-xs text-gray-500 mt-1">Lowest</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-xl font-bold text-gray-900">28.9°C</p>
+                    <p class="text-xs text-gray-500 mt-1">Average</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rainfall Data -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Rainfall Distribution</h3>
+                    <p class="text-sm text-gray-500">Monthly precipitation by district</p>
+                </div>
+                <button class="text-sm text-terra-green font-medium">View Map</button>
+            </div>
+            <!-- Chart Placeholder -->
+            <div class="chart-placeholder h-40 rounded-lg flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 opacity-20"></div>
+                <div class="relative">
+                    <i data-lucide="cloud-rain" class="w-10 h-10 text-gray-400 mx-auto"></i>
+                    <p class="text-sm text-gray-500 mt-2 text-center">Rainfall Bar Chart</p>
+                </div>
+            </div>
+            <!-- Districts with highest/lowest rainfall -->
+            <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <p class="text-sm font-medium text-blue-900">Highest Rainfall</p>
+                    <p class="text-lg font-bold text-blue-600">285mm</p>
+                    <p class="text-xs text-blue-700">Sylhet District</p>
+                </div>
+                <div class="bg-orange-50 p-3 rounded-lg">
+                    <p class="text-sm font-medium text-orange-900">Lowest Rainfall</p>
+                    <p class="text-lg font-bold text-orange-600">42mm</p>
+                    <p class="text-xs text-orange-700">Rajshahi District</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Soil Health Map -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Soil Health Index</h3>
+                    <p class="text-sm text-gray-500">Regional soil quality assessment</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                    <span class="text-xs text-gray-600">Good</span>
+                    <span class="w-3 h-3 bg-yellow-500 rounded-full ml-2"></span>
+                    <span class="text-xs text-gray-600">Fair</span>
+                    <span class="w-3 h-3 bg-red-500 rounded-full ml-2"></span>
+                    <span class="text-xs text-gray-600">Poor</span>
+                </div>
+            </div>
+            <!-- Map Placeholder -->
+            <div class="chart-placeholder h-48 rounded-lg flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-green-400 via-yellow-400 to-red-400 opacity-20"></div>
+                <div class="relative">
+                    <i data-lucide="map" class="w-12 h-12 text-gray-400 mx-auto"></i>
+                    <p class="text-sm text-gray-500 mt-2 text-center">Interactive Soil Health Map</p>
+                    <p class="text-xs text-gray-400 text-center">Color-coded map showing soil quality across Bangladesh</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NDVI Satellite Data -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Vegetation Health (NDVI)</h3>
+                    <p class="text-sm text-gray-500">Satellite-derived vegetation index</p>
+                </div>
+                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded border">
+                    Updated 2h ago
+                </span>
+            </div>
+            <!-- NDVI Chart Placeholder -->
+            <div class="chart-placeholder h-40 rounded-lg flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 opacity-20"></div>
+                <div class="relative">
+                    <i data-lucide="satellite" class="w-10 h-10 text-gray-400 mx-auto"></i>
+                    <p class="text-sm text-gray-500 mt-2 text-center">NDVI Heatmap</p>
+                </div>
+            </div>
+            <!-- NDVI Stats -->
+            <div class="grid grid-cols-4 gap-3 mt-4 pt-4 border-t border-gray-100">
+                <div class="text-center">
+                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <i data-lucide="leaf" class="w-4 h-4 text-green-600"></i>
+                    </div>
+                    <p class="text-sm font-bold text-green-600">0.85</p>
+                    <p class="text-xs text-gray-500">Excellent</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-8 h-8 bg-lime-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <i data-lucide="leaf" class="w-4 h-4 text-lime-600"></i>
+                    </div>
+                    <p class="text-sm font-bold text-lime-600">0.72</p>
+                    <p class="text-xs text-gray-500">Good</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <i data-lucide="leaf" class="w-4 h-4 text-yellow-600"></i>
+                    </div>
+                    <p class="text-sm font-bold text-yellow-600">0.58</p>
+                    <p class="text-xs text-gray-500">Fair</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <i data-lucide="leaf" class="w-4 h-4 text-red-600"></i>
+                    </div>
+                    <p class="text-sm font-bold text-red-600">0.34</p>
+                    <p class="text-xs text-gray-500">Poor</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crop Yield Predictions -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Crop Yield Forecasts</h3>
+                    <p class="text-sm text-gray-500">AI-predicted yields for major crops</p>
+                </div>
+                <button class="text-sm text-terra-green font-medium">Details</button>
+            </div>
+            <!-- Crop Cards -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="wheat" class="w-5 h-5 text-yellow-600"></i>
+                        <span class="text-sm font-medium text-yellow-900">Rice</span>
+                    </div>
+                    <p class="text-2xl font-bold text-yellow-700">4.2 MT/ha</p>
+                    <p class="text-xs text-yellow-600">+8% vs last year</p>
+                    <div class="mt-2 w-full bg-yellow-200 rounded-full h-2">
+                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 84%"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="wheat" class="w-5 h-5 text-orange-600"></i>
+                        <span class="text-sm font-medium text-orange-900">Wheat</span>
+                    </div>
+                    <p class="text-2xl font-bold text-orange-700">3.1 MT/ha</p>
+                    <p class="text-xs text-orange-600">-2% vs last year</p>
+                    <div class="mt-2 w-full bg-orange-200 rounded-full h-2">
+                        <div class="bg-orange-500 h-2 rounded-full" style="width: 62%"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="wheat" class="w-5 h-5 text-purple-600"></i>
+                        <span class="text-sm font-medium text-purple-900">Potato</span>
+                    </div>
+                    <p class="text-2xl font-bold text-purple-700">24.8 MT/ha</p>
+                    <p class="text-xs text-purple-600">+12% vs last year</p>
+                    <div class="mt-2 w-full bg-purple-200 rounded-full h-2">
+                        <div class="bg-purple-500 h-2 rounded-full" style="width: 92%"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="wheat" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-sm font-medium text-green-900">Jute</span>
+                    </div>
+                    <p class="text-2xl font-bold text-green-700">2.8 MT/ha</p>
+                    <p class="text-xs text-green-600">+5% vs last year</p>
+                    <div class="mt-2 w-full bg-green-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 70%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Export & Download -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Export Data</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <button class="flex items-center justify-center space-x-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-100 transition-colors">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span class="text-sm font-medium">Download CSV</span>
+                </button>
+                <button class="flex items-center justify-center space-x-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 hover:bg-green-100 transition-colors">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span class="text-sm font-medium">Generate Report</span>
+                </button>
+                <button class="flex items-center justify-center space-x-2 p-3 bg-purple-50 border border-purple-200 rounded-lg text-purple-700 hover:bg-purple-100 transition-colors">
+                    <i data-lucide="share" class="w-4 h-4"></i>
+                    <span class="text-sm font-medium">Share Dashboard</span>
+                </button>
+                <button class="flex items-center justify-center space-x-2 p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 hover:bg-orange-100 transition-colors">
+                    <i data-lucide="api" class="w-4 h-4"></i>
+                    <span class="text-sm font-medium">API Access</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

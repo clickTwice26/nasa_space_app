@@ -2,6 +2,9 @@ from app import db, ma
 from datetime import datetime
 from sqlalchemy import func
 
+# Import user models
+from .user import User, UserSession, OnboardingProgress
+
 class Mission(db.Model):
     """NASA Mission model"""
     __tablename__ = 'missions'

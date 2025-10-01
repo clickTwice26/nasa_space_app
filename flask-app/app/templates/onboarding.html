@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TerraPulse - Welcome to Environmental Intelligence">
+    <meta name="theme-color" content="#059669">
+    <title>Welcome to TerraPulse</title>
+    
+    <!-- TerraPulse Global CSS -->
+    <link rel="stylesheet" href="/static/css/terrapulse.css">
+    
+    <!-- Tailwind CSS (for additional utilities) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        /* Onboarding specific styles */
+        .onboarding-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+        }
+        
+        .slide-container {
+            position: relative;
+            overflow: hidden;
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .slide {
+            position: absolute;
+            width: 100%;
+            max-width: 28rem;
+            padding: 1rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+        
+        .profile-card {
+            background: white;
+            border: 2px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .profile-card.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(5, 150, 105, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-brand);
+        }
+        
+        .profile-check {
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid var(--border-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-card.selected .profile-check {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .profile-check i {
+            opacity: 0;
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+        
+        .profile-card.selected .profile-check i {
+            opacity: 1;
+        }
+        
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .progress-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background-color: var(--terra-gray-300);
+            transition: background-color 0.3s ease;
+        }
+        
+        .progress-dot.active {
+            background-color: var(--primary-color);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+        }
+        
+        .feature-icon {
+            width: 2rem;
+            height: 2rem;
+            background-color: var(--terra-green-100);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .welcome-icon {
+            width: 6rem;
+            height: 6rem;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+        }
+        
+        .success-icon {
+            width: 5rem;
+            height: 5rem;
+            background-color: var(--terra-green-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="onboarding-container">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 py-4">
+                <div class="flex items-center justify-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-terra-green-600 to-terra-blue-500 rounded-xl flex items-center justify-center">
+                            <i data-lucide="leaf" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">TerraPulse</h1>
+                            <p class="text-sm text-gray-600">Environmental Intelligence Platform</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="slide-container">
+            <!-- Welcome Slide -->
+            <div id="slide-1" class="slide active">
+                <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                    <div class="welcome-icon">
+                        <i data-lucide="globe" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Welcome to TerraPulse</h2>
+                    <p class="text-gray-600 text-lg mb-8 leading-relaxed">
+                        Your intelligent companion for environmental monitoring and agricultural insights in Bangladesh
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center text-left p-4 bg-terra-green-50 rounded-lg">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-terra-green-600 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">Real-time environmental monitoring</span>
+                        </div>
+                        <div class="flex items-center text-left p-4 bg-terra-blue-50 rounded-lg">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-terra-blue-600 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">AI-powered agricultural insights</span>
+                        </div>
+                        <div class="flex items-center text-left p-4 bg-terra-orange-50 rounded-lg">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-terra-orange-600 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">Community-driven knowledge sharing</span>
+                        </div>
+                    </div>
+                    <button onclick="nextSlide()" class="btn btn-primary btn-lg btn-full mt-8">
+                        <span>Get Started</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Selection Slide -->
+            <div id="slide-2" class="slide">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Choose Your Profile</h2>
+                        <p class="text-gray-600">Help us personalize your TerraPulse experience</p>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <!-- Student Profile -->
+                        <div class="profile-card" data-profile="student">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="graduation-cap" class="w-6 h-6 text-blue-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-900">Student</h3>
+                                    <p class="text-sm text-gray-600">Learning about environmental science and climate change</p>
+                                </div>
+                                <div class="profile-check">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Farmer Profile -->
+                        <div class="profile-card" data-profile="farmer">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="wheat" class="w-6 h-6 text-green-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-900">Farmer</h3>
+                                    <p class="text-sm text-gray-600">Growing crops and managing agricultural operations</p>
+                                </div>
+                                <div class="profile-check">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Researcher Profile -->
+                        <div class="profile-card" data-profile="researcher">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="microscope" class="w-6 h-6 text-purple-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-900">Researcher</h3>
+                                    <p class="text-sm text-gray-600">Studying environmental patterns and climate data</p>
+                                </div>
+                                <div class="profile-check">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button id="continue-btn" onclick="nextSlide()" disabled class="btn btn-full py-4 text-lg font-semibold transition-all duration-300 bg-gray-300 text-gray-500 cursor-not-allowed">
+                            Continue
+                        </button>
+                        <button onclick="prevSlide()" class="btn btn-ghost btn-full">
+                            Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Setup Slide -->
+            <div id="slide-3" class="slide">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="text-center mb-8">
+                        <div class="success-icon">
+                            <i data-lucide="check-circle" class="w-8 h-8 text-terra-green-600"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">You're All Set!</h2>
+                        <p class="text-gray-600" id="profile-message">
+                            Your profile has been configured for the best TerraPulse experience
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-6 mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Available Features:</h3>
+                        <div id="features-list">
+                            <!-- Features will be dynamically populated -->
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button onclick="completeOnboarding()" class="btn btn-primary btn-lg btn-full">
+                            <span>Start Using TerraPulse</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="prevSlide()" class="btn btn-ghost btn-full">
+                            Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-dot active" data-slide="1"></div>
+            <div class="progress-dot" data-slide="2"></div>
+            <div class="progress-dot" data-slide="3"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSlide = 1;
+        let selectedProfile = null;
+
+        // Profile features configuration
+        const profileFeatures = {
+            student: {
+                message: "Your educational journey in environmental science begins here",
+                features: [
+                    { icon: "book-open", text: "Educational environmental data and resources" },
+                    { icon: "bar-chart-3", text: "Climate visualization and learning tools" },
+                    { icon: "users", text: "Student community discussions and forums" },
+                    { icon: "graduation-cap", text: "Learning modules and guided tutorials" },
+                    { icon: "download", text: "Educational content downloads" }
+                ]
+            },
+            farmer: {
+                message: "Empowering your agricultural decisions with smart insights",
+                features: [
+                    { icon: "trending-up", text: "Crop prediction and risk assessment" },
+                    { icon: "cloud-rain", text: "Weather forecasts and alerts" },
+                    { icon: "wheat", text: "Agricultural recommendations" },
+                    { icon: "users", text: "Farmer community and expert advice" },
+                    { icon: "bar-chart-3", text: "Soil and crop data analysis" }
+                ]
+            },
+            researcher: {
+                message: "Advanced tools for environmental research and analysis",
+                features: [
+                    { icon: "database", text: "Comprehensive environmental datasets" },
+                    { icon: "trending-up", text: "Advanced prediction models" },
+                    { icon: "bar-chart-3", text: "Data visualization and analytics" },
+                    { icon: "download", text: "Data export capabilities" },
+                    { icon: "microscope", text: "Research collaboration tools" }
+                ]
+            }
+        };
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Setup profile selection
+            setupProfileSelection();
+            
+            console.log('Onboarding initialized successfully');
+        });
+
+        function setupProfileSelection() {
+            const profileCards = document.querySelectorAll('.profile-card');
+            
+            profileCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Profile card clicked:', this.dataset.profile);
+                    
+                    // Remove previous selection
+                    profileCards.forEach(c => {
+                        c.classList.remove('selected');
+                    });
+
+                    // Add selection to clicked card
+                    this.classList.add('selected');
+
+                    // Update selected profile
+                    selectedProfile = this.dataset.profile;
+                    console.log('Selected profile:', selectedProfile);
+                    
+                    // Enable continue button
+                    enableContinueButton();
+                });
+            });
+        }
+
+        function enableContinueButton() {
+            const continueBtn = document.getElementById('continue-btn');
+            if (continueBtn) {
+                continueBtn.disabled = false;
+                continueBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                continueBtn.classList.add('btn-primary');
+                console.log('Continue button enabled');
+            }
+        }
+
+        function nextSlide() {
+            console.log('nextSlide called, currentSlide:', currentSlide, 'selectedProfile:', selectedProfile);
+            
+            // Don't proceed from slide 2 if no profile is selected
+            if (currentSlide === 2 && !selectedProfile) {
+                console.log('No profile selected, cannot continue');
+                return;
+            }
+            
+            // Setup final slide if moving from profile selection
+            if (currentSlide === 2 && selectedProfile) {
+                setupFinalSlide();
+            }
+            
+            if (currentSlide < 3) {
+                // Hide current slide
+                const currentSlideEl = document.getElementById(`slide-${currentSlide}`);
+                currentSlideEl.classList.remove('active');
+                currentSlideEl.classList.add('prev');
+                
+                // Move to next slide
+                currentSlide++;
+                
+                // Show next slide after a brief delay
+                setTimeout(() => {
+                    const nextSlideEl = document.getElementById(`slide-${currentSlide}`);
+                    nextSlideEl.classList.add('active');
+                    updateProgressIndicator();
+                }, 100);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                // Hide current slide
+                const currentSlideEl = document.getElementById(`slide-${currentSlide}`);
+                currentSlideEl.classList.remove('active');
+                
+                // Move to previous slide
+                currentSlide--;
+                
+                // Show previous slide
+                const prevSlideEl = document.getElementById(`slide-${currentSlide}`);
+                prevSlideEl.classList.remove('prev');
+                prevSlideEl.classList.add('active');
+                
+                updateProgressIndicator();
+            }
+        }
+
+        function updateProgressIndicator() {
+            const progressDots = document.querySelectorAll('.progress-dot');
+            progressDots.forEach((dot, index) => {
+                if (index + 1 <= currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        function setupFinalSlide() {
+            if (!selectedProfile || !profileFeatures[selectedProfile]) {
+                console.error('Invalid profile:', selectedProfile);
+                return;
+            }
+            
+            const config = profileFeatures[selectedProfile];
+            
+            // Update message
+            const messageEl = document.getElementById('profile-message');
+            if (messageEl) {
+                messageEl.textContent = config.message;
+            }
+            
+            // Update features list
+            const featuresList = document.getElementById('features-list');
+            if (featuresList) {
+                featuresList.innerHTML = '';
+                
+                config.features.forEach(feature => {
+                    const featureDiv = document.createElement('div');
+                    featureDiv.className = 'feature-item';
+                    featureDiv.innerHTML = `
+                        <div class="feature-icon">
+                            <i data-lucide="${feature.icon}" class="w-4 h-4 text-terra-green-600"></i>
+                        </div>
+                        <span class="text-gray-700">${feature.text}</span>
+                    `;
+                    featuresList.appendChild(featureDiv);
+                });
+                
+                // Reinitialize icons for new content
+                lucide.createIcons();
+            }
+            
+            console.log('Final slide setup completed for profile:', selectedProfile);
+        }
+
+        function completeOnboarding() {
+            if (!selectedProfile) {
+                console.error('No profile selected');
+                return;
+            }
+            
+            try {
+                // Save to backend using our authentication API
+                fetch('/auth/api/onboarding/complete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        profile_type: selectedProfile
+                    })
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          console.log('Onboarding completed:', data);
+                          // Redirect to dashboard
+                          window.location.href = '/dashboard';
+                      } else {
+                          console.error('Onboarding completion failed:', data.message);
+                          alert('Error completing onboarding. Please try again.');
+                      }
+                  })
+                  .catch(error => {
+                      console.error('Error completing onboarding:', error);
+                      alert('Error completing onboarding. Please try again.');
+                  });
+                
+            } catch (error) {
+                console.error('Error completing onboarding:', error);
+                alert('There was an error completing onboarding. Please try again.');
+            }
+        }
+
+        // Debug function to check if everything is working
+        function debugOnboarding() {
+            console.log('Current slide:', currentSlide);
+            console.log('Selected profile:', selectedProfile);
+            console.log('Profile cards:', document.querySelectorAll('.profile-card').length);
+        }
+    </script>
+</body>
+</html>

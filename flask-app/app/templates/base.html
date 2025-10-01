@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TerraPulse - Predicting and mitigating environmental degradation in Bangladesh">
+    <meta name="theme-color" content="#059669">
+    <title>{% block title %}TerraPulse{% endblock %}</title>
+    
+    <!-- TerraPulse Global CSS -->
+    <link rel="stylesheet" href="/static/css/terrapulse.css">
+    
+    <!-- Tailwind CSS (for additional utilities) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'terra-green': {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22'
+                        },
+                        'terra-blue': {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        },
+                        'terra-orange': '#ea580c',
+                        'terra-yellow': '#eab308',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- PWA Meta -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <style>
+        /* Fix iOS Safari scrolling */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .main-container {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+    </style>
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="h-full bg-gray-50 font-sans">
+    <!-- Main Content Container -->
+    <div class="main-container flex flex-col h-full">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+            <div class="px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-terra-green to-terra-blue rounded-lg flex items-center justify-center">
+                            <i data-lucide="leaf" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold text-gray-900">TerraPulse</h1>
+                            <p class="text-xs text-gray-500">{% block subtitle %}Environmental Intelligence{% endblock %}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <!-- Notification Bell -->
+                        <button class="relative p-2 text-gray-500 hover:text-terra-green transition-colors">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                        </button>
+                        <!-- Profile -->
+                        <button class="w-8 h-8 bg-terra-green rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-medium">A</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-1 relative" style="height: calc(100vh - 120px); overflow-y: auto; -webkit-overflow-scrolling: touch;">
+            <div class="w-full" style="padding-bottom: 100px;">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <!-- Floating Action Button -->
+        <div class="fixed bottom-20 right-4 z-50">
+            <button class="fab w-14 h-14 bg-terra-green text-white rounded-full flex items-center justify-center hover:bg-green-700 transition-all duration-300 transform hover:scale-110">
+                <i data-lucide="plus" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Navigation (hidden if not authenticated) -->
+        {% if session.get('session_id') %}
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40" id="bottom-nav">
+            <div class="grid h-16" id="nav-grid">
+                <a href="/dashboard" class="nav-item {% if request.endpoint == 'dashboard' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span class="text-xs font-medium">Dashboard</span>
+                </a>
+                <a href="/predictions" class="nav-item {% if request.endpoint == 'predictions' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 farming-feature">
+                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                    <span class="text-xs font-medium">Predict</span>
+                </a>
+                <a href="/data" class="nav-item {% if request.endpoint == 'data' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    <span class="text-xs font-medium">Data</span>
+                </a>
+                <a href="/community" class="nav-item {% if request.endpoint == 'community' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span class="text-xs font-medium">Community</span>
+                </a>
+                <a href="/settings" class="nav-item {% if request.endpoint == 'settings' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span class="text-xs font-medium">Settings</span>
+                </a>
+            </div>
+        </nav>
+        {% endif %}
+    </div>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+        
+        // Profile-based feature management
+        function initializeProfileFeatures() {
+            const userProfile = sessionStorage.getItem('userProfile');
+            const onboardingCompleted = sessionStorage.getItem('onboardingCompleted');
+            
+            // Redirect to onboarding if not completed
+            if (!onboardingCompleted && window.location.pathname !== '/onboarding') {
+                window.location.href = '/onboarding';
+                return;
+            }
+            
+            if (userProfile === 'student') {
+                // Hide farming-specific features for students
+                hideElementsByClass('farming-feature');
+                updateNavigationForStudent();
+            }
+            
+            // Update profile indicator in header
+            updateProfileIndicator(userProfile);
+        }
+        
+        function hideElementsByClass(className) {
+            const elements = document.querySelectorAll('.' + className);
+            elements.forEach(element => {
+                element.style.display = 'none';
+            });
+        }
+        
+        function updateNavigationForStudent() {
+            // Update grid layout to remove farming features
+            const navGrid = document.getElementById('nav-grid');
+            if (navGrid) {
+                navGrid.className = 'grid grid-cols-4 h-16'; // 4 columns instead of 5
+            }
+        }
+        
+        function updateProfileIndicator(profile) {
+            const profileButton = document.querySelector('header button:last-child span');
+            if (profileButton && profile) {
+                const profileIcons = {
+                    'student': 'S',
+                    'farmer': 'F', 
+                    'researcher': 'R'
+                };
+                profileButton.textContent = profileIcons[profile] || 'A';
+            }
+        }
+        
+        // Initialize profile features when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeProfileFeatures();
+        });
+        
+        // Simple PWA features
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js');
+        }
+        
+        // Simple touch feedback
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                e.target.style.transform = 'scale(0.95)';
+            }
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                setTimeout(() => {
+                    e.target.style.transform = 'scale(1)';
+                }, 100);
+            }
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

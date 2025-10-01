@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}TerraPulse - Predictions{% endblock %}
+{% block subtitle %}Environmental Predictions{% endblock %}
+
+{% block content %}
+<div style="min-height: 100vh;">
+    <div class="p-8 space-y-8 pb-16">
+        <!-- Header Section -->
+        <div class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg">
+            <div class="flex items-center gap-6">
+                <i data-lucide="trending-up" class="w-8 h-8 text-white"></i>
+                <div>
+                    <h2 class="text-3xl font-bold">Environmental Predictions</h2>
+                    <p class="text-indigo-100 mt-1">AI-powered risk assessment for your crops</p>
+                </div>
+            </div>
+        </div>
+
+    <!-- Prediction Form -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">Create New Prediction</h3>
+        <form class="space-y-6">
+            <!-- Location Input -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                    Location
+                </label>
+                <div class="relative">
+                    <select class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option>Select District</option>
+                        <option>Dhaka</option>
+                        <option>Chittagong</option>
+                        <option>Sylhet</option>
+                        <option>Rajshahi</option>
+                        <option>Khulna</option>
+                        <option>Barisal</option>
+                        <option>Rangpur</option>
+                        <option>Mymensingh</option>
+                        <option>Comilla</option>
+                    </select>
+                    <i data-lucide="chevron-down" style="position: absolute; right: var(--space-lg); top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;"></i>
+                </div>
+            </div>
+
+            <!-- Crop Type -->
+            <div>
+                <label class="block text-sm font-medium text-text-dark mb-2">
+                    <i data-lucide="wheat" class="w-4 h-4 inline mr-1"></i>
+                    Crop Type
+                </label>
+                                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-terra-yellow-600"></i>
+                        <span class="text-xs font-medium">Rice</span>
+                    </button>
+                    <button type="button" class="crop-btn btn btn-primary text-center transition-all">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-white"></i>
+                        <span class="text-xs font-medium text-white">Wheat</span>
+                    </button>
+                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-terra-orange-600"></i>
+                        <span class="text-xs font-medium">Potato</span>
+                    </button>
+                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-terra-green-600"></i>
+                        <span class="text-xs font-medium">Jute</span>
+                    </button>
+                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-terra-yellow-500"></i>
+                        <span class="text-xs font-medium">Maize</span>
+                    </button>
+                    <button type="button" class="crop-btn btn btn-outline text-center transition-all">
+                        <i data-lucide="wheat" class="w-6 h-6 mx-auto mb-1 text-danger"></i>
+                        <span class="text-xs font-medium">Tomato</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Soil Parameters -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-dark mb-2">
+                        <i data-lucide="beaker" class="w-4 h-4 inline mr-1"></i>
+                        Soil pH
+                    </label>
+                    <input type="number" 
+                           class="form-input" 
+                           placeholder="6.5" 
+                           step="0.1" 
+                           min="1" 
+                           max="14">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-dark mb-2">
+                        <i data-lucide="droplets" class="w-4 h-4 inline mr-1"></i>
+                        Soil Moisture (%)
+                    </label>
+                    <input type="number" 
+                           class="form-input" 
+                           placeholder="65" 
+                           min="0" 
+                           max="100">
+                </div>
+            </div>
+
+            <!-- Climate Parameters -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-dark mb-2">
+                        <i data-lucide="cloud-rain" class="w-4 h-4 inline mr-1"></i>
+                        Expected Rainfall (mm)
+                    </label>
+                    <input type="number" 
+                           class="form-input" 
+                           placeholder="150" 
+                           min="0">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i data-lucide="thermometer" class="w-4 h-4 inline mr-1"></i>
+                        Avg Temperature (°C)
+                    </label>
+                    <input type="number" 
+                           class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terra-green focus:border-transparent text-base" 
+                           placeholder="28" 
+                           min="-10" 
+                           max="50">
+                </div>
+            </div>
+
+            <!-- Growing Season -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>
+                    Growing Season
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" class="season-btn p-3 border-2 border-terra-green bg-terra-green bg-opacity-10 rounded-lg text-center transition-all">
+                        <span class="text-sm font-medium text-terra-green">Kharif</span>
+                        <span class="text-xs text-terra-green block">Apr-Sep</span>
+                    </button>
+                    <button type="button" class="season-btn p-3 border-2 border-gray-200 rounded-lg text-center transition-all">
+                        <span class="text-sm font-medium text-gray-700">Rabi</span>
+                        <span class="text-xs text-gray-500 block">Oct-Mar</span>
+                    </button>
+                    <button type="button" class="season-btn p-3 border-2 border-gray-200 rounded-lg text-center transition-all">
+                        <span class="text-sm font-medium text-gray-700">Summer</span>
+                        <span class="text-xs text-gray-500 block">Mar-Jun</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full bg-terra-green text-white py-4 rounded-lg font-semibold text-base flex items-center justify-center space-x-2 hover:bg-green-700 transition-colors">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+                <span>Generate Prediction</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Prediction Result Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Latest Prediction Result</h3>
+            <span class="text-xs text-gray-500">Generated 2 mins ago</span>
+        </div>
+        
+        <!-- Risk Score -->
+        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-4 mb-4 border border-yellow-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Environmental Risk Score</p>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-3xl font-bold text-orange-600">7.2</span>
+                        <span class="text-sm text-gray-500">/ 10</span>
+                    </div>
+                    <span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full border border-yellow-200 mt-2">
+                        Moderate Risk
+                    </span>
+                </div>
+                <div class="w-20 h-20">
+                    <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                              fill="none" stroke="#e5e7eb" stroke-width="3"/>
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                              fill="none" stroke="#ea580c" stroke-width="3" 
+                              stroke-dasharray="72, 100"/>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-sm font-bold text-orange-600">72%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Factors -->
+        <div class="space-y-3 mb-4">
+            <h4 class="text-sm font-semibold text-gray-900">Key Risk Factors</h4>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="thermometer-sun" class="w-4 h-4 text-red-600"></i>
+                        <span class="text-sm font-medium text-gray-900">High Temperature</span>
+                    </div>
+                    <span class="text-sm font-semibold text-red-600">High Risk</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="cloud-rain-wind" class="w-4 h-4 text-yellow-600"></i>
+                        <span class="text-sm font-medium text-gray-900">Irregular Rainfall</span>
+                    </div>
+                    <span class="text-sm font-semibold text-yellow-600">Medium Risk</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="beaker" class="w-4 h-4 text-green-600"></i>
+                        <span class="text-sm font-medium text-gray-900">Soil pH Level</span>
+                    </div>
+                    <span class="text-sm font-semibold text-green-600">Low Risk</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <h4 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                <i data-lucide="lightbulb" class="w-4 h-4 mr-2 text-blue-600"></i>
+                Recommendations
+            </h4>
+            <ul class="space-y-1 text-sm text-gray-700">
+                <li class="flex items-start space-x-2">
+                    <span class="w-1 h-1 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Consider drought-resistant wheat varieties</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                    <span class="w-1 h-1 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Install drip irrigation system</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                    <span class="w-1 h-1 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Apply organic mulch to retain soil moisture</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                    <span class="w-1 h-1 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Monitor soil moisture levels weekly</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Recent Predictions -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Predictions</h3>
+            <button class="text-sm text-terra-green font-medium">View All</button>
+        </div>
+        <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="wheat" class="w-5 h-5 text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Rice - Dhaka</p>
+                        <p class="text-xs text-gray-500">Risk Score: 5.4/10</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded border border-green-200">
+                        Low Risk
+                    </span>
+                    <p class="text-xs text-gray-500 mt-1">3 days ago</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="wheat" class="w-5 h-5 text-orange-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Potato - Rangpur</p>
+                        <p class="text-xs text-gray-500">Risk Score: 8.1/10</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded border border-red-200">
+                        High Risk
+                    </span>
+                    <p class="text-xs text-gray-500 mt-1">1 week ago</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script>
+    // Crop selection
+    document.querySelectorAll('.crop-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.crop-btn').forEach(b => {
+                b.className = 'crop-btn p-3 border-2 border-gray-200 rounded-lg text-center transition-all';
+                b.querySelector('i').className = b.querySelector('i').className.replace('text-terra-green', 'text-gray-400');
+                b.querySelector('span').className = 'text-xs font-medium text-gray-700';
+            });
+            this.className = 'crop-btn p-3 border-2 border-terra-green bg-terra-green bg-opacity-10 rounded-lg text-center transition-all';
+            this.querySelector('span').className = 'text-xs font-medium text-terra-green';
+        });
+    });
+
+    // Season selection
+    document.querySelectorAll('.season-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.season-btn').forEach(b => {
+                b.className = 'season-btn p-3 border-2 border-gray-200 rounded-lg text-center transition-all';
+                b.querySelector('span').className = 'text-sm font-medium text-gray-700';
+                b.querySelector('span:last-child').className = 'text-xs text-gray-500 block';
+            });
+            this.className = 'season-btn p-3 border-2 border-terra-green bg-terra-green bg-opacity-10 rounded-lg text-center transition-all';
+            this.querySelector('span').className = 'text-sm font-medium text-terra-green';
+            this.querySelector('span:last-child').className = 'text-xs text-terra-green block';
+        });
+    });
+</script>
+{% endblock %}

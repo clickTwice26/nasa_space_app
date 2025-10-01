@@ -29,6 +29,12 @@ def create_app(config_name='development'):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = os.getenv('FLASK_ENV') == 'development'
     
+    # Session configuration for proper cookie handling
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+    app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
+    
     # Ensure instance folder exists
     try:
         os.makedirs(app.instance_path)
@@ -39,16 +45,18 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     ma.init_app(app)
-    CORS(app)
+    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
     
     # Register blueprints
     from app.routes.main_routes import main_bp
     from app.routes.api_routes import api_bp
     from app.routes.mission_routes import mission_bp
+    from app.routes.auth_routes import auth_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp, url_prefix='/api')
-    app.register_blueprint(mission_bp, url_prefix='/api/missions')
+    app.register_blueprint(mission_bp, url_prefix='/missions')
+    app.register_blueprint(auth_bp)
     
     # Create database tables
     with app.app_context():
