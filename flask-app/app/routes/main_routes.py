@@ -1,8 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session
-from app.routes.auth_routes import login_required, onboarding_required, is_authenticated, get_current_user
-from app.services.auth_service import AuthService
-from app.models.user import User
-from app import db
+from app.routes.auth_routes import login_required, is_authenticated, get_current_user
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,22 +8,19 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    """Main entry point - redirect based on authentication status"""
+    """Main entry point - start session-based flow"""
     if is_authenticated():
         user = get_current_user()
-        if user and not user['onboarding_completed']:
+        if user and user.get('onboarding_completed'):
+            return redirect(url_for('main.dashboard'))
+        else:
             return redirect(url_for('main.onboarding'))
-        return redirect(url_for('main.dashboard'))
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('main.onboarding'))
 
 @main_bp.route('/onboarding')
-@login_required
 def onboarding():
-    """User onboarding flow"""
-    user = get_current_user()
-    if user and user['onboarding_completed']:
-        return redirect(url_for('main.dashboard'))
-    return render_template('onboarding.html')
+    """User onboarding flow - session-based registration"""
+    return render_template('onboarding_simple.html')
 
 @main_bp.route('/risk-dashboard')
 def risk_dashboard():
@@ -34,32 +28,32 @@ def risk_dashboard():
     return render_template('risk_dashboard.html')
 
 @main_bp.route('/dashboard')
-@onboarding_required
+@login_required
 def dashboard():
     """TerraPulse Dashboard"""
     return render_template('dashboard.html')
 
 @main_bp.route('/predictions')
-@onboarding_required
+@login_required
 def predictions():
     """Environmental Predictions"""
     return render_template('predictions.html')
 
 @main_bp.route('/data')
-@onboarding_required
+@login_required
 def data_page():
     """Data Insights & Analytics"""
     return render_template('data.html')
 
 @main_bp.route('/community')
-@onboarding_required
+@login_required
 def community():
     """Agricultural Community Feed"""
     user = get_current_user()
     return render_template('community.html', user=user)
 
 @main_bp.route('/discover')
-@onboarding_required
+@login_required
 def discover():
     """Discover communities page"""
     from app.services.community_service import CommunityService
@@ -82,13 +76,13 @@ def discover():
                          user=user)
 
 @main_bp.route('/settings')
-@onboarding_required
+@login_required
 def settings():
     """App Settings"""
     return render_template('settings.html')
 
 @main_bp.route('/missions')
-@onboarding_required
+@login_required
 def missions_page():
     """Legacy missions page (keep for compatibility)"""
     return render_template('missions.html')

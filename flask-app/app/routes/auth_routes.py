@@ -1,7 +1,10 @@
 from flask import Blueprint, request, jsonify, session, redirect, url_for, render_template, flash
-from app.services.auth_service import AuthService, OnboardingService, ProfileService
 from functools import wraps
 import logging
+import uuid
+import random
+import string
+from datetime import datetime
 
 # Create blueprint
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -10,56 +13,54 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Helper function to generate random user data
+def generate_random_user():
+    """Generate random user credentials for session-based auth"""
+    
+    # Generate random username
+    adjectives = ['Happy', 'Smart', 'Bright', 'Green', 'Solar', 'Earth', 'Ocean', 'Sky', 'Forest', 'River']
+    nouns = ['Farmer', 'Gardener', 'Explorer', 'Guardian', 'Scientist', 'Pioneer', 'Keeper', 'Watcher', 'Friend', 'Helper']
+    username = f"{random.choice(adjectives)}{random.choice(nouns)}{random.randint(100, 999)}"
+    
+    # Generate random email
+    domains = ['terrapulse.com', 'earthwatch.com', 'greentech.com', 'climate.org', 'sustainability.net']
+    email = f"{username.lower()}@{random.choice(domains)}"
+    
+    # Generate random full name
+    first_names = ['Alex', 'Jordan', 'Taylor', 'Casey', 'Morgan', 'Riley', 'Avery', 'Jamie', 'Sage', 'River']
+    last_names = ['Green', 'Earth', 'Forest', 'Field', 'Garden', 'Grove', 'Hill', 'Vale', 'Brook', 'Stone']
+    full_name = f"{random.choice(first_names)} {random.choice(last_names)}"
+    
+    return {
+        'id': str(uuid.uuid4()),
+        'username': username,
+        'email': email,
+        'full_name': full_name,
+        'created_at': datetime.now().isoformat(),
+        'onboarding_completed': False,
+        'profile_data': {}
+    }
+
+def get_current_user():
+    """Get current user from session storage"""
+    return session.get('user_data')
+
+def is_authenticated():
+    """Check if user is authenticated via session"""
+    return session.get('user_data') is not None
 
 def login_required(f):
-    """Decorator to require authentication"""
+    """Decorator to require session-based authentication"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        from app.services.auth_service import AuthService
-        from app.models.user import User
-        
-        session_id = session.get('session_id')
-        
-        if not session_id:
-            # For development - check if we have a valid user in the database we can use
-            try:
-                user = User.query.filter_by(is_active=True).first()
-                if user:
-                    logger.info(f"Using development user: {user.username}")
-                    # Create a temporary session for this request
-                    request.current_user = user.to_dict()
-                    return f(*args, **kwargs)
-            except Exception as e:
-                logger.error(f"Development user lookup failed: {e}")
+        if not is_authenticated():
+            # Create temporary user for session
+            user_data = generate_random_user()
+            session['user_data'] = user_data
+            session.permanent = True
+            logger.info(f"Created temporary user: {user_data['username']}")
             
-            if request.is_json:
-                return jsonify({'success': False, 'message': 'Authentication required'}), 401
-            return redirect(url_for('auth.login'))
-        
-        # Validate session
-        result = AuthService.get_session(session_id)
-        if not result['success']:
-            logger.warning(f"Session validation failed: {result.get('message')}")
-            session.clear()
-            if request.is_json:
-                return jsonify({'success': False, 'message': 'Session expired'}), 401
-            return redirect(url_for('auth.login'))
-        
-        # Add user to request context
-        request.current_user = result['user']
-        return f(*args, **kwargs)
-    
-    return decorated_function
-
-
-def onboarding_required(f):
-    """Decorator to require completed onboarding"""
-    @wraps(f)
-    @login_required
-    def decorated_function(*args, **kwargs):
-        user = request.current_user
-        
-        if not user['onboarding_completed']:
+            # Redirect to onboarding for new users
             if request.is_json:
                 return jsonify({
                     'success': False, 
@@ -68,496 +69,152 @@ def onboarding_required(f):
                 }), 403
             return redirect(url_for('main.onboarding'))
         
+        # Add user to request context
+        request.current_user = session['user_data']
+        return f(*args, **kwargs)
+    
+    return decorated_function
+    
+    return decorated_function
+
+
+def onboarding_required(f):
+    """Decorator to require completed onboarding - now optional"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = get_current_user()
+        
+        if not user:
+            # Create temporary user
+            user_data = generate_random_user()
+            session['user_data'] = user_data
+            session.permanent = True
+            return redirect(url_for('main.onboarding'))
+        
+        # Allow access regardless of onboarding status
+        request.current_user = user
         return f(*args, **kwargs)
     
     return decorated_function
 
 
-# Routes for authentication pages
-@auth_bp.route('/login')
-def login():
-    """Login page"""
-    # If already logged in, redirect to dashboard
-    session_id = session.get('session_id')
-    if session_id:
-        result = AuthService.get_session(session_id)
-        if result['success']:
-            return redirect(url_for('main.dashboard'))
-    
-    return render_template('auth/login.html')
-
-
-@auth_bp.route('/register')
-def register():
-    """Registration page"""
-    # If already logged in, redirect to dashboard
-    session_id = session.get('session_id')
-    if session_id:
-        result = AuthService.get_session(session_id)
-        if result['success']:
-            return redirect(url_for('main.dashboard'))
-    return render_template('auth/register_wizard.html')
-
-
-@auth_bp.route('/logout')
-def logout():
-    """Logout page"""
-    session_id = session.get('session_id')
-    if session_id:
-        AuthService.logout_session(session_id)
-    
-    session.clear()
-    flash('You have been logged out successfully', 'info')
-    return redirect(url_for('auth.login'))
-
-
-# API Routes for authentication
-@auth_bp.route('/api/register/complete-wizard', methods=['POST'])
-def api_register_complete_wizard():
-    """Complete registration wizard - handles all data in one request"""
+# API Routes for session-based auth
+@auth_bp.route('/start-session', methods=['POST'])
+def start_session():
+    """Start a new temporary session"""
     try:
-        data = request.get_json() or {}
+        user_data = generate_random_user()
+        session['user_data'] = user_data
+        session.permanent = True
         
-        # Validate required fields
-        required_fields = ['email', 'username', 'password', 'role', 'location_type']
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'success': False, 'message': f'{field.capitalize()} is required'}), 400
-        
-        # Validate location data based on type
-        if data['location_type'] == 'fixed':
-            if not data.get('latitude') or not data.get('longitude'):
-                return jsonify({'success': False, 'message': 'Fixed location coordinates are required'}), 400
-        elif data['location_type'] == 'journey':
-            if not all([data.get('start_latitude'), data.get('start_longitude'), 
-                       data.get('end_latitude'), data.get('end_longitude')]):
-                return jsonify({'success': False, 'message': 'Journey start and end coordinates are required'}), 400
-        
-        # Check if user already exists
-        if AuthService.get_user_by_email(data['email']):
-            return jsonify({'success': False, 'message': 'Email already registered'}), 400
-        if AuthService.get_user_by_username(data['username']):
-            return jsonify({'success': False, 'message': 'Username already taken'}), 400
-        
-        # Create user with all data
-        user_data = {
-            'email': data['email'],
-            'username': data['username'],
-            'password': data['password'],
-            'profile_type': data['role'],
-            'location_type': data['location_type'],
-            'onboarding_completed': True
-        }
-        
-        # Add location coordinates
-        if data['location_type'] == 'fixed':
-            user_data['latitude'] = float(data['latitude'])
-            user_data['longitude'] = float(data['longitude'])
-        else:  # journey
-            user_data['start_latitude'] = float(data['start_latitude'])
-            user_data['start_longitude'] = float(data['start_longitude'])
-            user_data['end_latitude'] = float(data['end_latitude'])
-            user_data['end_longitude'] = float(data['end_longitude'])
-        
-        # Create user
-        result = AuthService.create_complete_user(user_data)
-        
-        if result['success']:
-            # Auto-login the new user
-            user = result['user']
-            session_result = AuthService.create_session(user_id=user['id'], expires_hours=24)
-            if session_result['success']:
-                session['session_id'] = session_result['session_id']
-                session['user_id'] = user['id']
-                result['session_id'] = session_result['session_id']
-            
-            logger.info(f"Complete registration successful: {data['email']}")
-            return jsonify(result), 201
-        
-        return jsonify(result), 400
-        
-    except Exception as e:
-        logger.error(f"Complete wizard registration error: {str(e)}")
-        return jsonify({'success': False, 'message': 'Server error during registration'}), 500
-
-
-@auth_bp.route('/api/register/start', methods=['POST'])
-def api_register_start():
-    """Start multi-step registration (creates user record and auto-login)"""
-    try:
-        data = request.get_json() or {}
-        for field in ['email', 'username', 'password']:
-            if not data.get(field):
-                return jsonify({'success': False, 'message': f'{field.capitalize()} is required'}), 400
-        result = AuthService.register_user(
-            email=data['email'],
-            username=data['username'],
-            password=data['password']
-        )
-        if result['success']:
-            logger.info(f"User registered (start wizard): {data['email']}")
-            # Auto-login: create session for the new user
-            user = result['user']
-            session_result = AuthService.create_session(user_id=user['id'], expires_hours=24)
-            if session_result['success']:
-                session['session_id'] = session_result['session_id']
-                session['user_id'] = user['id']
-                result['session_id'] = session_result['session_id']
-            return jsonify(result), 201
-        return jsonify(result), 400
-    except Exception as e:
-        logger.error(f"Registration start error: {str(e)}")
-        return jsonify({'success': False, 'message': 'Server error starting registration'}), 500
-
-@auth_bp.route('/api/register/role', methods=['POST'])
-def api_register_role():
-    """Set user role (requires session)"""
-    try:
-        session_id = session.get('session_id')
-        if not session_id:
-            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
-        result = AuthService.get_session(session_id)
-        if not result['success']:
-            return jsonify({'success': False, 'message': 'Session invalid'}), 401
-        user_dict = result['user']
-        user_obj = AuthService._get_user_by_id(user_dict['id']) if hasattr(AuthService, '_get_user_by_id') else None
-        # Fallback manual import to get live model instance
-        from app.models.user import User
-        if not user_obj:
-            user_obj = User.query.get(user_dict['id'])
-        data = request.get_json() or {}
-        role = data.get('role')
-        AuthService.set_user_role(user_obj, role)
-        return jsonify({'success': True, 'user': user_obj.to_dict()}), 200
-    except ValueError as ve:
-        return jsonify({'success': False, 'message': str(ve)}), 400
-    except Exception as e:
-        logger.error(f"Registration role error: {str(e)}")
-        return jsonify({'success': False, 'message': 'Server error setting role'}), 500
-
-@auth_bp.route('/api/register/location', methods=['POST'])
-def api_register_location():
-    """Set location data (requires session)"""
-    try:
-        session_id = session.get('session_id')
-        if not session_id:
-            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
-        result = AuthService.get_session(session_id)
-        if not result['success']:
-            return jsonify({'success': False, 'message': 'Session invalid'}), 401
-        user_dict = result['user']
-        from app.models.user import User
-        user_obj = User.query.get(user_dict['id'])
-        data = request.get_json() or {}
-        AuthService.set_user_location(user_obj, data)
-        return jsonify({'success': True, 'user': user_obj.to_dict()}), 200
-    except ValueError as ve:
-        return jsonify({'success': False, 'message': str(ve)}), 400
-    except Exception as e:
-        logger.error(f"Registration location error: {str(e)}")
-        return jsonify({'success': False, 'message': 'Server error setting location'}), 500
-
-@auth_bp.route('/api/register/complete', methods=['POST'])
-def api_register_complete():
-    """Finalize registration and mark onboarding complete (requires session)"""
-    try:
-        session_id = session.get('session_id')
-        if not session_id:
-            return jsonify({'success': False, 'message': 'Not authenticated'}), 401
-        result = AuthService.get_session(session_id)
-        if not result['success']:
-            return jsonify({'success': False, 'message': 'Session invalid'}), 401
-        user_dict = result['user']
-        from app.models.user import User
-        user_obj = User.query.get(user_dict['id'])
-        AuthService.complete_registration(user_obj)
-        return jsonify({'success': True, 'user': user_obj.to_dict()}), 200
-    except Exception as e:
-        logger.error(f"Registration complete error: {str(e)}")
-        return jsonify({'success': False, 'message': 'Server error completing registration'}), 500
-
-
-@auth_bp.route('/api/login', methods=['POST'])
-def api_login():
-    """Authenticate user and create session"""
-    try:
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'success': False, 'message': 'No data provided'}), 400
-        
-        # Required fields
-        if 'email_or_username' not in data or 'password' not in data:
-            return jsonify({
-                'success': False,
-                'message': 'Email/username and password are required'
-            }), 400
-        
-        # Authenticate user
-        auth_result = AuthService.authenticate_user(
-            email_or_username=data['email_or_username'],
-            password=data['password']
-        )
-        
-        if not auth_result['success']:
-            return jsonify(auth_result), 401
-        
-        # Create session
-        user = auth_result['user']
-        session_result = AuthService.create_session(
-            user_id=user['id'],
-            expires_hours=24 * 7 if data.get('remember_me') else 24
-        )
-        
-        if not session_result['success']:
-            return jsonify(session_result), 500
-        
-        # Store session in Flask session
-        session['session_id'] = session_result['session_id']
-        session['user_id'] = user['id']
-        session.permanent = data.get('remember_me', False)
-        
-        logger.info(f"User logged in: {user['email']}")
+        logger.info(f"Started new session for user: {user_data['username']}")
         
         return jsonify({
             'success': True,
-            'message': 'Login successful',
-            'user': user,
-            'session_id': session_result['session_id'],
-            'redirect': '/onboarding' if not user['onboarding_completed'] else '/dashboard'
-        }), 200
-        
+            'message': 'Session started successfully',
+            'user': {
+                'username': user_data['username'],
+                'email': user_data['email'],
+                'full_name': user_data['full_name']
+            }
+        })
     except Exception as e:
-        logger.error(f"Login error: {str(e)}")
+        logger.error(f"Error starting session: {str(e)}")
         return jsonify({
             'success': False,
-            'message': 'Login failed due to server error'
+            'message': 'Failed to start session'
         }), 500
 
-
-@auth_bp.route('/api/logout', methods=['POST'])
-@login_required
-def api_logout():
-    """Logout current session"""
+@auth_bp.route('/update-profile', methods=['POST'])
+def update_profile():
+    """Update user profile in session"""
     try:
-        session_id = session.get('session_id')
+        user_data = get_current_user()
+        if not user_data:
+            return jsonify({
+                'success': False,
+                'message': 'No active session'
+            }), 401
         
-        if session_id:
-            result = AuthService.logout_session(session_id)
-            if not result['success']:
-                logger.warning(f"Logout warning: {result['message']}")
+        # Get profile data from request
+        profile_update = request.json
         
-        session.clear()
+        # Update profile data
+        user_data['profile_data'].update(profile_update)
+        
+        # Update specific fields if provided
+        if 'full_name' in profile_update:
+            user_data['full_name'] = profile_update['full_name']
+        
+        # Save back to session
+        session['user_data'] = user_data
         
         return jsonify({
             'success': True,
-            'message': 'Logged out successfully'
-        }), 200
-        
+            'message': 'Profile updated successfully',
+            'user': user_data
+        })
     except Exception as e:
-        logger.error(f"Logout error: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': 'Logout failed'
-        }), 500
-
-
-@auth_bp.route('/api/session', methods=['GET'])
-def api_session():
-    """Get current session information"""
-    try:
-        session_id = session.get('session_id')
-        
-        if not session_id:
-            return jsonify({
-                'success': False,
-                'message': 'No active session',
-                'authenticated': False
-            }), 401
-        
-        result = AuthService.get_session(session_id)
-        
-        if result['success']:
-            return jsonify({
-                'success': True,
-                'authenticated': True,
-                'user': result['user'],
-                'session': result['session']
-            }), 200
-        else:
-            session.clear()
-            return jsonify({
-                'success': False,
-                'message': result['message'],
-                'authenticated': False
-            }), 401
-            
-    except Exception as e:
-        logger.error(f"Session check error: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': 'Session check failed',
-            'authenticated': False
-        }), 500
-
-
-@auth_bp.route('/api/profile', methods=['GET'])
-@login_required
-def api_get_profile():
-    """Get user profile"""
-    try:
-        user = request.current_user
-        
-        result = ProfileService.get_user_profile(user['id'])
-        
-        if result['success']:
-            return jsonify(result), 200
-        else:
-            return jsonify(result), 404
-            
-    except Exception as e:
-        logger.error(f"Get profile error: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': 'Failed to get profile'
-        }), 500
-
-
-@auth_bp.route('/api/profile', methods=['PUT'])
-@login_required
-def api_update_profile():
-    """Update user profile"""
-    try:
-        data = request.get_json()
-        user = request.current_user
-        
-        if not data:
-            return jsonify({'success': False, 'message': 'No data provided'}), 400
-        
-        result = ProfileService.update_profile(user['id'], data)
-        
-        if result['success']:
-            return jsonify(result), 200
-        else:
-            return jsonify(result), 400
-            
-    except Exception as e:
-        logger.error(f"Update profile error: {str(e)}")
+        logger.error(f"Error updating profile: {str(e)}")
         return jsonify({
             'success': False,
             'message': 'Failed to update profile'
         }), 500
 
-
-# Onboarding API Routes
-@auth_bp.route('/api/onboarding/progress', methods=['GET'])
-@login_required
-def api_onboarding_progress():
-    """Get onboarding progress"""
+@auth_bp.route('/complete-onboarding', methods=['POST'])
+def complete_onboarding():
+    """Mark onboarding as completed"""
     try:
-        user = request.current_user
-        
-        result = OnboardingService.get_onboarding_progress(user['id'])
-        
-        if result['success']:
-            return jsonify(result), 200
-        else:
-            return jsonify(result), 500
-            
-    except Exception as e:
-        logger.error(f"Onboarding progress error: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': 'Failed to get onboarding progress'
-        }), 500
-
-
-@auth_bp.route('/api/onboarding/step', methods=['POST'])
-@login_required
-def api_onboarding_step():
-    """Update onboarding step"""
-    try:
-        data = request.get_json()
-        user = request.current_user
-        
-        if not data or 'step' not in data:
+        user_data = get_current_user()
+        if not user_data:
             return jsonify({
                 'success': False,
-                'message': 'Step name is required'
-            }), 400
+                'message': 'No active session'
+            }), 401
         
-        result = OnboardingService.update_onboarding_step(
-            user_id=user['id'],
-            step_name=data['step'],
-            data=data.get('data')
-        )
+        user_data['onboarding_completed'] = True
+        session['user_data'] = user_data
         
-        if result['success']:
-            return jsonify(result), 200
-        else:
-            return jsonify(result), 400
-            
-    except Exception as e:
-        logger.error(f"Onboarding step error: {str(e)}")
         return jsonify({
-            'success': False,
-            'message': 'Failed to update onboarding step'
-        }), 500
-
-
-@auth_bp.route('/api/onboarding/complete', methods=['POST'])
-@login_required
-def api_onboarding_complete():
-    """Complete onboarding"""
-    try:
-        user = request.current_user
-        
-        result = OnboardingService.complete_onboarding(user['id'])
-        
-        if result['success']:
-            return jsonify(result), 200
-        else:
-            return jsonify(result), 400
-            
+            'success': True,
+            'message': 'Onboarding completed successfully'
+        })
     except Exception as e:
-        logger.error(f"Complete onboarding error: {str(e)}")
+        logger.error(f"Error completing onboarding: {str(e)}")
         return jsonify({
             'success': False,
             'message': 'Failed to complete onboarding'
         }), 500
 
 
-# Utility function to check authentication status
+@auth_bp.route('/logout')
+def logout():
+    """Clear session"""
+    session.clear()
+    return redirect(url_for('main.index'))
+
+@auth_bp.route('/status')
+def auth_status():
+    """Get current authentication status"""
+    user = get_current_user()
+    return jsonify({
+        'authenticated': user is not None,
+        'user': user if user else None
+    })
+
+# Legacy routes for backwards compatibility - now redirect to main app
+@auth_bp.route('/login')
+def login():
+    """Legacy login route - redirect to main app"""
+    return redirect(url_for('main.index'))
+
+@auth_bp.route('/register') 
+def register():
+    """Legacy register route - redirect to onboarding"""
+    return redirect(url_for('main.onboarding'))
+
+
+# Additional utility functions for backwards compatibility
 def is_authenticated():
-    """Check if user is authenticated"""
-    session_id = session.get('session_id')
-    if not session_id:
-        return False
-    
-    result = AuthService.get_session(session_id)
-    return result['success']
-
-
-def get_current_user():
-    """Get current authenticated user"""
-    # Check if we already have a user from the login_required decorator
-    if hasattr(request, 'current_user'):
-        return request.current_user
-        
-    session_id = session.get('session_id')
-    if not session_id:
-        # For development - try to get any active user
-        try:
-            from app.models.user import User
-            user = User.query.filter_by(is_active=True).first()
-            if user:
-                return user.to_dict()
-        except Exception:
-            pass
-        return None
-    
-    result = AuthService.get_session(session_id)
-    if result['success']:
-        return result['user']
-    
-    return None
+    """Check if user is authenticated via session"""
+    return session.get('user_data') is not None

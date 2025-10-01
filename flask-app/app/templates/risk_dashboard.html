@@ -1,997 +1,675 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agricultural Risk Dashboard - TerraPulse</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .risk-low { background: #d4edda; color: #155724; }
-        .risk-medium { background: #fff3cd; color: #856404; }
-        .risk-high { background: #f8d7da; color: #721c24; }
-        .alert-item { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #ffc107; }
-        .recommendation-item { background: #e3f2fd; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #2196f3; }
-    </style>
-</head>
-<body class="bg-gray-50">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white py-8">
-        <div class="container mx-auto px-6 text-center">
-            <h1 class="text-4xl font-bold mb-2">🌾 Agricultural Risk Dashboard</h1>
-            <p class="text-lg opacity-90">NASA-powered crop risk analysis for intelligent farming</p>
-        </div>
-    </div>
+{% extends "base.html" %}
 
-    <div class="container mx-auto px-6 py-8">
-        <!-- Risk Analysis Form -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 class="text-xl font-semibold mb-4">🔍 Analyze Crop Risk</h2>
-            
-            <form id="riskAnalysisForm">
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">📍 Latitude</label>
-                        <input type="number" id="latitude" step="0.0001" placeholder="23.7644" value="23.7644" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">📍 Longitude</label>
-                        <input type="number" id="longitude" step="0.0001" placeholder="90.3897" value="90.3897"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">🌾 Crop Type</label>
-                        <select id="crop" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="">Select Crop</option>
-                            <option value="rice" selected>🌾 Rice</option>
-                            <option value="wheat">🌾 Wheat</option>
-                            <option value="potato">🥔 Potato</option>
-                            <option value="jute">🌿 Jute</option>
-                            <option value="corn">🌽 Corn</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">📅 Start Date</label>
-                        <input type="date" id="startDate" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">📅 End Date</label>
-                        <input type="date" id="endDate" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
+{% block title %}Risk Dashboard - TerraPulse{% endblock %}
+{% block subtitle %}NASA-Powered Crop Risk Analysis{% endblock %}
+
+{% block head_extra %}
+<style>
+    .risk-low { 
+        background: #d4edda; 
+        color: #155724; 
+        border-color: #c3e6cb;
+    }
+    .risk-medium { 
+        background: #fff3cd; 
+        color: #856404; 
+        border-color: #ffeaa7;
+    }
+    .risk-high { 
+        background: #f8d7da; 
+        color: #721c24; 
+        border-color: #f5c6cb;
+    }
+    .alert-item { 
+        background: #fff8e1; 
+        padding: 12px 16px; 
+        border-radius: 8px; 
+        margin-bottom: 8px; 
+        border-left: 3px solid #ffc107;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    .recommendation-item { 
+        background: #e3f2fd; 
+        padding: 12px 16px; 
+        border-radius: 8px; 
+        margin-bottom: 8px; 
+        border-left: 3px solid #2196f3;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border: 1px solid #e2e8f0;
+    }
+    .analysis-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border: 1px solid #e2e8f0;
+        transition: box-shadow 0.3s ease;
+    }
+    .analysis-card:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    .example-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .loading-spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #48c085;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .risk-badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 2px solid;
+    }
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    .icon-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <!-- Risk Analysis Form -->
+    <div class="form-card p-6">
+        <div class="section-header">
+            <div class="icon-badge bg-terra-green text-white">
+                <i data-lucide="search"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Crop Risk Analysis</h2>
+                <p class="text-sm text-gray-600">Analyze crop risks using NASA satellite data</p>
+            </div>
+        </div>
+        
+        <form id="riskAnalysisForm">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                <div class="space-y-2">
+                    <label for="latitude" class="block text-sm font-medium text-gray-700">
+                        <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                        Latitude
+                    </label>
+                    <input type="number" 
+                           id="latitude" 
+                           step="0.0001" 
+                           placeholder="23.7644" 
+                           value="23.7644"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terra-green focus:border-terra-green transition-colors"
+                           required>
                 </div>
                 
-                <button type="submit" id="analyzeBtn" 
-                        class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                    🔍 Analyze Crop Risk
-                </button>
-            </form>
-        </div>
-        
-        <!-- Loading State -->
-        <div id="analysisLoading" class="hidden bg-white rounded-lg shadow-lg p-8 text-center mb-8">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Analyzing Crop Risks</h3>
-            <p class="text-gray-600">Processing NASA satellite data...</p>
-        </div>
-        
-        <!-- Error State -->
-        <div id="analysisError" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
-            <div class="flex items-center gap-3 text-red-600 mb-4">
-                <i class="fas fa-exclamation-triangle text-xl"></i>
-                <h3 class="text-lg font-semibold">Analysis Failed</h3>
+                <div class="space-y-2">
+                    <label for="longitude" class="block text-sm font-medium text-gray-700">
+                        <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                        Longitude
+                    </label>
+                    <input type="number" 
+                           id="longitude" 
+                           step="0.0001" 
+                           placeholder="90.3897" 
+                           value="90.3897"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terra-green focus:border-terra-green transition-colors"
+                           required>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="crop" class="block text-sm font-medium text-gray-700">
+                        <i data-lucide="wheat" class="w-4 h-4 inline mr-1"></i>
+                        Crop Type
+                    </label>
+                    <select id="crop" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terra-green focus:border-terra-green transition-colors"
+                            required>
+                        <option value="">Select Crop</option>
+                        <option value="rice" selected>🌾 Rice</option>
+                        <option value="wheat">🌾 Wheat</option>
+                        <option value="potato">🥔 Potato</option>
+                        <option value="jute">🌿 Jute</option>
+                        <option value="corn">🌽 Corn</option>
+                    </select>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="startDate" class="block text-sm font-medium text-gray-700">
+                        <i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>
+                        Start Date
+                    </label>
+                    <input type="date" 
+                           id="startDate" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terra-green focus:border-terra-green transition-colors"
+                           required>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="endDate" class="block text-sm font-medium text-gray-700">
+                        <i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>
+                        End Date
+                    </label>
+                    <input type="date" 
+                           id="endDate" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terra-green focus:border-terra-green transition-colors"
+                           required>
+                </div>
             </div>
-            <p class="text-gray-600 mb-4" id="analysisErrorMessage">Unable to complete risk analysis</p>
-            <button id="retryAnalysis" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                <i class="fas fa-redo"></i> Try Again
+            
+            <button type="submit" 
+                    id="analyzeBtn" 
+                    class="w-full bg-terra-green text-white px-6 py-3 rounded-lg hover:bg-terra-green-600 transition-colors font-medium flex items-center justify-center gap-2">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                Analyze Crop Risk
             </button>
+        </form>
+    </div>
+    
+    <!-- Loading State -->
+    <!-- Loading State -->
+    <div id="analysisLoading" class="hidden analysis-card p-8 text-center">
+        <div class="loading-spinner mb-4"></div>
+        <div class="section-header justify-center">
+            <div class="icon-badge bg-terra-blue text-white">
+                <i data-lucide="satellite" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Analyzing Crop Risks</h3>
+                <p class="text-gray-600">Processing NASA satellite data...</p>
+            </div>
         </div>
-        
-        <!-- Risk Analysis Results -->
-        <div id="analysisResults" class="hidden space-y-6">
-            <!-- Risk Overview -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-4">
-                            <h2 id="resultCropName" class="text-2xl font-bold text-gray-900">Rice Analysis</h2>
-                            <span id="resultRiskBadge" class="px-3 py-1 text-sm font-semibold rounded-full risk-medium">
-                                ⚠️ Medium Risk
-                            </span>
-                        </div>
-                        <div class="text-sm text-gray-600 mb-4" id="resultLocationInfo">
+    </div>
+    
+    <!-- Error State -->
+    <div id="analysisError" class="hidden analysis-card p-6">
+        <div class="section-header">
+            <div class="icon-badge bg-red-500 text-white">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-red-600">Analysis Failed</h3>
+                <p class="text-gray-600" id="analysisErrorMessage">Unable to complete risk analysis</p>
+            </div>
+        </div>
+        <button id="retryAnalysis" 
+                class="bg-terra-green text-white px-4 py-2 rounded-lg hover:bg-terra-green-600 transition-colors flex items-center gap-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            Try Again
+        </button>
+    </div>    <!-- Risk Analysis Results -->
+    <div id="analysisResults" class="hidden space-y-6">
+        <!-- Risk Overview -->
+        <div class="analysis-card p-6">
+            <div class="section-header">
+                <div class="icon-badge bg-terra-green text-white">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                </div>
+                <div class="flex-1 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                        <h2 id="resultCropName" class="text-xl font-bold text-gray-900">Rice Analysis</h2>
+                        <div class="text-sm text-gray-600" id="resultLocationInfo">
                             📍 Location • 📅 Period
                         </div>
-                        <div id="resultSummary" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <p class="text-blue-800 leading-relaxed">Risk analysis summary...</p>
-                        </div>
                     </div>
+                    <span id="resultRiskBadge" class="risk-badge risk-medium">
+                        ⚠️ Medium Risk
+                    </span>
                 </div>
             </div>
-            
-            <!-- Alerts and Recommendations -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Alerts -->
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-exclamation-triangle text-red-600"></i>
-                        </div>
+            <div id="resultSummary" class="bg-terra-green-50 border border-terra-green-200 rounded-lg p-4">
+                <p class="text-terra-green-800 leading-relaxed">Risk analysis summary...</p>
+            </div>
+        </div>
+        
+        <!-- Alerts and Recommendations -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Alerts -->
+            <div class="analysis-card p-6">
+                <div class="section-header">
+                    <div class="icon-badge bg-orange-500 text-white">
+                        <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
                         <h3 class="text-lg font-semibold text-gray-900">Risk Alerts</h3>
-                        <span id="alertCount" class="ml-auto px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">0</span>
-                    </div>
-                    <div id="resultAlerts" class="space-y-3">
-                        <!-- Alerts populated by JavaScript -->
+                        <p class="text-sm text-gray-600"><span id="alertCount">0</span> issues detected</p>
                     </div>
                 </div>
-                
-                <!-- Recommendations -->
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-lightbulb text-blue-600"></i>
-                        </div>
+                <div id="resultAlerts" class="space-y-3">
+                    <!-- Alerts populated by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Recommendations -->
+            <div class="analysis-card p-6">
+                <div class="section-header">
+                    <div class="icon-badge bg-terra-blue text-white">
+                        <i data-lucide="lightbulb" class="w-5 h-5"></i>
+                    </div>
+                    <div>
                         <h3 class="text-lg font-semibold text-gray-900">Recommendations</h3>
-                    </div>
-                    <div id="resultRecommendations" class="space-y-3">
-                        <!-- Recommendations populated by JavaScript -->
+                        <p class="text-sm text-gray-600">Actionable insights</p>
                     </div>
                 </div>
+                <div id="resultRecommendations" class="space-y-3">
+                    <!-- Recommendations populated by JavaScript -->
+                </div>
             </div>
-            
-            <!-- Data Sources -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-satellite text-green-600"></i>
-                    </div>
+        </div>
+        
+        <!-- Data Sources -->
+        <div class="analysis-card p-6">
+            <div class="section-header">
+                <div class="icon-badge bg-terra-green text-white">
+                    <i data-lucide="satellite" class="w-5 h-5"></i>
+                </div>
+                <div>
                     <h3 class="text-lg font-semibold text-gray-900">NASA Data Sources</h3>
-                </div>
-                <div id="resultDataSources" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <!-- Data sources populated by JavaScript -->
+                    <p class="text-sm text-gray-600">Satellite data availability</p>
                 </div>
             </div>
-        </div>
-        
-        <!-- Quick Examples -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Analysis Examples</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button class="example-btn p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
-                        data-lat="23.7644" data-lon="90.3897" data-crop="rice" data-location="Dhaka, Bangladesh">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="text-2xl">🇧🇩</span>
-                        <div>
-                            <h4 class="font-medium text-gray-900">Rice in Bangladesh</h4>
-                            <p class="text-sm text-gray-600">Dhaka Region</p>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-500">Monsoon season analysis</p>
-                </button>
-                
-                <button class="example-btn p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
-                        data-lat="28.6139" data-lon="77.2090" data-crop="wheat" data-location="Delhi, India">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="text-2xl">🇮🇳</span>
-                        <div>
-                            <h4 class="font-medium text-gray-900">Wheat in India</h4>
-                            <p class="text-sm text-gray-600">Delhi Region</p>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-500">Winter crop analysis</p>
-                </button>
-                
-                <button class="example-btn p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
-                        data-lat="44.0682" data-lon="-114.7420" data-crop="potato" data-location="Idaho, USA">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="text-2xl">🇺🇸</span>
-                        <div>
-                            <h4 class="font-medium text-gray-900">Potato in USA</h4>
-                            <p class="text-sm text-gray-600">Idaho Region</p>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-500">Cool season analysis</p>
-                </button>
+            <div id="resultDataSources" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Data sources populated by JavaScript -->
             </div>
         </div>
     </div>
-
-    <script>
-        class RiskDashboard {
-            constructor() {
-                this.currentAnalysis = null;
-                this.isAnalyzing = false;
-                this.init();
-            }
-
-            init() {
-                console.log('🌾 Risk Dashboard initialized');
-                this.setupEventListeners();
-                this.setDefaultDates();
-            }
-
-            setupEventListeners() {
-                // Form submission
-                const form = document.getElementById('riskAnalysisForm');
-                if (form) {
-                    form.addEventListener('submit', (e) => this.handleFormSubmit(e));
-                }
-
-                // Example buttons
-                document.querySelectorAll('.example-btn').forEach(btn => {
-                    btn.addEventListener('click', () => this.loadExample(btn));
-                });
-
-                // Retry button
-                const retryBtn = document.getElementById('retryAnalysis');
-                if (retryBtn) {
-                    retryBtn.addEventListener('click', () => this.retryLastAnalysis());
-                }
-            }
-
-            setDefaultDates() {
-                const today = new Date();
-                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                
-                document.getElementById('endDate').value = today.toISOString().split('T')[0];
-                document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
-            }
-
-            handleFormSubmit(event) {
-                event.preventDefault();
-                
-                const lat = document.getElementById('latitude').value;
-                const lon = document.getElementById('longitude').value;
-                const crop = document.getElementById('crop').value;
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-                
-                console.log('Form submitted:', { lat, lon, crop, startDate, endDate });
-                
-                if (!this.validateInputs(lat, lon, crop, startDate, endDate)) {
-                    return;
-                }
-                
-                this.analyzeRisk(lat, lon, crop, startDate, endDate);
-            }
-
-            loadExample(btn) {
-                const lat = btn.dataset.lat;
-                const lon = btn.dataset.lon;
-                const crop = btn.dataset.crop;
-                const location = btn.dataset.location;
-                
-                // Fill form
-                document.getElementById('latitude').value = lat;
-                document.getElementById('longitude').value = lon;
-                document.getElementById('crop').value = crop;
-                
-                // Use current dates
-                this.setDefaultDates();
-                
-                // Analyze
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-                
-                this.analyzeRisk(lat, lon, crop, startDate, endDate, location);
-            }
-
-            validateInputs(lat, lon, crop, startDate, endDate) {
-                if (!lat || !lon || !crop || !startDate || !endDate) {
-                    this.showError('Please fill in all required fields');
-                    return false;
-                }
-                
-                const latitude = parseFloat(lat);
-                const longitude = parseFloat(lon);
-                
-                if (isNaN(latitude) || latitude < -90 || latitude > 90) {
-                    this.showError('Latitude must be between -90 and 90');
-                    return false;
-                }
-                
-                if (isNaN(longitude) || longitude < -180 || longitude > 180) {
-                    this.showError('Longitude must be between -180 and 180');
-                    return false;
-                }
-                
-                return true;
-            }
-
-            async analyzeRisk(lat, lon, crop, startDate, endDate, locationName = null) {
-                if (this.isAnalyzing) {
-                    console.log('Analysis already in progress, skipping...');
-                    return;
-                }
-                
-                this.isAnalyzing = true;
-                this.showLoading();
-                
-                try {
-                    const startStr = startDate.replace(/-/g, '');
-                    const endStr = endDate.replace(/-/g, '');
-                    
-                    const url = `/api/risk-alerts?lat=${lat}&lon=${lon}&crop=${crop}&start=${startStr}&end=${endStr}`;
-                    
-                    console.log(`🔍 Analyzing risk: ${url}`);
-                    
-                    const response = await fetch(url);
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const data = await response.json();
-                    console.log('📊 Risk analysis response:', data);
-                    
-                    if (data.success) {
-                        this.currentAnalysis = {
-                            ...data,
-                            locationName: locationName || `${lat}°, ${lon}°`,
-                            analysisTime: new Date().toISOString()
-                        };
-                        this.displayResults(this.currentAnalysis);
-                    } else {
-                        throw new Error(data.error || 'Analysis failed');
-                    }
-                    
-                } catch (error) {
-                    console.error('❌ Risk analysis error:', error);
-                    this.showError(`Analysis failed: ${error.message}`);
-                } finally {
-                    this.isAnalyzing = false;
-                    this.hideLoading();
-                }
-            }
-
-            displayResults(data) {
-                console.log('📋 Displaying results:', data);
-                this.hideError();
-                
-                // Update crop name and location
-                document.getElementById('resultCropName').textContent = `${data.crop} Analysis`;
-                document.getElementById('resultLocationInfo').textContent = 
-                    `📍 ${data.locationName} • 📅 ${data.period.start} to ${data.period.end}`;
-                
-                // Update risk badge
-                this.updateRiskBadge(data.risk_level);
-                
-                // Update summary
-                this.updateSummary(data.summary);
-                
-                // Update alerts
-                this.updateAlerts(data.alerts);
-                
-                // Update recommendations
-                this.updateRecommendations(data.recommendations);
-                
-                // Update data sources
-                this.updateDataSources(data.data_availability);
-                
-                // Show results
-                document.getElementById('analysisResults').classList.remove('hidden');
-                
-                // Scroll to results
-                document.getElementById('analysisResults').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-                
-                console.log('✅ Results displayed successfully');
-            }
-
-            updateRiskBadge(level) {
-                const badge = document.getElementById('resultRiskBadge');
-                if (!badge) return;
-                
-                const configs = {
-                    low: { emoji: '✅', label: 'Low Risk', classes: 'risk-low' },
-                    medium: { emoji: '⚠️', label: 'Medium Risk', classes: 'risk-medium' },
-                    high: { emoji: '🚨', label: 'High Risk', classes: 'risk-high' }
-                };
-                
-                const config = configs[level] || configs.medium;
-                badge.textContent = `${config.emoji} ${config.label}`;
-                badge.className = `px-3 py-1 text-sm font-semibold rounded-full ${config.classes}`;
-            }
-
-            updateSummary(summary) {
-                const summaryEl = document.getElementById('resultSummary');
-                if (summaryEl) {
-                    summaryEl.innerHTML = `<p class="text-blue-800 leading-relaxed">${summary}</p>`;
-                }
-            }
-
-            updateAlerts(alerts) {
-                const alertsEl = document.getElementById('resultAlerts');
-                const countEl = document.getElementById('alertCount');
-                
-                if (!alertsEl || !countEl) return;
-                
-                countEl.textContent = alerts.length;
-                
-                if (alerts.length === 0) {
-                    alertsEl.innerHTML = '<div class="alert-item">✅ No risk alerts for this period</div>';
-                } else {
-                    alertsEl.innerHTML = alerts.map(alert => 
-                        `<div class="alert-item">${alert}</div>`
-                    ).join('');
-                }
-            }
-
-            updateRecommendations(recommendations) {
-                const recEl = document.getElementById('resultRecommendations');
-                if (!recEl) return;
-                
-                if (recommendations.length === 0) {
-                    recEl.innerHTML = '<div class="recommendation-item">✅ No specific recommendations needed</div>';
-                } else {
-                    recEl.innerHTML = recommendations.map(rec => 
-                        `<div class="recommendation-item">${rec}</div>`
-                    ).join('');
-                }
-            }
-
-            updateDataSources(sources) {
-                const sourcesEl = document.getElementById('resultDataSources');
-                if (!sourcesEl) return;
-                
-                const sourceNames = {
-                    'power_api': 'NASA POWER',
-                    'gpm_api': 'GPM IMERG', 
-                    'modis_api': 'MODIS',
-                    'worldview_api': 'Worldview'
-                };
-                
-                sourcesEl.innerHTML = Object.keys(sourceNames).map(key => {
-                    const available = sources[key] || false;
-                    const statusClass = available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-                    const statusIcon = available ? '✅' : '❌';
-                    return `
-                        <div class="p-3 ${statusClass} rounded-lg text-center">
-                            <div class="text-lg">${statusIcon}</div>
-                            <div class="text-sm font-medium">${sourceNames[key]}</div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            showLoading() {
-                document.getElementById('analysisLoading').classList.remove('hidden');
-                document.getElementById('analysisResults').classList.add('hidden');
-                document.getElementById('analysisError').classList.add('hidden');
-                
-                const btn = document.getElementById('analyzeBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
-            }
-
-            hideLoading() {
-                document.getElementById('analysisLoading').classList.add('hidden');
-                
-                const btn = document.getElementById('analyzeBtn');
-                btn.disabled = false;
-                btn.innerHTML = '🔍 Analyze Crop Risk';
-            }
-
-            showError(message) {
-                this.hideLoading();
-                document.getElementById('analysisError').classList.remove('hidden');
-                document.getElementById('analysisErrorMessage').textContent = message;
-                document.getElementById('analysisResults').classList.add('hidden');
-            }
-
-            hideError() {
-                document.getElementById('analysisError').classList.add('hidden');
-            }
-
-            retryLastAnalysis() {
-                if (this.currentAnalysis) {
-                    const { latitude, longitude } = this.currentAnalysis.location;
-                    const crop = this.currentAnalysis.crop.toLowerCase();
-                    const { start, end } = this.currentAnalysis.period;
-                    
-                    // Convert YYYYMMDD back to YYYY-MM-DD
-                    const startDate = start.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-                    const endDate = end.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-                    
-                    this.analyzeRisk(latitude, longitude, crop, startDate, endDate);
-                }
-            }
-        }
-
-        // Initialize dashboard when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 DOM loaded, initializing Risk Dashboard...');
-            new RiskDashboard();
-        });
-    </script>
-</body>
-</html>
         
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .risk-form {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .form-group label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-        }
-        
-        .form-group input, .form-group select {
-            padding: 10px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .analyze-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .analyze-btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .analyze-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .risk-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
-        }
-        
-        .risk-card.hidden {
-            display: none;
-        }
-        
-        .risk-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .crop-info h3 {
-            color: #333;
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        
-        .location-info {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .risk-level {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
-        
-        .risk-low {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .risk-medium {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .risk-high {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .summary-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .summary-text {
-            font-size: 1rem;
-            color: #333;
-            line-height: 1.5;
-        }
-        
-        .alerts-section, .recommendations-section {
-            margin-bottom: 20px;
-        }
-        
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .alert-item, .recommendation-item {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 3px solid #667eea;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-        
-        .alert-item {
-            border-left-color: #ffc107;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .data-sources {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .data-sources h4 {
-            color: #1565c0;
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-        
-        .source-status {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-        }
-        
-        .source-item {
-            padding: 8px;
-            background: white;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 0.85rem;
-            border: 1px solid #e1e5e9;
-        }
-        
-        .source-available {
-            border-color: #28a745;
-            color: #28a745;
-        }
-        
-        .source-unavailable {
-            border-color: #dc3545;
-            color: #dc3545;
-        }
-        
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .risk-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .container {
-                padding: 0 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🌾 Agricultural Risk Dashboard</h1>
-            <p>Intelligent crop risk analysis powered by NASA satellite data</p>
+    <!-- Quick Examples -->
+    <div class="analysis-card p-6">
+        <div class="section-header">
+            <div class="icon-badge bg-terra-blue text-white">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Quick Analysis Examples</h3>
+                <p class="text-sm text-gray-600">Try these pre-configured scenarios</p>
+            </div>
         </div>
-        
-        <div class="risk-form">
-            <form id="riskForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="latitude">📍 Latitude</label>
-                        <input type="number" id="latitude" step="0.0001" placeholder="23.7644" value="23.7644" required>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button class="example-btn p-4 border-2 border-gray-200 rounded-lg hover:border-terra-green hover:bg-terra-green-50 transition-all text-left"
+                    data-lat="23.7644" data-lon="90.3897" data-crop="rice" data-location="Dhaka, Bangladesh">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <span class="text-lg">🇧🇩</span>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="longitude">📍 Longitude</label>
-                        <input type="number" id="longitude" step="0.0001" placeholder="90.3897" value="90.3897" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="crop">🌾 Crop Type</label>
-                        <select id="crop" required>
-                            <option value="">Select Crop</option>
-                            <option value="rice" selected>Rice</option>
-                            <option value="wheat">Wheat</option>
-                            <option value="potato">Potato</option>
-                            <option value="jute">Jute</option>
-                            <option value="corn">Corn</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="startDate">📅 Start Date</label>
-                        <input type="date" id="startDate" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="endDate">📅 End Date</label>
-                        <input type="date" id="endDate" required>
+                    <div>
+                        <h4 class="font-medium text-gray-900">Rice in Bangladesh</h4>
+                        <p class="text-sm text-gray-600">Dhaka Region</p>
                     </div>
                 </div>
-                
-                <button type="submit" class="analyze-btn" id="analyzeBtn">
-                    🔍 Analyze Crop Risk
-                </button>
-            </form>
-        </div>
-        
-        <div class="risk-card hidden" id="riskCard">
-            <div class="risk-header">
-                <div class="crop-info">
-                    <h3 id="cropName">-</h3>
-                    <div class="location-info" id="locationInfo">-</div>
+                <p class="text-xs text-gray-500">Monsoon season analysis</p>
+            </button>
+            
+            <button class="example-btn p-4 border-2 border-gray-200 rounded-lg hover:border-terra-green hover:bg-terra-green-50 transition-all text-left"
+                    data-lat="28.6139" data-lon="77.2090" data-crop="wheat" data-location="Delhi, India">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <span class="text-lg">🇮🇳</span>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900">Wheat in India</h4>
+                        <p class="text-sm text-gray-600">Delhi Region</p>
+                    </div>
                 </div>
-                <div class="risk-level" id="riskLevel">-</div>
-            </div>
+                <p class="text-xs text-gray-500">Winter crop analysis</p>
+            </button>
             
-            <div class="summary-section">
-                <div class="summary-text" id="summaryText">-</div>
-            </div>
-            
-            <div class="alerts-section" id="alertsSection">
-                <div class="section-title">🚨 Risk Alerts</div>
-                <div id="alertsList"></div>
-            </div>
-            
-            <div class="recommendations-section" id="recommendationsSection">
-                <div class="section-title">💡 Recommendations</div>
-                <div id="recommendationsList"></div>
-            </div>
-            
-            <div class="data-sources">
-                <h4>📡 Data Source Status</h4>
-                <div class="source-status" id="sourceStatus">
-                    <!-- Data sources will be populated here -->
+            <button class="example-btn p-4 border-2 border-gray-200 rounded-lg hover:border-terra-green hover:bg-terra-green-50 transition-all text-left"
+                    data-lat="44.0682" data-lon="-114.7420" data-crop="potato" data-location="Idaho, USA">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <span class="text-lg">🇺🇸</span>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900">Potato in USA</h4>
+                        <p class="text-sm text-gray-600">Idaho Region</p>
+                    </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="loading hidden" id="loading">
-            <p>🔄 Analyzing crop risks using NASA satellite data...</p>
-        </div>
-        
-        <div class="error hidden" id="error">
-            <p id="errorMessage">-</p>
+                <p class="text-xs text-gray-500">Cool season analysis</p>
+            </button>
         </div>
     </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    class RiskDashboard {
+        constructor() {
+            this.currentAnalysis = null;
+            this.isAnalyzing = false;
+            this.init();
+        }
 
-    <script>
-        // Set default dates (last 7 days)
-        const today = new Date();
-        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        
-        document.getElementById('endDate').value = today.toISOString().split('T')[0];
-        document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
-        
-        // Form submission handler
-        document.getElementById('riskForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        init() {
+            console.log('🌾 Risk Dashboard initialized');
+            this.setupEventListeners();
+            this.setDefaultDates();
+        }
+
+        setupEventListeners() {
+            // Form submission
+            const form = document.getElementById('riskAnalysisForm');
+            if (form) {
+                form.addEventListener('submit', (e) => this.handleFormSubmit(e));
+            }
+
+            // Example buttons
+            document.querySelectorAll('.example-btn').forEach(btn => {
+                btn.addEventListener('click', () => this.loadExample(btn));
+            });
+
+            // Retry button
+            const retryBtn = document.getElementById('retryAnalysis');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', () => this.retryLastAnalysis());
+            }
+        }
+
+        setDefaultDates() {
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
             
-            const latitude = document.getElementById('latitude').value;
-            const longitude = document.getElementById('longitude').value;
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
+        }
+
+        handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const lat = document.getElementById('latitude').value;
+            const lon = document.getElementById('longitude').value;
             const crop = document.getElementById('crop').value;
-            const startDate = document.getElementById('startDate').value.replace(/-/g, '');
-            const endDate = document.getElementById('endDate').value.replace(/-/g, '');
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
             
-            // Validate inputs
-            if (!latitude || !longitude || !crop || !startDate || !endDate) {
-                showError('Please fill in all fields');
+            console.log('Form submitted:', { lat, lon, crop, startDate, endDate });
+            
+            if (!this.validateInputs(lat, lon, crop, startDate, endDate)) {
                 return;
             }
             
-            // Show loading
-            showLoading();
+            this.analyzeRisk(lat, lon, crop, startDate, endDate);
+        }
+
+        loadExample(btn) {
+            const lat = btn.dataset.lat;
+            const lon = btn.dataset.lon;
+            const crop = btn.dataset.crop;
+            const location = btn.dataset.location;
+            
+            // Fill form
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lon;
+            document.getElementById('crop').value = crop;
+            
+            // Use current dates
+            this.setDefaultDates();
+            
+            // Analyze
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            this.analyzeRisk(lat, lon, crop, startDate, endDate, location);
+        }
+
+        validateInputs(lat, lon, crop, startDate, endDate) {
+            if (!lat || !lon || !crop || !startDate || !endDate) {
+                this.showError('Please fill in all required fields');
+                return false;
+            }
+            
+            const latitude = parseFloat(lat);
+            const longitude = parseFloat(lon);
+            
+            if (isNaN(latitude) || latitude < -90 || latitude > 90) {
+                this.showError('Latitude must be between -90 and 90');
+                return false;
+            }
+            
+            if (isNaN(longitude) || longitude < -180 || longitude > 180) {
+                this.showError('Longitude must be between -180 and 180');
+                return false;
+            }
+            
+            return true;
+        }
+
+        async analyzeRisk(lat, lon, crop, startDate, endDate, locationName = null) {
+            if (this.isAnalyzing) {
+                console.log('Analysis already in progress, skipping...');
+                return;
+            }
+            
+            this.isAnalyzing = true;
+            this.showLoading();
             
             try {
-                const response = await fetch(`/api/risk-alerts?lat=${latitude}&lon=${longitude}&crop=${crop}&start=${startDate}&end=${endDate}`);
+                const startStr = startDate.replace(/-/g, '');
+                const endStr = endDate.replace(/-/g, '');
+                
+                const url = `/api/risk-alerts?lat=${lat}&lon=${lon}&crop=${crop}&start=${startStr}&end=${endStr}`;
+                
+                console.log(`🔍 Analyzing risk: ${url}`);
+                
+                const response = await fetch(url);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
+                console.log('📊 Risk analysis response:', data);
                 
                 if (data.success) {
-                    displayRiskAnalysis(data);
+                    this.currentAnalysis = {
+                        ...data,
+                        locationName: locationName || `${lat}°, ${lon}°`,
+                        analysisTime: new Date().toISOString()
+                    };
+                    this.displayResults(this.currentAnalysis);
                 } else {
-                    showError(data.error || 'Analysis failed');
+                    throw new Error(data.error || 'Analysis failed');
                 }
                 
             } catch (error) {
-                console.error('Risk analysis error:', error);
-                showError(`Failed to analyze risk: ${error.message}`);
+                console.error('❌ Risk analysis error:', error);
+                this.showError(`Analysis failed: ${error.message}`);
+            } finally {
+                this.isAnalyzing = false;
+                this.hideLoading();
             }
-        });
-        
-        function showLoading() {
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('riskCard').classList.add('hidden');
-            document.getElementById('error').classList.add('hidden');
-            document.getElementById('analyzeBtn').disabled = true;
-            document.getElementById('analyzeBtn').textContent = '🔄 Analyzing...';
         }
-        
-        function hideLoading() {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('analyzeBtn').disabled = false;
-            document.getElementById('analyzeBtn').textContent = '🔍 Analyze Crop Risk';
-        }
-        
-        function showError(message) {
-            hideLoading();
-            document.getElementById('error').classList.remove('hidden');
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('riskCard').classList.add('hidden');
-        }
-        
-        function displayRiskAnalysis(data) {
-            hideLoading();
-            document.getElementById('error').classList.add('hidden');
+
+        displayResults(data) {
+            console.log('📋 Displaying results:', data);
+            this.hideError();
             
-            // Update crop and location info
-            document.getElementById('cropName').textContent = data.crop;
-            document.getElementById('locationInfo').textContent = 
-                `${data.location.latitude}°, ${data.location.longitude}° • ${data.period.start} to ${data.period.end}`;
+            // Update crop name and location
+            document.getElementById('resultCropName').textContent = `${data.crop} Analysis`;
+            document.getElementById('resultLocationInfo').textContent = 
+                `📍 ${data.locationName} • 📅 ${data.period.start} to ${data.period.end}`;
             
-            // Update risk level
-            const riskElement = document.getElementById('riskLevel');
-            riskElement.textContent = data.risk_level.toUpperCase();
-            riskElement.className = `risk-level risk-${data.risk_level}`;
+            // Update risk badge
+            this.updateRiskBadge(data.risk_level);
             
             // Update summary
-            document.getElementById('summaryText').textContent = data.summary;
+            this.updateSummary(data.summary);
             
             // Update alerts
-            const alertsList = document.getElementById('alertsList');
-            if (data.alerts && data.alerts.length > 0) {
-                alertsList.innerHTML = data.alerts.map(alert => 
-                    `<div class="alert-item">${alert}</div>`
-                ).join('');
-                document.getElementById('alertsSection').style.display = 'block';
-            } else {
-                alertsList.innerHTML = '<div class="alert-item">✅ No risk alerts for this period</div>';
-            }
+            this.updateAlerts(data.alerts);
             
             // Update recommendations
-            const recommendationsList = document.getElementById('recommendationsList');
-            if (data.recommendations && data.recommendations.length > 0) {
-                recommendationsList.innerHTML = data.recommendations.map(rec => 
-                    `<div class="recommendation-item">${rec}</div>`
-                ).join('');
-                document.getElementById('recommendationsSection').style.display = 'block';
-            } else {
-                recommendationsList.innerHTML = '<div class="recommendation-item">✅ No specific recommendations needed</div>';
-            }
+            this.updateRecommendations(data.recommendations);
             
-            // Update data sources status
-            const sourceStatus = document.getElementById('sourceStatus');
-            const sources = data.data_availability || {};
-            const sourceNames = {
-                'power_api': 'NASA POWER',
-                'gpm_api': 'GPM IMERG',
-                'modis_api': 'MODIS',
-                'worldview_api': 'Worldview'
+            // Update data sources
+            this.updateDataSources(data.data_availability);
+            
+            // Show results
+            document.getElementById('analysisResults').classList.remove('hidden');
+            
+            // Scroll to results
+            document.getElementById('analysisResults').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            
+            console.log('✅ Results displayed successfully');
+        }
+
+        updateRiskBadge(level) {
+            const badge = document.getElementById('resultRiskBadge');
+            if (!badge) return;
+            
+            const configs = {
+                low: { emoji: '✅', label: 'Low Risk', classes: 'bg-green-100 text-green-800' },
+                medium: { emoji: '⚠️', label: 'Medium Risk', classes: 'bg-yellow-100 text-yellow-800' },
+                high: { emoji: '🚨', label: 'High Risk', classes: 'bg-red-100 text-red-800' }
             };
             
-            sourceStatus.innerHTML = Object.keys(sourceNames).map(key => {
-                const available = sources[key] || false;
-                const statusClass = available ? 'source-available' : 'source-unavailable';
-                const statusIcon = available ? '✅' : '❌';
-                return `<div class="source-item ${statusClass}">${statusIcon} ${sourceNames[key]}</div>`;
-            }).join('');
-            
-            // Show the risk card
-            document.getElementById('riskCard').classList.remove('hidden');
+            const config = configs[level] || configs.medium;
+            badge.textContent = `${config.emoji} ${config.label}`;
+            badge.className = `px-3 py-1 text-sm font-semibold rounded-full ${config.classes}`;
         }
-        
-        // Auto-analyze on page load with default values
-        window.addEventListener('load', function() {
-            // Small delay to ensure everything is loaded
-            setTimeout(() => {
-                document.getElementById('riskForm').dispatchEvent(new Event('submit'));
-            }, 500);
-        });
-    </script>
-</body>
+
+        updateSummary(summary) {
+            const summaryEl = document.getElementById('resultSummary');
+            if (summaryEl) {
+                summaryEl.innerHTML = `<p class="text-terra-green-800 leading-relaxed">${summary}</p>`;
+            }
+        }
+
+        updateAlerts(alerts) {
+            const alertsEl = document.getElementById('resultAlerts');
+            const countEl = document.getElementById('alertCount');
+            
+            if (!alertsEl || !countEl) return;
+            
+            countEl.textContent = alerts.length;
+            
+            if (alerts.length === 0) {
+                alertsEl.innerHTML = '<div class="p-3 bg-green-50 text-green-800 rounded-lg">✅ No risk alerts for this period</div>';
+            } else {
+                alertsEl.innerHTML = alerts.map(alert => 
+                    `<div class="p-3 bg-orange-50 text-orange-800 rounded-lg border-l-4 border-orange-300">${alert}</div>`
+                ).join('');
+            }
+        }
+
+        updateRecommendations(recommendations) {
+            const recEl = document.getElementById('resultRecommendations');
+            if (!recEl) return;
+            
+            if (recommendations.length === 0) {
+                recEl.innerHTML = '<div class="p-3 bg-green-50 text-green-800 rounded-lg">✅ No specific recommendations needed</div>';
+            } else {
+                recEl.innerHTML = recommendations.map(rec => 
+                    `<div class="p-3 bg-terra-green-50 text-terra-green-800 rounded-lg border-l-4 border-terra-green-300">${rec}</div>`
+                ).join('');
+            }
+        }
+
+        updateDataSources(sources) {
+            const sourcesEl = document.getElementById('resultDataSources');
+            if (!sourcesEl) return;
+            
+            sourcesEl.innerHTML = Object.entries(sources).map(([source, available]) => {
+                const status = available ? 'text-green-600' : 'text-red-600';
+                const icon = available ? '✅' : '❌';
+                return `<div class="flex items-center gap-2 ${status}">
+                    <span>${icon}</span>
+                    <span class="font-medium">${source}</span>
+                </div>`;
+            }).join('');
+        }
+
+        showLoading() {
+            document.getElementById('analysisLoading').classList.remove('hidden');
+            document.getElementById('analysisError').classList.add('hidden');
+            document.getElementById('analysisResults').classList.add('hidden');
+            
+            // Update button state
+            const btn = document.getElementById('analyzeBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Analyzing...';
+            }
+        }
+
+        hideLoading() {
+            document.getElementById('analysisLoading').classList.add('hidden');
+            
+            // Reset button state
+            const btn = document.getElementById('analyzeBtn');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="search" class="w-4 h-4"></i> Analyze Crop Risk';
+            }
+        }
+
+        showError(message) {
+            const errorEl = document.getElementById('analysisError');
+            const errorText = document.getElementById('analysisErrorMessage');
+            
+            if (errorEl && errorText) {
+                errorText.textContent = message;
+                errorEl.classList.remove('hidden');
+            }
+            
+            this.hideLoading();
+        }
+
+        hideError() {
+            const errorEl = document.getElementById('analysisError');
+            if (errorEl) {
+                errorEl.classList.add('hidden');
+            }
+        }
+
+        retryLastAnalysis() {
+            if (this.currentAnalysis) {
+                // Extract form data and retry
+                const lat = document.getElementById('latitude').value;
+                const lon = document.getElementById('longitude').value;
+                const crop = document.getElementById('crop').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                this.analyzeRisk(lat, lon, crop, startDate, endDate);
+            }
+        }
+    }
+
+    // Initialize on DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+        window.riskDashboard = new RiskDashboard();
+    });
+</script>
+{% endblock %}
+

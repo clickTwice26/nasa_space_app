@@ -199,26 +199,26 @@
         </div>
 
         <!-- Bottom Navigation (hidden if not authenticated) -->
-        {% if session.get('session_id') %}
+        {% if user %}
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 z-40 shadow-lg" id="bottom-nav">
-            <div class="grid h-16" id="nav-grid">
-                <a href="/dashboard" class="nav-item nav-light {% if request.endpoint == 'dashboard' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
+            <div class="grid grid-cols-5 h-16" id="nav-grid">
+                <a href="/dashboard" class="nav-item nav-light {% if request.endpoint == 'main.dashboard' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="home" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Dashboard</span>
                 </a>
-                <a href="/predictions" class="nav-item nav-light {% if request.endpoint == 'predictions' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 farming-feature text-gray-700 hover:text-terra-green transition-colors">
+                <a href="/predictions" class="nav-item nav-light {% if request.endpoint == 'main.predictions' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 farming-feature text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="trending-up" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Predict</span>
                 </a>
-                <a href="/data" class="nav-item nav-light {% if request.endpoint == 'data' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
+                <a href="/data" class="nav-item nav-light {% if request.endpoint == 'main.data_page' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Data</span>
                 </a>
-                <a href="/community" class="nav-item nav-light {% if request.endpoint == 'community' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
+                <a href="/community" class="nav-item nav-light {% if request.endpoint == 'main.community' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="users" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Community</span>
                 </a>
-                <a href="/settings" class="nav-item nav-light {% if request.endpoint == 'settings' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
+                <a href="/settings" class="nav-item nav-light {% if request.endpoint == 'main.settings' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="settings" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Settings</span>
                 </a>
@@ -231,29 +231,20 @@
     <script>
         lucide.createIcons();
         
-        // Profile-based feature management
+        // Profile-based feature management - simplified for new session system
         function initializeProfileFeatures() {
-            const userProfile = sessionStorage.getItem('userProfile');
-            const onboardingCompleted = sessionStorage.getItem('onboardingCompleted');
+            // Get user data from server context (provided by session)
+            const hasUser = {% if user %}true{% else %}false{% endif %};
             
-            // Don't redirect to onboarding if on auth pages or already on onboarding
-            const isAuthPage = window.location.pathname.startsWith('/auth/');
-            const isOnboardingPage = window.location.pathname === '/onboarding';
-            
-            // Redirect to onboarding if not completed (but not from auth pages)
-            if (!onboardingCompleted && !isAuthPage && !isOnboardingPage) {
-                window.location.href = '/onboarding';
-                return;
+            if (hasUser) {
+                const userRole = '{% if user and user.profile_data and user.profile_data.role %}{{ user.profile_data.role }}{% else %}explorer{% endif %}';
+                updateProfileIndicator(userRole);
+                
+                // Update navigation based on role
+                if (userRole === 'student') {
+                    updateNavigationForStudent();
+                }
             }
-            
-            if (userProfile === 'student') {
-                // Hide farming-specific features for students
-                hideElementsByClass('farming-feature');
-                updateNavigationForStudent();
-            }
-            
-            // Update profile indicator in header
-            updateProfileIndicator(userProfile);
         }
         
         function hideElementsByClass(className) {

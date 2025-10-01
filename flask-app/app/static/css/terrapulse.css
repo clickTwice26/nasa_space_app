@@ -1865,7 +1865,7 @@ p:not(.bg-gradient-terra p) {
 
 /* Enhanced Navigation Grid */
 #nav-grid {
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
 }
 
 /* Enhanced header for light mode */

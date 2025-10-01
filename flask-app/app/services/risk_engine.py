@@ -123,32 +123,48 @@ class RiskEngine:
             risk_level = "low"
             
             # Weather-based risk analysis
-            weather_risks = self._analyze_weather_risks(weather_data, crop_profile)
-            alerts.extend(weather_risks["alerts"])
-            if weather_risks["level"] == "high":
-                risk_level = "high"
-            elif weather_risks["level"] == "medium" and risk_level != "high":
-                risk_level = "medium"
+            try:
+                weather_risks = self._analyze_weather_risks(weather_data, crop_profile)
+                alerts.extend(weather_risks["alerts"])
+                if weather_risks["level"] == "high":
+                    risk_level = "high"
+                elif weather_risks["level"] == "medium" and risk_level != "high":
+                    risk_level = "medium"
+            except Exception as e:
+                logger.error(f"Weather risk analysis failed: {e}")
+                alerts.append("⚠️ Weather analysis temporarily unavailable")
             
             # Precipitation risk analysis
-            precip_risks = self._analyze_precipitation_risks(precipitation_data, crop_profile)
-            alerts.extend(precip_risks["alerts"])
-            if precip_risks["level"] == "high":
-                risk_level = "high"
-            elif precip_risks["level"] == "medium" and risk_level != "high":
-                risk_level = "medium"
+            try:
+                precip_risks = self._analyze_precipitation_risks(precipitation_data, crop_profile)
+                alerts.extend(precip_risks["alerts"])
+                if precip_risks["level"] == "high":
+                    risk_level = "high"
+                elif precip_risks["level"] == "medium" and risk_level != "high":
+                    risk_level = "medium"
+            except Exception as e:
+                logger.error(f"Precipitation risk analysis failed: {e}")
+                alerts.append("⚠️ Precipitation analysis temporarily unavailable")
             
             # Vegetation health analysis
-            vegetation_risks = self._analyze_vegetation_health(vegetation_data, crop_profile)
-            alerts.extend(vegetation_risks["alerts"])
-            if vegetation_risks["level"] == "high":
-                risk_level = "high"
-            elif vegetation_risks["level"] == "medium" and risk_level != "high":
-                risk_level = "medium"
+            try:
+                vegetation_risks = self._analyze_vegetation_health(vegetation_data, crop_profile)
+                alerts.extend(vegetation_risks["alerts"])
+                if vegetation_risks["level"] == "high":
+                    risk_level = "high"
+                elif vegetation_risks["level"] == "medium" and risk_level != "high":
+                    risk_level = "medium"
+            except Exception as e:
+                logger.error(f"Vegetation risk analysis failed: {e}")
+                alerts.append("⚠️ Vegetation analysis temporarily unavailable")
             
             # Historical trend analysis
-            historical_risks = self._analyze_historical_trends(historical_data, crop)
-            alerts.extend(historical_risks["alerts"])
+            try:
+                historical_risks = self._analyze_historical_trends(historical_data, crop)
+                alerts.extend(historical_risks["alerts"])
+            except Exception as e:
+                logger.error(f"Historical trend analysis failed: {e}")
+                alerts.append("⚠️ Historical analysis temporarily unavailable")
             
             # Generate summary and recommendations
             summary = self._generate_summary(crop, alerts, risk_level, start, end)
@@ -255,30 +271,36 @@ class RiskEngine:
         
         temperatures = []
         for day in weather_data["data"]:
-            temp = day.get("temperature", 25)
+            temp = day.get("temperature")
+            # Handle None values safely
+            if temp is None:
+                temp = 25  # Default temperature
             temperatures.append(temp)
             
             # Heat stress check
-            if temp > crop_profile["heat_stress_temp"]:
+            if temp is not None and temp > crop_profile["heat_stress_temp"]:
                 alerts.append(f"🌡️ Heat stress risk: {temp}°C (limit: {crop_profile['heat_stress_temp']}°C)")
                 risk_level = "high"
             
             # Cold stress check
-            if temp < crop_profile["cold_stress_temp"]:
+            if temp is not None and temp < crop_profile["cold_stress_temp"]:
                 alerts.append(f"🧊 Cold stress risk: {temp}°C (limit: {crop_profile['cold_stress_temp']}°C)")
                 risk_level = "high"
         
         # Temperature trend analysis
         if temperatures:
-            avg_temp = statistics.mean(temperatures)
-            min_optimal, max_optimal = crop_profile["optimal_temp_range"]
-            
-            if avg_temp < min_optimal - 5:
-                alerts.append(f"❄️ Sustained cold conditions: {avg_temp:.1f}°C average")
-                risk_level = "medium" if risk_level == "low" else risk_level
-            elif avg_temp > max_optimal + 5:
-                alerts.append(f"🔥 Sustained hot conditions: {avg_temp:.1f}°C average")
-                risk_level = "medium" if risk_level == "low" else risk_level
+            # Filter out None values before calculating mean
+            valid_temps = [t for t in temperatures if t is not None]
+            if valid_temps:
+                avg_temp = statistics.mean(valid_temps)
+                min_optimal, max_optimal = crop_profile["optimal_temp_range"]
+                
+                if avg_temp < min_optimal - 5:
+                    alerts.append(f"❄️ Sustained cold conditions: {avg_temp:.1f}°C average")
+                    risk_level = "medium" if risk_level == "low" else risk_level
+                elif avg_temp > max_optimal + 5:
+                    alerts.append(f"🔥 Sustained hot conditions: {avg_temp:.1f}°C average")
+                    risk_level = "medium" if risk_level == "low" else risk_level
         
         return {"alerts": alerts, "level": risk_level}
     
@@ -294,24 +316,30 @@ class RiskEngine:
         daily_rainfall = []
         
         for day in precip_data["data"]:
-            rainfall = day.get("precipitation", 0)
+            rainfall = day.get("precipitation")
+            # Handle None values safely
+            if rainfall is None:
+                rainfall = 0  # Default to no rainfall
             daily_rainfall.append(rainfall)
             total_rainfall += rainfall
             
             # Daily flooding risk
-            if rainfall > crop_profile["flooding_threshold"]:
+            if rainfall is not None and rainfall > crop_profile["flooding_threshold"]:
                 alerts.append(f"🌊 Flooding risk: {rainfall}mm rainfall (limit: {crop_profile['flooding_threshold']}mm)")
                 risk_level = "high"
-            elif rainfall > crop_profile["flooding_threshold"] * 0.8:
+            elif rainfall is not None and rainfall > crop_profile["flooding_threshold"] * 0.8:
                 alerts.append(f"🌧️ Heavy rainfall warning: {rainfall}mm")
                 risk_level = "medium" if risk_level == "low" else risk_level
         
         # Weekly drought assessment
         if daily_rainfall:
-            avg_daily = total_rainfall / len(daily_rainfall)
-            if avg_daily < crop_profile["drought_threshold"] / 7:
-                alerts.append(f"🏜️ Drought conditions: {total_rainfall:.1f}mm total rainfall")
-                risk_level = "medium" if risk_level == "low" else risk_level
+            # Filter out None values
+            valid_rainfall = [r for r in daily_rainfall if r is not None]
+            if valid_rainfall:
+                avg_daily = sum(valid_rainfall) / len(valid_rainfall)
+                if avg_daily < crop_profile["drought_threshold"] / 7:
+                    alerts.append(f"🏜️ Drought conditions: {total_rainfall:.1f}mm total rainfall")
+                    risk_level = "medium" if risk_level == "low" else risk_level
         
         # Water needs assessment
         water_needs = crop_profile.get("water_needs", "moderate")

@@ -1,0 +1,881 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to TerraPulse{% endblock %}
+{% block subtitle %}Let's set up your profile{% endblock %}
+
+{% block head_extra %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+<style>
+    .onboarding-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .onboarding-card:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .step {
+        display: none;
+        opacity: 0;
+        transform: translateX(30px);
+        transition: all 0.5s ease;
+    }
+    
+    .step.active {
+        display: block;
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .progress-bar {
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #48c085, #38a169);
+        transition: width 0.3s ease;
+        border-radius: 2px;
+    }
+    
+    .location-option {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .location-option:hover {
+        border-color: #48c085;
+        background: #f0fdf4;
+    }
+    
+    .location-option.selected {
+        border-color: #48c085;
+        background: #f0fdf4;
+    }
+    
+    .role-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .role-card:hover {
+        border-color: #48c085;
+        background: #f0fdf4;
+        transform: translateY(-2px);
+    }
+    
+    .role-card.selected {
+        border-color: #48c085;
+        background: #f0fdf4;
+        transform: translateY(-2px);
+    }
+    
+    /* Button styling improvements */
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    button:disabled:hover {
+        transform: none !important;
+    }
+    
+    .btn-primary {
+        background: #16a34a;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+        background: #15803d;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    /* Map styling */
+    #location-map {
+        height: 300px;
+        width: 100%;
+        border-radius: 8px;
+        border: 2px solid #e2e8f0;
+        margin-bottom: 16px;
+    }
+    
+    .map-instructions {
+        background: #f0f9ff;
+        border: 1px solid #0ea5e9;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .coordinates-display {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 12px;
+        font-family: monospace;
+        font-size: 14px;
+    }
+    
+    .location-input-section {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <!-- Progress Bar -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-700">Setup Progress</span>
+            <span class="text-sm text-gray-500" id="progress-text">Step 1 of 3</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 33%"></div>
+        </div>
+    </div>
+
+    <!-- Step 1: Welcome & Role Selection -->
+    <div class="step active" id="step-1">
+        <div class="onboarding-card p-8 text-center">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-terra-green rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="globe" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Welcome to TerraPulse!</h2>
+                <p class="text-gray-600">Let's personalize your environmental intelligence experience</p>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">What best describes you?</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="role-card" data-role="farmer">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="wheat" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900">Farmer</h4>
+                        <p class="text-sm text-gray-600">Agricultural producer or land manager</p>
+                    </div>
+                    
+                    <div class="role-card" data-role="researcher">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="microscope" class="w-6 h-6 text-blue-600"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900">Researcher</h4>
+                        <p class="text-sm text-gray-600">Academic or scientific researcher</p>
+                    </div>
+                    
+                    <div class="role-card" data-role="analyst">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="bar-chart" class="w-6 h-6 text-purple-600"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900">Data Analyst</h4>
+                        <p class="text-sm text-gray-600">Environmental data specialist</p>
+                    </div>
+                    
+                    <div class="role-card" data-role="curious">
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="compass" class="w-6 h-6 text-orange-600"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900">Explorer</h4>
+                        <p class="text-sm text-gray-600">Curious about environmental data</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="next-step-1" class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors font-medium shadow-lg" disabled>
+                <i data-lucide="arrow-right" class="w-4 h-4 inline mr-2"></i>
+                Continue
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 2: Location Setup -->
+    <div class="step" id="step-2">
+        <div class="onboarding-card p-8">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-terra-blue rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="map-pin" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Set Your Location</h2>
+                <p class="text-gray-600">This helps us provide relevant environmental data</p>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <div class="location-option" data-location-type="current">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="navigation" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Use Current Location</h4>
+                            <p class="text-sm text-gray-600">Detect location automatically</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="location-option" data-location-type="manual">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="map" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Enter Manually</h4>
+                            <p class="text-sm text-gray-600">Input coordinates or address</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Manual Location Input (Hidden by default) -->
+            <div id="manual-location" class="hidden space-y-4 mb-6">
+                <div class="location-input-section">
+                    <div class="map-instructions">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-600 flex-shrink-0"></i>
+                        <p class="text-sm text-blue-800">
+                            <strong>Click on the map</strong> to select your location, or enter coordinates manually below.
+                        </p>
+                    </div>
+                    
+                    <!-- Interactive Map -->
+                    <div id="location-map"></div>
+                    
+                    <!-- Coordinates Display -->
+                    <div class="coordinates-display">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Selected Location:</span>
+                            <button id="clear-location" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                <i data-lucide="x" class="w-4 h-4 inline mr-1"></i>
+                                Clear
+                            </button>
+                        </div>
+                        <div id="map-coordinates" class="text-gray-800 font-medium mt-1">
+                            Click on the map to select a location
+                        </div>
+                    </div>
+                    
+                    <!-- Manual Input Fields -->
+                    <div class="mt-4">
+                        <h5 class="text-sm font-medium text-gray-700 mb-3">Or enter coordinates manually:</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                                <input type="number" id="latitude" step="0.0001" placeholder="23.7644" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                                <input type="number" id="longitude" step="0.0001" placeholder="90.3897"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Location Name (Optional)</label>
+                            <input type="text" id="location-name" placeholder="e.g., Dhaka, Bangladesh"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-8">
+                <button id="back-step-2" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg transition-colors font-medium shadow">
+                    <i data-lucide="arrow-left" class="w-4 h-4 inline mr-2"></i>
+                    Back
+                </button>
+                <button id="next-step-2" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors font-medium shadow-lg" disabled>
+                    <i data-lucide="arrow-right" class="w-4 h-4 inline mr-2"></i>
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Final Setup -->
+    <div class="step" id="step-3">
+        <div class="onboarding-card p-8 text-center">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="check" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">You're All Set!</h2>
+                <p class="text-gray-600">Your profile has been created successfully</p>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Your Profile</h4>
+                        <p class="text-sm text-gray-600">Username: <span id="display-username">-</span></p>
+                        <p class="text-sm text-gray-600">Email: <span id="display-email">-</span></p>
+                        <p class="text-sm text-gray-600">Role: <span id="display-role">-</span></p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Location</h4>
+                        <p class="text-sm text-gray-600">Latitude: <span id="display-lat">-</span></p>
+                        <p class="text-sm text-gray-600">Longitude: <span id="display-lng">-</span></p>
+                        <p class="text-sm text-gray-600">Name: <span id="display-location-name">-</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-8">
+                <button id="back-step-3" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg transition-colors font-medium shadow">
+                    <i data-lucide="arrow-left" class="w-4 h-4 inline mr-2"></i>
+                    Back
+                </button>
+                <button id="complete-onboarding" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors font-medium shadow-lg">
+                    <i data-lucide="check" class="w-4 h-4 inline mr-2"></i>
+                    Start Using TerraPulse
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+<script>
+    class OnboardingFlow {
+        constructor() {
+            this.currentStep = 1;
+            this.maxSteps = 3;
+            this.userData = {
+                role: null,
+                location: {
+                    type: null,
+                    latitude: null,
+                    longitude: null,
+                    name: null
+                }
+            };
+            this.map = null;
+            this.marker = null;
+            this.init();
+        }
+
+        init() {
+            console.log('🚀 Starting session-based onboarding...');
+            this.setupEventListeners();
+            this.startSession();
+            
+            // Initialize Lucide icons
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                    console.log('✅ Icons initialized');
+                }
+            }, 100);
+            
+            // Debug button visibility
+            this.debugButtons();
+        }
+        
+        debugButtons() {
+            console.log('🔍 Debugging button visibility...');
+            const buttons = ['next-step-1', 'next-step-2', 'back-step-2', 'back-step-3', 'complete-onboarding'];
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    console.log(`   ${id}: Found, disabled=${btn.disabled}, visible=${!btn.classList.contains('hidden')}`);
+                    // Ensure buttons are visible
+                    btn.style.display = 'inline-flex';
+                    btn.style.alignItems = 'center';
+                    btn.style.justifyContent = 'center';
+                } else {
+                    console.warn(`   ${id}: NOT FOUND`);
+                }
+            });
+        }
+
+        initializeMap() {
+            if (this.map) {
+                return; // Map already initialized
+            }
+
+            console.log('🗺️ Initializing interactive map...');
+            
+            // Default to Bangladesh (Dhaka) for better user experience
+            const defaultLat = 23.7644;
+            const defaultLng = 90.3897;
+            
+            this.map = L.map('location-map').setView([defaultLat, defaultLng], 10);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19,
+                crossOrigin: true
+            }).addTo(this.map);
+            
+            // Add click event listener
+            this.map.on('click', (e) => {
+                this.onMapClick(e);
+            });
+            
+            // Add some popular location markers for reference
+            this.addReferenceMarkers();
+            
+            console.log('✅ Map initialized successfully');
+        }
+        
+        addReferenceMarkers() {
+            const referenceLocations = [
+                { lat: 23.7644, lng: 90.3897, name: 'Dhaka, Bangladesh', color: 'blue' },
+                { lat: 28.6139, lng: 77.2090, name: 'Delhi, India', color: 'blue' },
+                { lat: 40.7128, lng: -74.0060, name: 'New York, USA', color: 'blue' },
+                { lat: 51.5074, lng: -0.1278, name: 'London, UK', color: 'blue' }
+            ];
+            
+            referenceLocations.forEach(location => {
+                const marker = L.circleMarker([location.lat, location.lng], {
+                    radius: 4,
+                    fillColor: location.color,
+                    color: 'white',
+                    weight: 2,
+                    opacity: 0.7,
+                    fillOpacity: 0.7
+                }).addTo(this.map);
+                
+                marker.bindTooltip(location.name, {
+                    permanent: false,
+                    direction: 'top',
+                    className: 'map-tooltip'
+                });
+            });
+        }
+        
+        onMapClick(e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+            
+            console.log(`📍 Map clicked: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+            
+            // Remove existing marker
+            if (this.marker) {
+                this.map.removeLayer(this.marker);
+            }
+            
+            // Add new marker
+            this.marker = L.marker([lat, lng], {
+                draggable: true
+            }).addTo(this.map);
+            
+            // Add drag event to marker
+            this.marker.on('dragend', (event) => {
+                const position = event.target.getLatLng();
+                this.updateLocationFromMap(position.lat, position.lng);
+            });
+            
+            // Update location data
+            this.updateLocationFromMap(lat, lng);
+        }
+        
+        updateLocationFromMap(lat, lng) {
+            // Update internal data
+            this.userData.location.latitude = lat;
+            this.userData.location.longitude = lng;
+            
+            // Update input fields
+            document.getElementById('latitude').value = lat.toFixed(6);
+            document.getElementById('longitude').value = lng.toFixed(6);
+            
+            // Update coordinates display
+            document.getElementById('map-coordinates').innerHTML = `
+                <strong>Lat:</strong> ${lat.toFixed(6)} | <strong>Lng:</strong> ${lng.toFixed(6)}
+            `;
+            
+            // Try to get location name (reverse geocoding simulation)
+            this.updateLocationName(lat, lng);
+            
+            // Validate and enable next button
+            this.validateLocationInputs();
+        }
+        
+        updateLocationName(lat, lng) {
+            // Simple location naming based on coordinates
+            let locationName = `Location ${lat.toFixed(2)}, ${lng.toFixed(2)}`;
+            
+            // Some basic region detection for better UX
+            if (lat >= 20 && lat <= 27 && lng >= 88 && lng <= 93) {
+                locationName = "Bangladesh Region";
+            } else if (lat >= 25 && lat <= 32 && lng >= 74 && lng <= 80) {
+                locationName = "India Region";
+            } else if (lat >= 40 && lat <= 42 && lng >= -75 && lng <= -73) {
+                locationName = "New York Region";
+            } else if (lat >= 51 && lat <= 52 && lng >= -1 && lng <= 1) {
+                locationName = "London Region";
+            }
+            
+            this.userData.location.name = locationName;
+            
+            // Update the location name input if it's empty
+            const nameInput = document.getElementById('location-name');
+            if (!nameInput.value) {
+                nameInput.value = locationName;
+            }
+        }
+        
+        clearLocation() {
+            if (this.marker) {
+                this.map.removeLayer(this.marker);
+                this.marker = null;
+            }
+            
+            // Clear data
+            this.userData.location.latitude = null;
+            this.userData.location.longitude = null;
+            this.userData.location.name = null;
+            
+            // Clear inputs
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+            document.getElementById('location-name').value = '';
+            
+            // Reset coordinates display
+            document.getElementById('map-coordinates').textContent = 'Click on the map to select a location';
+            
+            // Disable next button
+            const nextBtn = document.getElementById('next-step-2');
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50');
+            nextBtn.classList.remove('shadow-lg');
+        }
+
+        async startSession() {
+            try {
+                const response = await fetch('/auth/start-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    console.log('✅ Session started for user:', data.user.username);
+                    this.userData.username = data.user.username;
+                    this.userData.email = data.user.email;
+                    this.userData.fullName = data.user.full_name;
+                } else {
+                    console.error('❌ Failed to start session:', data.message);
+                }
+            } catch (error) {
+                console.error('❌ Session start error:', error);
+            }
+        }
+
+        setupEventListeners() {
+            // Role selection
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.addEventListener('click', () => this.selectRole(card));
+            });
+
+            // Location type selection
+            document.querySelectorAll('.location-option').forEach(option => {
+                option.addEventListener('click', () => this.selectLocationType(option));
+            });
+
+            // Navigation buttons
+            document.getElementById('next-step-1').addEventListener('click', () => this.nextStep());
+            document.getElementById('next-step-2').addEventListener('click', () => this.nextStep());
+            document.getElementById('back-step-2').addEventListener('click', () => this.prevStep());
+            document.getElementById('back-step-3').addEventListener('click', () => this.prevStep());
+            document.getElementById('complete-onboarding').addEventListener('click', () => this.completeOnboarding());
+
+            // Location input validation
+            ['latitude', 'longitude'].forEach(id => {
+                const input = document.getElementById(id);
+                input.addEventListener('input', () => this.validateLocationInputs());
+                input.addEventListener('input', () => this.updateMapFromInputs());
+            });
+            
+            // Location name input
+            document.getElementById('location-name').addEventListener('input', () => {
+                this.userData.location.name = document.getElementById('location-name').value;
+            });
+            
+            // Clear location button
+            document.getElementById('clear-location').addEventListener('click', () => this.clearLocation());
+        }
+        
+        updateMapFromInputs() {
+            const lat = parseFloat(document.getElementById('latitude').value);
+            const lng = parseFloat(document.getElementById('longitude').value);
+            
+            if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                if (this.map) {
+                    // Update map view
+                    this.map.setView([lat, lng], 12);
+                    
+                    // Remove existing marker
+                    if (this.marker) {
+                        this.map.removeLayer(this.marker);
+                    }
+                    
+                    // Add new marker
+                    this.marker = L.marker([lat, lng], {
+                        draggable: true
+                    }).addTo(this.map);
+                    
+                    // Add drag event to marker
+                    this.marker.on('dragend', (event) => {
+                        const position = event.target.getLatLng();
+                        this.updateLocationFromMap(position.lat, position.lng);
+                    });
+                    
+                    // Update coordinates display
+                    document.getElementById('map-coordinates').innerHTML = `
+                        <strong>Lat:</strong> ${lat.toFixed(6)} | <strong>Lng:</strong> ${lng.toFixed(6)}
+                    `;
+                    
+                    // Update internal data
+                    this.userData.location.latitude = lat;
+                    this.userData.location.longitude = lng;
+                }
+            }
+        }
+
+        selectRole(card) {
+            // Remove previous selections
+            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+            
+            // Select current card
+            card.classList.add('selected');
+            this.userData.role = card.dataset.role;
+            
+            // Enable next button with visual feedback
+            const nextBtn = document.getElementById('next-step-1');
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50');
+            nextBtn.classList.add('shadow-lg', 'transform', 'hover:scale-105');
+            
+            console.log('✅ Role selected:', this.userData.role);
+        }
+
+        selectLocationType(option) {
+            // Remove previous selections
+            document.querySelectorAll('.location-option').forEach(o => o.classList.remove('selected'));
+            
+            // Select current option
+            option.classList.add('selected');
+            this.userData.location.type = option.dataset.locationType;
+            
+            const manualLocation = document.getElementById('manual-location');
+            
+            if (this.userData.location.type === 'current') {
+                manualLocation.classList.add('hidden');
+                this.getCurrentLocation();
+            } else {
+                manualLocation.classList.remove('hidden');
+                
+                // Initialize map after the container is visible
+                setTimeout(() => {
+                    this.initializeMap();
+                    // Refresh icons after map is loaded
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }, 100);
+                
+                this.validateLocationInputs();
+            }
+            
+            console.log('Location type selected:', this.userData.location.type);
+        }
+
+        async getCurrentLocation() {
+            if (navigator.geolocation) {
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject);
+                    });
+                    
+                    this.userData.location.latitude = position.coords.latitude;
+                    this.userData.location.longitude = position.coords.longitude;
+                    this.userData.location.name = 'Current Location';
+                    
+                    // Enable next button with visual feedback
+                    const nextBtn = document.getElementById('next-step-2');
+                    nextBtn.disabled = false;
+                    nextBtn.classList.remove('opacity-50');
+                    nextBtn.classList.add('shadow-lg');
+                    
+                    console.log('✅ Current location detected:', this.userData.location);
+                } catch (error) {
+                    console.error('❌ Location detection failed:', error);
+                    alert('Unable to detect location. Please enter manually.');
+                    document.querySelector('[data-location-type=\"manual\"]').click();
+                }
+            } else {
+                alert('Geolocation not supported. Please enter manually.');
+                document.querySelector('[data-location-type=\"manual\"]').click();
+            }
+        }
+
+        validateLocationInputs() {
+            const lat = parseFloat(document.getElementById('latitude').value);
+            const lng = parseFloat(document.getElementById('longitude').value);
+            
+            const isValid = !isNaN(lat) && !isNaN(lng) && 
+                           lat >= -90 && lat <= 90 && 
+                           lng >= -180 && lng <= 180;
+            
+            const nextBtn = document.getElementById('next-step-2');
+            
+            if (isValid) {
+                this.userData.location.latitude = lat;
+                this.userData.location.longitude = lng;
+                this.userData.location.name = document.getElementById('location-name').value || 'Manual Location';
+                
+                // Enable button with visual feedback
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('opacity-50');
+                nextBtn.classList.add('shadow-lg');
+                
+                console.log('✅ Manual location validated:', this.userData.location);
+            } else {
+                // Disable button
+                nextBtn.disabled = true;
+                nextBtn.classList.add('opacity-50');
+                nextBtn.classList.remove('shadow-lg');
+            }
+        }
+
+        nextStep() {
+            if (this.currentStep < this.maxSteps) {
+                // Hide current step
+                document.getElementById(`step-${this.currentStep}`).classList.remove('active');
+                
+                // Show next step
+                this.currentStep++;
+                setTimeout(() => {
+                    document.getElementById(`step-${this.currentStep}`).classList.add('active');
+                }, 100);
+                
+                // Update progress
+                this.updateProgress();
+                
+                // Handle step 3 (final step)
+                if (this.currentStep === 3) {
+                    this.displaySummary();
+                }
+            }
+        }
+
+        prevStep() {
+            if (this.currentStep > 1) {
+                // Hide current step
+                document.getElementById(`step-${this.currentStep}`).classList.remove('active');
+                
+                // Show previous step
+                this.currentStep--;
+                setTimeout(() => {
+                    document.getElementById(`step-${this.currentStep}`).classList.add('active');
+                }, 100);
+                
+                // Update progress
+                this.updateProgress();
+            }
+        }
+
+        updateProgress() {
+            const progress = (this.currentStep / this.maxSteps) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `Step ${this.currentStep} of ${this.maxSteps}`;
+        }
+
+        displaySummary() {
+            document.getElementById('display-username').textContent = this.userData.username || '-';
+            document.getElementById('display-email').textContent = this.userData.email || '-';
+            document.getElementById('display-role').textContent = this.userData.role || '-';
+            document.getElementById('display-lat').textContent = this.userData.location.latitude || '-';
+            document.getElementById('display-lng').textContent = this.userData.location.longitude || '-';
+            document.getElementById('display-location-name').textContent = this.userData.location.name || '-';
+        }
+
+        async completeOnboarding() {
+            try {
+                // Update profile with collected data
+                const profileResponse = await fetch('/auth/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        role: this.userData.role,
+                        location: this.userData.location,
+                        full_name: this.userData.fullName
+                    })
+                });
+
+                if (profileResponse.ok) {
+                    // Mark onboarding as completed
+                    const completeResponse = await fetch('/auth/complete-onboarding', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (completeResponse.ok) {
+                        console.log('✅ Onboarding completed successfully');
+                        window.location.href = '/dashboard';
+                    } else {
+                        console.error('❌ Failed to complete onboarding');
+                        alert('Failed to complete setup. Please try again.');
+                    }
+                } else {
+                    console.error('❌ Failed to update profile');
+                    alert('Failed to save profile. Please try again.');
+                }
+            } catch (error) {
+                console.error('❌ Onboarding completion error:', error);
+                alert('Setup failed. Please try again.');
+            }
+        }
+    }
+
+    // Initialize onboarding flow
+    document.addEventListener('DOMContentLoaded', () => {
+        window.onboardingFlow = new OnboardingFlow();
+    });
+</script>
+{% endblock %}
