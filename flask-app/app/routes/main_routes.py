@@ -87,10 +87,10 @@ def missions_page():
     """Legacy missions page (keep for compatibility)"""
     return render_template('missions.html')
 
-@main_bp.route('/about')
-def about():
-    """About page"""
-    return render_template('about.html')
+# @main_bp.route('/about')
+# def about():
+#     """About page - disabled, no template exists"""
+#     return render_template('about.html')
 
 @main_bp.route('/health')
 def health_check():

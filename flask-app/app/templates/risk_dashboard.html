@@ -5,65 +5,115 @@
 
 {% block head_extra %}
 <style>
+    /* Mobile-optimized risk dashboard styles */
+    .risk-card {
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: var(--spacing-lg);
+        transition: all 0.2s ease;
+    }
+    
+    .risk-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+    }
+    
     .risk-low { 
         background: #d4edda; 
         color: #155724; 
         border-color: #c3e6cb;
+        border-radius: var(--border-radius-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
     }
     .risk-medium { 
         background: #fff3cd; 
         color: #856404; 
         border-color: #ffeaa7;
+        border-radius: var(--border-radius-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
     }
     .risk-high { 
         background: #f8d7da; 
         color: #721c24; 
         border-color: #f5c6cb;
+        border-radius: var(--border-radius-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
     }
     .alert-item { 
         background: #fff8e1; 
-        padding: 12px 16px; 
-        border-radius: 8px; 
-        margin-bottom: 8px; 
+        padding: var(--spacing-md); 
+        border-radius: var(--border-radius-sm); 
+        margin-bottom: var(--spacing-sm); 
         border-left: 3px solid #ffc107;
-        font-size: 0.9rem;
+        font-size: 0.875rem;
         line-height: 1.5;
+        border: 1px solid #ffeaa7;
     }
     .recommendation-item { 
         background: #e3f2fd; 
-        padding: 12px 16px; 
-        border-radius: 8px; 
-        margin-bottom: 8px; 
+        padding: var(--spacing-md); 
+        border-radius: var(--border-radius-sm); 
+        margin-bottom: var(--spacing-sm); 
         border-left: 3px solid #2196f3;
-        font-size: 0.9rem;
+        font-size: 0.875rem;
         line-height: 1.5;
+        border: 1px solid #bbdefb;
     }
-    .form-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        border: 1px solid #e2e8f0;
+    
+    .mobile-form-card {
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
+        margin-bottom: var(--spacing-lg);
     }
-    .analysis-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        border: 1px solid #e2e8f0;
-        transition: box-shadow 0.3s ease;
+    
+    .mobile-input {
+        width: 100%;
+        padding: var(--spacing-md);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--border-radius-sm);
+        font-size: 1rem;
+        background: var(--bg-primary);
+        transition: border-color 0.2s ease;
     }
-    .analysis-card:hover {
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    
+    .mobile-input:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
     }
-    .example-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    .mobile-btn {
+        width: 100%;
+        padding: var(--spacing-md);
+        background: #059669;
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-sm);
+        font-weight: 600;
+        font-size: 1rem;
+        touch-action: manipulation;
+        transition: all 0.2s ease;
     }
+    
+    .mobile-btn:hover {
+        background: #047857;
+        transform: translateY(-1px);
+    }
+    
+    .mobile-btn:active {
+        transform: scale(0.98);
+    }
+    
     .loading-spinner {
         border: 3px solid #f3f3f3;
         border-top: 3px solid #48c085;
         border-radius: 50%;
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
         animation: spin 1s linear infinite;
         margin: 0 auto;
     }
@@ -71,66 +121,166 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
+    
     .risk-badge {
-        padding: 6px 16px;
-        border-radius: 20px;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--border-radius-xl);
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         border: 2px solid;
+        display: inline-block;
     }
+    
     .section-header {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
-        padding-bottom: 8px;
-        border-bottom: 2px solid #f1f5f9;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-sm);
+        border-bottom: 2px solid var(--border-light);
     }
+    
     .icon-badge {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--border-radius-sm);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1rem;
+    }
+    
+    /* Mobile-specific adjustments */
+    @media (max-width: 768px) {
+        .mobile-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+        }
+        
+        .mobile-two-col {
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+<div class="space-y-4 pb-32">
     <!-- Risk Analysis Form -->
-    <div class="form-card p-6">
-        <div class="section-header">
-            <div class="icon-badge bg-terra-green text-white">
-                <i data-lucide="search"></i>
-            </div>
-            <div>
-                <h2 class="text-xl font-bold text-gray-900">Crop Risk Analysis</h2>
-                <p class="text-sm text-gray-600">Analyze crop risks using NASA satellite data</p>
+    <div class="mobile-form-card">
+        <div class="app-card-header">
+            <div class="section-header">
+                <div class="icon-badge bg-terra-green-500 text-white">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h2 class="text-heading-2 text-gray-900">Crop Risk Analysis</h2>
+                    <p class="text-caption text-gray-600">Analyze crop risks using NASA satellite data</p>
+                </div>
             </div>
         </div>
         
-        <form id="riskAnalysisForm">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <div class="space-y-2">
-                    <label for="latitude" class="block text-sm font-medium text-gray-700">
-                        <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
-                        Latitude
-                    </label>
-                    <input type="number" 
-                           id="latitude" 
-                           step="0.0001" 
-                           placeholder="23.7644" 
-                           value="23.7644"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terra-green focus:border-terra-green transition-colors"
-                           required>
+        <div class="app-card-body">
+            <form id="riskAnalysisForm">
+                <div class="grid mobile-grid gap-4 mb-6">
+                    <div class="space-y-2">
+                        <label for="latitude" class="block text-body font-medium text-gray-700">
+                            <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                            Latitude
+                        </label>
+                        <input type="number" 
+                               id="latitude" 
+                               step="0.0001" 
+                               placeholder="23.7644" 
+                               value="23.7644"
+                               class="mobile-input"
+                               required>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label for="longitude" class="block text-body font-medium text-gray-700">
+                            <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                            Longitude
+                        </label>
+                        <input type="number" 
+                               id="longitude" 
+                               step="0.0001" 
+                               placeholder="90.3948" 
+                               value="90.3948"
+                               class="mobile-input"
+                               required>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label for="cropType" class="block text-body font-medium text-gray-700">
+                            <i data-lucide="wheat" class="w-4 h-4 inline mr-1"></i>
+                            Crop Type
+                        </label>
+                        <select id="cropType" class="mobile-input" required>
+                            <option value="">Select Crop</option>
+                            <option value="rice">Rice</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="jute">Jute</option>
+                            <option value="sugarcane">Sugarcane</option>
+                            <option value="tea">Tea</option>
+                            <option value="cotton">Cotton</option>
+                        </select>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label for="season" class="block text-body font-medium text-gray-700">
+                            <i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>
+                            Season
+                        </label>
+                        <select id="season" class="mobile-input" required>
+                            <option value="">Select Season</option>
+                            <option value="kharif">Kharif (Summer)</option>
+                            <option value="rabi">Rabi (Winter)</option>
+                            <option value="boro">Boro (Spring)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label for="analysisDate" class="block text-body font-medium text-gray-700">
+                            <i data-lucide="calendar-days" class="w-4 h-4 inline mr-1"></i>
+                            Analysis Date
+                        </label>
+                        <input type="date" 
+                               id="analysisDate" 
+                               class="mobile-input"
+                               required>
+                    </div>
                 </div>
                 
-                <div class="space-y-2">
+                <!-- Quick Location Examples -->
+                <div class="mb-6">
+                    <p class="text-body font-medium text-gray-700 mb-3">Quick Examples:</p>
+                    <div class="grid mobile-two-col gap-2">
+                        <button type="button" class="example-btn btn-mobile text-left" onclick="fillLocation(23.7644, 90.3948, 'Dhaka')">
+                            📍 Dhaka
+                        </button>
+                        <button type="button" class="example-btn btn-mobile text-left" onclick="fillLocation(24.8949, 91.8687, 'Sylhet')">
+                            📍 Sylhet
+                        </button>
+                        <button type="button" class="example-btn btn-mobile text-left" onclick="fillLocation(22.3569, 91.7832, 'Chittagong')">
+                            📍 Chittagong
+                        </button>
+                        <button type="button" class="example-btn btn-mobile text-left" onclick="fillLocation(24.3636, 88.6241, 'Rajshahi')">
+                            📍 Rajshahi
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="mobile-btn" id="analyzeBtn">
+                    <i data-lucide="play-circle" class="w-4 h-4 inline mr-2"></i>
+                    Analyze Risk
+                </button>
+            </form>
+        </div>
+    </div>
                     <label for="longitude" class="block text-sm font-medium text-gray-700">
                         <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
                         Longitude

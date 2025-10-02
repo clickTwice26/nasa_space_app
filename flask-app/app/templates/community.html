@@ -9,91 +9,97 @@
 {% block subtitle %}Community Hub{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+<div class="space-y-4 pb-32">
     
-    <!-- Clean Header -->
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Community Feed</h1>
-        <p class="text-gray-600">Connect with farmers and share your agricultural knowledge</p>
-    </div>
-
-    <!-- Quick Stats & Actions -->
-    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 mb-6">
-        <div class="grid grid-cols-3 gap-4 text-center mb-4">
-            <div>
-                <div class="text-2xl font-bold text-green-600">125K+</div>
-                <div class="text-sm text-gray-600">Active Farmers</div>
-            </div>
-            <div>
-                <div class="text-2xl font-bold text-blue-600">45</div>
-                <div class="text-sm text-gray-600">Communities</div>
-            </div>
-            <div>
-                <div class="text-2xl font-bold text-purple-600">2.3K</div>
-                <div class="text-sm text-gray-600">Daily Posts</div>
-            </div>
-        </div>
-        
-        <div class="flex gap-3">
-            <a href="/discover" class="flex-1 bg-green-600 text-white text-center py-3 rounded-lg font-medium hover:bg-green-700 transition-colors">
-                <i class="fas fa-search mr-2"></i>Discover Communities
-            </a>
-            <button onclick="showCreatePostModal()" class="flex-1 bg-blue-600 text-white text-center py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                <i class="fas fa-plus mr-2"></i>Create Post
-            </button>
+    <!-- Mobile-Friendly Header -->
+    <div class="app-card">
+        <div class="app-card-body text-center">
+            <h1 class="text-heading-1 text-gray-900 mb-2">Community Feed</h1>
+            <p class="text-body text-gray-600">Connect with farmers and share knowledge</p>
         </div>
     </div>
 
-    <!-- Simple Post Creation -->
-    <div class="bg-white rounded-lg p-4 shadow-sm">
-        <div class="flex items-center space-x-3 mb-3">
-            <div class="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center">
-                <span class="text-white text-sm font-semibold">{{ user.full_name[0].upper() if user.full_name else 'U' }}</span>
+    <!-- Mobile Stats Grid -->
+    <div class="app-card">
+        <div class="app-card-body">
+            <div class="grid grid-cols-3 gap-4 text-center mb-4">
+                <div>
+                    <div class="text-heading-2 font-bold text-green-600">125K+</div>
+                    <div class="text-caption text-gray-600">Active Farmers</div>
+                </div>
+                <div>
+                    <div class="text-heading-2 font-bold text-blue-600">45</div>
+                    <div class="text-caption text-gray-600">Communities</div>
+                </div>
+                <div>
+                    <div class="text-heading-2 font-bold text-purple-600">2.3K</div>
+                    <div class="text-caption text-gray-600">Daily Posts</div>
+                </div>
             </div>
-            <input type="text" 
-                   placeholder="Share your farming experience or ask a question..." 
-                   onclick="showCreatePostModal()"
-                   readonly
-                   class="flex-1 bg-gray-100 rounded-full px-4 py-2 cursor-pointer hover:bg-gray-200 transition-colors">
-        </div>
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
-                    <i class="fas fa-camera"></i>
-                    <span class="text-sm">Photo</span>
-                </button>
-                <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span class="text-sm">Location</span>
-                </button>
-                <button onclick="showCreatePostModal()" class="flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors">
-                    <i class="fas fa-tags"></i>
-                    <span class="text-sm">Topic</span>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <a href="/discover" class="btn-mobile btn-primary text-center touch-target">
+                    <i class="fas fa-search mr-2"></i>Discover
+                </a>
+                <button onclick="showCreatePostModal()" class="btn-mobile bg-blue-600 text-white border-blue-600 hover:bg-blue-700 touch-target">
+                    <i class="fas fa-plus mr-2"></i>Create Post
                 </button>
             </div>
-            <button onclick="showCreatePostModal()" class="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition-colors font-medium">
-                Post
-            </button>
         </div>
     </div>
 
-    <!-- Simple Filter -->
-    <div class="flex gap-2 overflow-x-auto pb-2">
-        <button class="px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium whitespace-nowrap" data-filter="all">
-            All Posts
-        </button>
-        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 whitespace-nowrap" data-filter="questions">
-            Questions
-        </button>
-        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 whitespace-nowrap" data-filter="tips">
-            Tips
-        </button>
-        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 whitespace-nowrap" data-filter="market">
-            Market
-        </button>
-        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 whitespace-nowrap" data-filter="alerts">
-            Alerts
-        </button>
+    <!-- Mobile Post Creation Card -->
+    <div class="app-card">
+        <div class="app-card-body">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-white text-sm font-semibold">{{ user.full_name[0].upper() if user.full_name else 'U' }}</span>
+                </div>
+                <input type="text" 
+                       placeholder="Share your farming experience..." 
+                       onclick="showCreatePostModal()"
+                       readonly
+                       class="flex-1 bg-gray-100 rounded-full px-4 py-2 cursor-pointer hover:bg-gray-200 transition-colors touch-target">
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="showCreatePostModal()" class="flex items-center gap-1 text-gray-600 hover:text-green-600 transition-colors touch-target">
+                        <i class="fas fa-camera text-sm"></i>
+                        <span class="text-caption">Photo</span>
+                    </button>
+                    <button onclick="showCreatePostModal()" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors touch-target">
+                        <i class="fas fa-map-marker-alt text-sm"></i>
+                        <span class="text-caption">Location</span>
+                    </button>
+                </div>
+                <button onclick="showCreatePostModal()" class="btn-mobile btn-primary px-4 py-1 text-sm">
+                    Post
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Filter Tabs -->
+    <div class="app-card">
+        <div class="app-card-body">
+            <div class="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2">
+                <button class="px-3 py-2 bg-green-600 text-white rounded-full text-caption font-medium whitespace-nowrap touch-target" data-filter="all">
+                    All Posts
+                </button>
+                <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-caption font-medium hover:bg-gray-200 whitespace-nowrap touch-target" data-filter="questions">
+                    Questions
+                </button>
+                <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-caption font-medium hover:bg-gray-200 whitespace-nowrap touch-target" data-filter="tips">
+                    Tips
+                </button>
+                <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-caption font-medium hover:bg-gray-200 whitespace-nowrap touch-target" data-filter="market">
+                    Market
+                </button>
+                <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-caption font-medium hover:bg-gray-200 whitespace-nowrap touch-target" data-filter="alerts">
+                    Alerts
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Community Feed -->

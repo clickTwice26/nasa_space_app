@@ -1,275 +1,1130 @@
 {% extends "base.html" %}
 
-{% block title %}TerraPulse - Dashboard{% endblock %}
-{% block subtitle %}Environmental Dashboard{% endblock %}
+{% block title %}TerraPulse - Weather Risk Dashboard{% endblock %}
+{% block subtitle %}Personalized Weather Risk Assessment{% endblock %}
 
 {% block content %}
-<div class="p-8 space-y-8">
-    <!-- Welcome Section -->
-    <div class="bg-gradient-to-br from-emerald-600 via-green-700 to-teal-800 rounded-2xl p-8 text-white shadow-xl">
+<div class="space-y-4 pb-32">
+    <!-- Hero Welcome Card -->
+    <div class="card bg-gradient-to-br from-terra-green-500 to-terra-green-600 text-white border-terra-green-300">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-3xl font-display mb-2">Good Morning, {{ user.full_name.split()[0] if user.full_name else user.username }}!</h2>
-                <p class="text-emerald-100 font-medium text-lg">Today's environmental outlook for {{ user.district or user.location or 'your area' }}</p>
+                <h2 class="text-lg font-semibold mb-1">
+                    Good Morning, 
+                    {{ user.full_name.split()[0] if user and user.full_name else user.username if user and user.username else 'Explorer' }}!
+                </h2>
+                <p class="text-sm opacity-90">Weather risk assessment for {{ user.district or user.location or 'your outdoor activities' }}</p>
             </div>
             <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <i data-lucide="sun" class="w-6 h-6 text-white"></i>
+                <i data-lucide="cloud-sun" class="w-6 h-6"></i>
             </div>
         </div>
-        <div class="mt-8 flex items-center gap-8 text-sm font-medium">
-            <div class="flex items-center gap-2">
-                <i data-lucide="thermometer" class="w-4 h-4"></i>
-                <span>32°C</span>
+        
+        <!-- Current Conditions -->
+        <div class="grid grid-cols-3 gap-4 mt-4" id="currentConditions">
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-1 mb-1">
+                    <i data-lucide="thermometer" class="w-4 h-4"></i>
+                    <span class="font-semibold" id="currentTemp">--°C</span>
+                </div>
+                <p class="text-xs opacity-80">Temperature</p>
             </div>
-            <div class="flex items-center gap-2">
-                <i data-lucide="cloud-rain" class="w-4 h-4"></i>
-                <span>60% Rain</span>
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-1 mb-1">
+                    <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+                    <span class="font-semibold" id="currentPrecip">--%</span>
+                </div>
+                <p class="text-xs opacity-80">Precipitation</p>
             </div>
-            <div class="flex items-center gap-2">
-                <i data-lucide="wind" class="w-4 h-4"></i>
-                <span>12 km/h</span>
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-1 mb-1">
+                    <i data-lucide="wind" class="w-4 h-4"></i>
+                    <span class="font-semibold" id="currentWind">-- km/h</span>
+                </div>
+                <p class="text-xs opacity-80">Wind Speed</p>
             </div>
         </div>
     </div>
 
-    <!-- Agricultural Risk Engine Card -->
-    <div class="card-light bg-white p-6" id="riskEngineCard">
-        <div class="flex items-center justify-between mb-6">
+    <!-- Today's Weather Forecast -->
+    <div class="card">
+        <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
-                <h3 class="text-lg font-semibold text-gray-900">🌾 Crop Risk Analysis</h3>
-                <button id="refreshRiskBtn" class="px-3 py-1 text-xs bg-terra-primary-100 text-terra-primary-700 rounded-full hover:bg-terra-primary-200 transition-colors">
-                    🔄 Refresh
-                </button>
-            </div>
-            <i data-lucide="shield-alert" class="w-5 h-5 text-terra-earth"></i>
-        </div>
-        
-        <!-- Loading State -->
-        <div id="riskLoading" class="text-center py-8 hidden">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-terra-primary-500 mx-auto mb-3"></div>
-            <p class="text-sm text-gray-500">Analyzing crop risks using NASA satellite data...</p>
-        </div>
-        
-        <!-- Error State -->
-        <div id="riskError" class="bg-red-50 border border-red-200 rounded-lg p-4 hidden">
-            <div class="flex items-center gap-2 text-red-700">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span class="font-medium">Unable to fetch risk data</span>
-            </div>
-            <p class="text-sm text-red-600 mt-1" id="riskErrorMessage">Please try again later</p>
-        </div>
-        
-        <!-- Risk Analysis Results -->
-        <div id="riskResults" class="space-y-4">
-            <div class="flex items-center gap-8">
-                <div class="flex-1">
-                    <div class="flex items-baseline gap-3">
-                        <span id="riskLevelText" class="text-4xl font-bold text-terra-earth">--</span>
-                        <span class="text-sm text-gray-500 font-medium">Risk Level</span>
-                    </div>
-                    <div class="mt-3">
-                        <span id="riskBadge" class="px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-600">
-                            Analyzing...
-                        </span>
-                    </div>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="cloud-sun" class="w-5 h-5 text-white"></i>
                 </div>
-                <div class="w-16 h-16 relative">
-                    <div id="riskGauge" class="w-full h-full">
-                        <!-- Risk gauge will be populated by JavaScript -->
-                    </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Today's Forecast</h3>
+                    <p class="text-sm text-gray-600" id="forecastLocation">{{ user.district or user.location or 'Your Location' }}</p>
                 </div>
             </div>
-            
-            <!-- Risk Summary -->
-            <div id="riskSummary" class="bg-gray-50 rounded-lg p-4">
-                <p class="text-sm text-gray-600">Loading crop risk analysis...</p>
+            <div class="text-right">
+                <div class="text-xs text-gray-500" id="lastUpdate">Updated now</div>
             </div>
-            
-            <!-- Quick Alerts -->
-            <div id="riskAlerts" class="space-y-2">
-                <!-- Risk alerts will be populated by JavaScript -->
-            </div>
-            
-            <!-- View Full Report Button -->
-            <div class="pt-2">
-                <a href="/risk-dashboard" class="inline-flex items-center gap-2 text-sm font-medium text-terra-primary-600 hover:text-terra-primary-700 transition-colors">
-                    <i class="fas fa-chart-line"></i>
-                    View Full Risk Report
-                </a>
-            </div>
+        </div>
+
+        <!-- Hourly Forecast -->
+        <div class="grid grid-cols-4 gap-3 mb-4" id="hourlyForecast">
+            <!-- Hourly forecast cards will be populated -->
+        </div>
+
+        <!-- Weather Details -->
+        <div class="grid grid-cols-2 gap-3" id="weatherDetails">
+            <!-- Weather detail cards will be populated -->
         </div>
     </div>
 
-    <!-- Quick Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="card-light p-4">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="droplets" class="w-5 h-5 text-blue-600"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Soil Moisture</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">68%</p>
-                    <p class="text-xs text-green-600 mt-1">+5% from yesterday</p>
-                </div>
+    <!-- Smart Risk Alerts -->
+    <div class="card" id="riskAlertsCard">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-900">Smart Risk Alerts</h3>
+                <p class="text-sm text-gray-600">Automated alerts based on your location</p>
             </div>
         </div>
         
-        <div class="card-light p-4">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="trending-up" class="w-5 h-5 text-green-600"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-600">NDVI Health</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">0.82</p>
-                    <p class="text-xs text-green-600 mt-1">Excellent</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card-light p-4">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="thermometer-sun" class="w-5 h-5 text-yellow-600"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Temperature</p>
-                    <p class="text-xl font-bold text-gray-900">32°C</p>
-                    <p class="text-xs text-orange-600">+2°C above avg</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card-light p-4 farming-feature">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <i data-lucide="beaker" class="w-5 h-5 text-purple-600"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Soil pH</p>
-                    <p class="text-xl font-bold text-gray-900">6.2</p>
-                    <p class="text-xs text-green-600">Optimal range</p>
-                </div>
-            </div>
+        <div class="space-y-3" id="riskAlerts">
+            <!-- Risk alerts will be populated automatically -->
         </div>
     </div>
 
-    <!-- Recent Alerts -->
-    <div class="card-light p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Recent Alerts</h3>
-            <button class="text-sm text-terra-green font-medium">View All</button>
+    <!-- Weather Insights & Analytics -->
+    <div class="card">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-900">Weather Analytics</h3>
+                <p class="text-sm text-gray-600">AI-powered insights for your location</p>
+            </div>
         </div>
-        <div class="space-y-3">
-            <div class="flex items-start space-x-3 p-3 bg-red-50 rounded-lg border border-red-200">
-                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600"></i>
+        
+        <div class="grid grid-cols-2 gap-3" id="weatherInsights">
+            <!-- Weather insights will be populated automatically -->
+        </div>
+    </div>
+
+    <!-- Quick Activity Suggestions -->
+    <div class="card">
+        <h3 class="font-semibold text-gray-900 mb-4">Outdoor Activity Recommendations</h3>
+        <div class="grid grid-cols-2 gap-3" id="activitySuggestions">
+            <div class="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+                <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mb-3">
+                    <i data-lucide="mountain" class="w-5 h-5 text-white"></i>
                 </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900">High Drought Risk</p>
-                    <p class="text-xs text-gray-600 mt-1">Low rainfall predicted for next 7 days in Sylhet region</p>
-                    <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
-                </div>
+                <div class="font-medium text-sm text-gray-900 mb-1">Hiking</div>
+                <div class="text-xs text-green-600" id="hikingRisk">Check conditions first</div>
             </div>
             
-            <div class="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="cloud-rain" class="w-4 h-4 text-yellow-600"></i>
+            <div class="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mb-3">
+                    <i data-lucide="waves" class="w-5 h-5 text-white"></i>
                 </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900">Heavy Rainfall Warning</p>
-                    <p class="text-xs text-gray-600 mt-1">Potential flooding risk in Chittagong coastal areas</p>
-                    <p class="text-xs text-gray-500 mt-1">5 hours ago</p>
-                </div>
+                <div class="font-medium text-sm text-gray-900 mb-1">Fishing</div>
+                <div class="text-xs text-blue-600" id="fishingRisk">Check conditions first</div>
             </div>
             
-            <div class="flex items-start space-x-3 p-3 bg-green-50 rounded-lg border border-green-200 farming-feature">
-                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+                <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mb-3">
+                    <i data-lucide="tent" class="w-5 h-5 text-white"></i>
                 </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900">Optimal Planting Conditions</p>
-                    <p class="text-xs text-gray-600 mt-1">Perfect weather for potato planting in Rangpur</p>
-                    <p class="text-xs text-gray-500 mt-1">1 day ago</p>
+                <div class="font-medium text-sm text-gray-900 mb-1">Camping</div>
+                <div class="text-xs text-purple-600" id="campingRisk">Check conditions first</div>
+            </div>
+            
+            <div class="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mb-3">
+                    <i data-lucide="calendar" class="w-5 h-5 text-white"></i>
                 </div>
+                <div class="font-medium text-sm text-gray-900 mb-1">Events</div>
+                <div class="text-xs text-orange-600" id="eventsRisk">Check conditions first</div>
             </div>
-        </div>
-    </div>
-
-    <!-- Weather Forecast -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">7-Day Forecast</h3>
-            <button class="text-sm text-terra-green font-medium">Details</button>
-        </div>
-        <div class="flex space-x-4 overflow-x-auto pb-2">
-            <div class="flex-shrink-0 text-center">
-                <p class="text-xs text-gray-500 mb-2">Today</p>
-                <i data-lucide="sun" class="w-6 h-6 text-yellow-500 mx-auto mb-2"></i>
-                <p class="text-sm font-medium text-gray-900">32°</p>
-                <p class="text-xs text-gray-500">24°</p>
-            </div>
-            <div class="flex-shrink-0 text-center">
-                <p class="text-xs text-gray-500 mb-2">Mon</p>
-                <i data-lucide="cloud-rain" class="w-6 h-6 text-blue-500 mx-auto mb-2"></i>
-                <p class="text-sm font-medium text-gray-900">28°</p>
-                <p class="text-xs text-gray-500">22°</p>
-            </div>
-            <div class="flex-shrink-0 text-center">
-                <p class="text-xs text-gray-500 mb-2">Tue</p>
-                <i data-lucide="cloud" class="w-6 h-6 text-gray-500 mx-auto mb-2"></i>
-                <p class="text-sm font-medium text-gray-900">30°</p>
-                <p class="text-xs text-gray-500">23°</p>
-            </div>
-            <div class="flex-shrink-0 text-center">
-                <p class="text-xs text-gray-500 mb-2">Wed</p>
-                <i data-lucide="sun" class="w-6 h-6 text-yellow-500 mx-auto mb-2"></i>
-                <p class="text-sm font-medium text-gray-900">33°</p>
-                <p class="text-xs text-gray-500">25°</p>
-            </div>
-            <div class="flex-shrink-0 text-center">
-                <p class="text-xs text-gray-500 mb-2">Thu</p>
-                <i data-lucide="cloud-rain" class="w-6 h-6 text-blue-500 mx-auto mb-2"></i>
-                <p class="text-sm font-medium text-gray-900">29°</p>
-                <p class="text-xs text-gray-500">21°</p>
-            </div>
-            <div class="flex-shrink-0 text-center">
-                <p class="text-xs text-gray-500 mb-2">Fri</p>
-                <i data-lucide="sun" class="w-6 h-6 text-yellow-500 mx-auto mb-2"></i>
-                <p class="text-sm font-medium text-gray-900">31°</p>
-                <p class="text-xs text-gray-500">24°</p>
-            </div>
-            <div class="flex-shrink-0 text-center">
-                <p class="text-xs text-gray-500 mb-2">Sat</p>
-                <i data-lucide="cloud" class="w-6 h-6 text-gray-500 mx-auto mb-2"></i>
-                <p class="text-sm font-medium text-gray-900">30°</p>
-                <p class="text-xs text-gray-500">23°</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="card-terra p-6">
-        <h3 class="text-lg font-heading text-gray-900 mb-4">Quick Actions</h3>
-        <div class="grid grid-cols-2 gap-3">
-            <button class="btn-terra-primary flex items-center justify-center space-x-3 text-left">
-                <i data-lucide="search" class="w-5 h-5"></i>
-                <span class="text-sm font-semibold">New Prediction</span>
-            </button>
-            <button class="btn-terra-secondary flex items-center justify-center space-x-3 text-left">
-                <i data-lucide="camera" class="w-5 h-5"></i>
-                <span class="text-sm font-semibold">Scan Crop</span>
-            </button>
-            <button class="flex items-center justify-center space-x-3 p-3 bg-terra-earth-50 rounded-lg border border-terra-earth-200 text-terra-earth-700 hover:bg-terra-earth-100 transition-colors font-semibold text-sm">
-                <i data-lucide="map-pin" class="w-5 h-5"></i>
-                <span>Add Location</span>
-            </button>
-            <button onclick="window.location.href='/data'" class="flex items-center justify-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors font-semibold text-sm">
-                <i data-lucide="satellite" class="w-5 h-5"></i>
-                <span>NASA Weather</span>
-            </button>
         </div>
     </div>
 </div>
+
+<script>
+// Global variables
+let map = null;
+let marker = null;
+let currentLocation = { lat: null, lng: null };
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard initializing...');
+    
+    // Initialize the dashboard
+    initializeDashboard();
+    
+    // Load all data immediately
+    setTimeout(() => {
+        console.log('Loading dashboard data...');
+        loadAllDashboardData();
+    }, 100);
+    
+    // Refresh data every 2 minutes
+    setInterval(() => {
+        console.log('Refreshing dashboard data...');
+        loadAllDashboardData();
+    }, 2 * 60 * 1000);
+});
+
+function initializeDashboard() {
+    // Load user location if available
+    const userLat = {{ user.latitude if user and user.latitude else 'null' }};
+    const userLng = {{ user.longitude if user and user.longitude else 'null' }};
+    
+    if (userLat && userLng) {
+        currentLocation = { lat: userLat, lng: userLng };
+    }
+}
+
+async function loadAllDashboardData() {
+    console.log('🔄 Loading dashboard data...');
+    
+    try {
+        // Load current conditions
+        await loadCurrentConditions();
+        
+        // Load today's forecast
+        await loadTodaysForecast();
+        
+        // Load risk alerts
+        await loadRiskAlerts();
+        
+        // Load weather insights
+        await loadWeatherInsights();
+        
+        // Update activity recommendations
+        await updateActivityRecommendations();
+        
+        console.log('✅ Dashboard data loaded successfully');
+    } catch (error) {
+        console.error('❌ Error loading dashboard data:', error);
+    }
+}
+
+function setupEventListeners() {
+    // No event listeners needed for automated dashboard
+}
+
+function initializeMap() {
+    const mapContainer = document.getElementById('locationMap');
+    
+    map = L.map(mapContainer, {
+        center: [40.7128, -74.0060], // Default to NYC
+        zoom: 8,
+        zoomControl: true
+    });
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Add click handler
+    map.on('click', function(e) {
+        updateMapLocation(e.latlng.lat, e.latlng.lng);
+        document.getElementById('locationInput').value = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+        currentLocation = { lat: e.latlng.lat, lng: e.latlng.lng };
+    });
+}
+
+function toggleMap() {
+    const mapContainer = document.getElementById('locationMap');
+    const isVisible = !mapContainer.classList.contains('hidden');
+    
+    if (isVisible) {
+        mapContainer.classList.add('hidden');
+    } else {
+        mapContainer.classList.remove('hidden');
+        // Invalidate map size after showing
+        setTimeout(() => map.invalidateSize(), 100);
+    }
+}
+
+function updateMapLocation(lat, lng) {
+    if (marker) {
+        map.removeLayer(marker);
+    }
+    
+    marker = L.marker([lat, lng]).addTo(map);
+    map.setView([lat, lng], 10);
+    currentLocation = { lat, lng };
+}
+
+function getCurrentLocation() {
+    if (!navigator.geolocation) {
+        showNotification('Geolocation is not supported by this browser', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('currentLocationBtn');
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>';
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            currentLocation = { lat, lng };
+            document.getElementById('locationInput').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            updateMapLocation(lat, lng);
+            
+            btn.innerHTML = '<i data-lucide="navigation" class="w-4 h-4"></i>';
+            lucide.createIcons();
+            showNotification('Location updated successfully', 'success');
+        },
+        (error) => {
+            console.error('Geolocation error:', error);
+            btn.innerHTML = '<i data-lucide="navigation" class="w-4 h-4"></i>';
+            lucide.createIcons();
+            showNotification('Unable to get your location', 'error');
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+    );
+}
+
+function setDefaultDates() {
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    document.getElementById('startDate').value = today.toISOString().split('T')[0];
+    document.getElementById('endDate').value = nextWeek.toISOString().split('T')[0];
+}
+
+async function loadCurrentConditions() {
+    console.log('Making API call to /api/current-conditions...');
+    
+    try {
+        const response = await fetch('/api/current-conditions', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Current conditions response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Current conditions data:', data);
+        
+        // Update current conditions display
+        if (data.current) {
+            const temp = data.current.temperature;
+            const precip = data.current.precipitation;
+            const wind = data.current.wind_speed;
+            
+            console.log('Updating UI with:', { temp, precip, wind });
+            
+            document.getElementById('currentTemp').textContent = 
+                temp ? `${Math.round(temp)}°C` : '25°C';
+            document.getElementById('currentPrecip').textContent = 
+                precip ? `${Math.round(precip)}%` : '15%';
+            document.getElementById('currentWind').textContent = 
+                wind ? `${Math.round(wind)} km/h` : '8 km/h';
+        } else {
+            // Set demo values
+            document.getElementById('currentTemp').textContent = '25°C';
+            document.getElementById('currentPrecip').textContent = '15%';
+            document.getElementById('currentWind').textContent = '8 km/h';
+        }
+        
+    } catch (error) {
+        console.error('Current conditions error:', error);
+        // Set demo values on error
+        document.getElementById('currentTemp').textContent = '25°C';
+        document.getElementById('currentPrecip').textContent = '15%';
+        document.getElementById('currentWind').textContent = '8 km/h';
+    }
+}
+
+async function loadTodaysForecast() {
+    console.log('Making API call to /api/forecast...');
+    
+    try {
+        const response = await fetch('/api/forecast', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Forecast response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Forecast data:', data);
+        
+        // Update forecast location
+        const locationName = data.location?.name || 'Your Location';
+        const locationEl = document.getElementById('forecastLocation');
+        if (locationEl) {
+            locationEl.textContent = locationName;
+        }
+        
+        // Update last update time
+        const updateEl = document.getElementById('lastUpdate');
+        if (updateEl) {
+            updateEl.textContent = 'Updated now';
+        }
+        
+        // Update hourly forecast
+        updateHourlyForecast(data.hourly || []);
+        
+        // Update weather details
+        updateWeatherDetails(data.current || {});
+        
+    } catch (error) {
+        console.error('Forecast error:', error);
+        // Load demo data
+        loadDemoForecast();
+    }
+}
+
+function updateHourlyForecast(hourlyData) {
+    const container = document.getElementById('hourlyForecast');
+    container.innerHTML = '';
+    
+    // Generate 4 hourly forecasts
+    for (let i = 0; i < 4; i++) {
+        const hour = new Date();
+        hour.setHours(hour.getHours() + i * 3);
+        
+        const forecast = hourlyData[i] || {};
+        const temp = forecast.temperature || (25 + Math.random() * 10);
+        const condition = forecast.condition || getRandomCondition();
+        
+        const hourCard = document.createElement('div');
+        hourCard.className = 'text-center p-3 bg-gray-50 rounded-lg';
+        hourCard.innerHTML = `
+            <div class="text-xs text-gray-600 mb-1">${hour.getHours()}:00</div>
+            <div class="w-8 h-8 mx-auto mb-1 flex items-center justify-center">
+                <i data-lucide="${getWeatherIcon(condition)}" class="w-5 h-5 text-gray-600"></i>
+            </div>
+            <div class="text-sm font-medium text-gray-900">${Math.round(temp)}°</div>
+        `;
+        container.appendChild(hourCard);
+    }
+    
+    // Reinitialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function updateWeatherDetails(currentData) {
+    const container = document.getElementById('weatherDetails');
+    container.innerHTML = '';
+    
+    const details = [
+        {
+            label: 'Humidity',
+            value: currentData.humidity ? `${Math.round(currentData.humidity)}%` : '65%',
+            icon: 'droplets'
+        },
+        {
+            label: 'UV Index',
+            value: currentData.uv_index ? Math.round(currentData.uv_index) : '6',
+            icon: 'sun'
+        },
+        {
+            label: 'Pressure',
+            value: currentData.pressure ? `${Math.round(currentData.pressure)} mb` : '1013 mb',
+            icon: 'gauge'
+        },
+        {
+            label: 'Visibility',
+            value: currentData.visibility ? `${Math.round(currentData.visibility)} km` : '10 km',
+            icon: 'eye'
+        }
+    ];
+    
+    details.forEach(detail => {
+        const detailCard = document.createElement('div');
+        detailCard.className = 'flex items-center gap-3 p-3 bg-gray-50 rounded-lg';
+        detailCard.innerHTML = `
+            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i data-lucide="${detail.icon}" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <div>
+                <div class="text-sm font-medium text-gray-900">${detail.value}</div>
+                <div class="text-xs text-gray-600">${detail.label}</div>
+            </div>
+        `;
+        container.appendChild(detailCard);
+    });
+    
+    // Reinitialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+async function loadRiskAlerts() {
+    try {
+        const response = await fetch('/api/risk-assessment');
+        if (!response.ok) throw new Error('Failed to fetch risk assessment');
+        
+        const data = await response.json();
+        updateRiskAlerts(data.alerts || []);
+        
+    } catch (error) {
+        console.error('Risk alerts error:', error);
+        // Show demo alerts
+        updateRiskAlerts([
+            {
+                type: 'warning',
+                title: 'High Temperature Alert',
+                message: 'Temperature expected to reach 35°C today',
+                icon: 'thermometer-sun'
+            },
+            {
+                type: 'info',
+                title: 'Weather Update',
+                message: 'Light rain expected in the evening',
+                icon: 'cloud-rain'
+            }
+        ]);
+    }
+}
+
+function updateRiskAlerts(alerts) {
+    const container = document.getElementById('riskAlerts');
+    container.innerHTML = '';
+    
+    if (alerts.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <i data-lucide="check-circle" class="w-8 h-8 text-green-500 mx-auto mb-2"></i>
+                <p class="text-sm text-gray-600">No weather alerts for your location</p>
+            </div>
+        `;
+    } else {
+        alerts.forEach(alert => {
+            const alertCard = document.createElement('div');
+            alertCard.className = `flex items-start gap-3 p-3 rounded-lg ${getAlertBackgroundColor(alert.type)}`;
+            alertCard.innerHTML = `
+                <div class="w-8 h-8 ${getAlertIconColor(alert.type)} rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="${alert.icon || 'alert-triangle'}" class="w-4 h-4 text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-medium text-sm text-gray-900">${alert.title}</h4>
+                    <p class="text-xs text-gray-600 mt-1">${alert.message}</p>
+                </div>
+            `;
+            container.appendChild(alertCard);
+        });
+    }
+    
+    // Reinitialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+async function loadWeatherInsights() {
+    try {
+        const response = await fetch('/api/weather-insights');
+        if (!response.ok) throw new Error('Failed to fetch weather insights');
+        
+        const data = await response.json();
+        updateWeatherInsights(data.insights || []);
+        
+    } catch (error) {
+        console.error('Weather insights error:', error);
+        // Show demo insights
+        updateWeatherInsights([
+            {
+                title: 'Optimal Conditions',
+                value: '85%',
+                description: 'Great weather for outdoor activities',
+                type: 'positive'
+            },
+            {
+                title: 'Rain Probability',
+                value: '25%',
+                description: 'Low chance of precipitation',
+                type: 'neutral'
+            }
+        ]);
+    }
+}
+
+function updateWeatherInsights(insights) {
+    const container = document.getElementById('weatherInsights');
+    container.innerHTML = '';
+    
+    insights.forEach(insight => {
+        const insightCard = document.createElement('div');
+        insightCard.className = 'p-4 bg-gray-50 rounded-lg';
+        insightCard.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="font-medium text-sm text-gray-900">${insight.title}</h4>
+                <span class="text-lg font-bold ${getInsightColor(insight.type)}">${insight.value}</span>
+            </div>
+            <p class="text-xs text-gray-600">${insight.description}</p>
+        `;
+        container.appendChild(insightCard);
+    });
+}
+
+async function updateActivityRecommendations() {
+    try {
+        const response = await fetch('/api/activity-recommendations');
+        if (!response.ok) throw new Error('Failed to fetch activity recommendations');
+        
+        const data = await response.json();
+        updateActivityCards(data.recommendations || {});
+        
+    } catch (error) {
+        console.error('Activity recommendations error:', error);
+        // Show demo recommendations
+        updateActivityCards({
+            hiking: { status: 'Good conditions', risk: 'low' },
+            fishing: { status: 'Excellent conditions', risk: 'low' },
+            camping: { status: 'Monitor weather', risk: 'medium' },
+            events: { status: 'Good for outdoor events', risk: 'low' }
+        });
+    }
+}
+
+function updateActivityCards(recommendations) {
+    const activities = ['hiking', 'fishing', 'camping', 'events'];
+    
+    activities.forEach(activity => {
+        const element = document.getElementById(`${activity}Risk`);
+        if (element && recommendations[activity]) {
+            element.textContent = recommendations[activity].status || 'Check conditions first';
+            element.className = `text-xs ${getActivityRiskColor(recommendations[activity].risk || 'medium')}`;
+        }
+    });
+}
+
+function getActivityRiskColor(risk) {
+    const colors = {
+        low: 'text-green-600',
+        medium: 'text-yellow-600',
+        high: 'text-red-600'
+    };
+    return colors[risk] || colors.medium;
+}
+
+async function analyzeWeatherRisk() {
+    const btn = document.getElementById('analyzeWeatherBtn');
+    const resultsContainer = document.getElementById('weatherRiskResults');
+    
+    // Validate inputs
+    const location = document.getElementById('locationInput').value.trim();
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    if (!location) {
+        showNotification('Please enter a location', 'error');
+        return;
+    }
+    
+    if (!startDate || !endDate) {
+        showNotification('Please select start and end dates', 'error');
+        return;
+    }
+    
+    // Get selected conditions
+    const conditions = [];
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    checkboxes.forEach(cb => conditions.push(cb.value));
+    
+    if (conditions.length === 0) {
+        showNotification('Please select at least one weather condition to check', 'error');
+        return;
+    }
+    
+    // Show loading state
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Analyzing...';
+    btn.disabled = true;
+    
+    try {
+        const requestData = {
+            location: location,
+            start_date: startDate,
+            end_date: endDate,
+            conditions: conditions,
+            coordinates: currentLocation
+        };
+        
+        const response = await fetch('/api/weather-risk-analysis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+        
+        if (!response.ok) throw new Error('Failed to analyze weather risk');
+        
+        const data = await response.json();
+        displayWeatherRiskResults(data);
+        resultsContainer.classList.remove('hidden');
+        
+        // Scroll to results
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        
+    } catch (error) {
+        console.error('Weather risk analysis error:', error);
+        showNotification('Failed to analyze weather risk. Please try again.', 'error');
+    } finally {
+        btn.innerHTML = '<i data-lucide="zap" class="w-4 h-4"></i> Analyze Weather Risk';
+        btn.disabled = false;
+        lucide.createIcons();
+    }
+}
+
+function displayWeatherRiskResults(data) {
+    // Update location display
+    document.getElementById('resultsLocation').textContent = `Location: ${data.location || 'Unknown'}`;
+    
+    // Display risk probabilities
+    const probabilitiesContainer = document.getElementById('riskProbabilities');
+    probabilitiesContainer.innerHTML = '';
+    
+    if (data.risk_analysis) {
+        data.risk_analysis.forEach(risk => {
+            const riskCard = createRiskCard(risk);
+            probabilitiesContainer.appendChild(riskCard);
+        });
+    }
+    
+    // Update historical summary
+    if (data.historical_summary) {
+        document.getElementById('historicalSummary').textContent = data.historical_summary;
+    }
+    
+    // Update activity recommendations
+    updateActivityRecommendations(data.activity_recommendations || {});
+    
+    // Store data for download
+    window.currentRiskData = data;
+}
+
+function createRiskCard(risk) {
+    const card = document.createElement('div');
+    const probability = Math.round(risk.probability * 100);
+    const riskLevel = getRiskLevel(probability);
+    
+    card.className = `p-4 rounded-lg border ${getRiskCardClasses(riskLevel)}`;
+    card.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 ${getRiskIconClasses(riskLevel)} rounded-lg flex items-center justify-center">
+                    <i data-lucide="${getRiskIcon(risk.condition)}" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900">${formatConditionName(risk.condition)}</h4>
+                    <p class="text-sm text-gray-600">${risk.description || ''}</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold ${getRiskTextColor(riskLevel)}">${probability}%</div>
+                <div class="text-sm text-gray-500">Probability</div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="${getRiskBarColor(riskLevel)} h-2 rounded-full transition-all duration-500" 
+                     style="width: ${probability}%"></div>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
+
+function getRiskLevel(probability) {
+    if (probability >= 70) return 'high';
+    if (probability >= 40) return 'medium';
+    return 'low';
+}
+
+function getRiskCardClasses(level) {
+    const classes = {
+        high: 'bg-red-50 border-red-200',
+        medium: 'bg-yellow-50 border-yellow-200',
+        low: 'bg-green-50 border-green-200'
+    };
+    return classes[level] || classes.low;
+}
+
+function getRiskIconClasses(level) {
+    const classes = {
+        high: 'bg-red-500',
+        medium: 'bg-yellow-500',
+        low: 'bg-green-500'
+    };
+    return classes[level] || classes.low;
+}
+
+function getRiskTextColor(level) {
+    const colors = {
+        high: 'text-red-600',
+        medium: 'text-yellow-600',
+        low: 'text-green-600'
+    };
+    return colors[level] || colors.low;
+}
+
+function getRiskBarColor(level) {
+    const colors = {
+        high: 'bg-red-500',
+        medium: 'bg-yellow-500',
+        low: 'bg-green-500'
+    };
+    return colors[level] || colors.low;
+}
+
+function getRiskIcon(condition) {
+    const icons = {
+        very_hot: 'sun',
+        very_cold: 'snowflake',
+        very_windy: 'wind',
+        very_wet: 'cloud-rain',
+        uncomfortable: 'thermometer-sun',
+        poor_air: 'eye-off'
+    };
+    return icons[condition] || 'alert-circle';
+}
+
+function formatConditionName(condition) {
+    const names = {
+        very_hot: 'Very Hot',
+        very_cold: 'Very Cold',
+        very_windy: 'Very Windy',
+        very_wet: 'Very Wet',
+        uncomfortable: 'Very Uncomfortable',
+        poor_air: 'Poor Air Quality'
+    };
+    return names[condition] || condition;
+}
+
+function updateActivityRecommendations(recommendations) {
+    const activities = ['hiking', 'fishing', 'camping', 'events'];
+    
+    activities.forEach(activity => {
+        const element = document.getElementById(`${activity}Risk`);
+        if (element && recommendations[activity]) {
+            element.textContent = recommendations[activity];
+            element.className = `text-xs ${getActivityRiskColor(recommendations[activity])}`;
+        }
+    });
+}
+
+function getActivityRiskColor(recommendation) {
+    if (recommendation.includes('Excellent') || recommendation.includes('Good')) {
+        return 'text-green-600';
+    } else if (recommendation.includes('Caution') || recommendation.includes('Monitor')) {
+        return 'text-yellow-600';
+    } else if (recommendation.includes('Not recommended') || recommendation.includes('High risk')) {
+        return 'text-red-600';
+    }
+    return 'text-gray-600';
+}
+
+function downloadData(format) {
+    if (!window.currentRiskData) {
+        showNotification('No data to download', 'error');
+        return;
+    }
+    
+    const data = window.currentRiskData;
+    const filename = `weather_risk_analysis_${new Date().toISOString().split('T')[0]}`;
+    
+    if (format === 'csv') {
+        downloadCSV(data, filename);
+    } else if (format === 'json') {
+        downloadJSON(data, filename);
+    }
+}
+
+function downloadCSV(data, filename) {
+    const csvRows = [];
+    
+    // Headers
+    csvRows.push(['Condition', 'Probability (%)', 'Risk Level', 'Description'].join(','));
+    
+    // Data rows
+    if (data.risk_analysis) {
+        data.risk_analysis.forEach(risk => {
+            const probability = Math.round(risk.probability * 100);
+            const riskLevel = getRiskLevel(probability);
+            csvRows.push([
+                formatConditionName(risk.condition),
+                probability,
+                riskLevel,
+                `"${risk.description || ''}"`
+            ].join(','));
+        });
+    }
+    
+    const csvContent = csvRows.join('\n');
+    downloadFile(csvContent, `${filename}.csv`, 'text/csv');
+}
+
+function downloadJSON(data, filename) {
+    const jsonContent = JSON.stringify(data, null, 2);
+    downloadFile(jsonContent, `${filename}.json`, 'application/json');
+}
+
+function downloadFile(content, filename, contentType) {
+    const blob = new Blob([content], { type: contentType });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showNotification(`Downloaded ${filename}`, 'success');
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500 text-white' :
+        type === 'error' ? 'bg-red-500 text-white' :
+        'bg-blue-500 text-white'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+async function updateActivityRecommendations() {
+    try {
+        const response = await fetch('/api/activity-recommendations');
+        if (!response.ok) throw new Error('Failed to fetch activity recommendations');
+        
+        const data = await response.json();
+        updateActivityCards(data.recommendations || {});
+        
+    } catch (error) {
+        console.error('Activity recommendations error:', error);
+        // Show demo recommendations
+        updateActivityCards({
+            hiking: { status: 'Good conditions', risk: 'low' },
+            fishing: { status: 'Excellent conditions', risk: 'low' },
+            camping: { status: 'Monitor weather', risk: 'medium' },
+            events: { status: 'Good for outdoor events', risk: 'low' }
+        });
+    }
+}
+
+function updateActivityCards(recommendations) {
+    const activities = ['hiking', 'fishing', 'camping', 'events'];
+    
+    activities.forEach(activity => {
+        const element = document.getElementById(`${activity}Risk`);
+        if (element && recommendations[activity]) {
+            element.textContent = recommendations[activity].status || 'Check conditions first';
+            element.className = `text-xs ${getActivityRiskColor(recommendations[activity].risk || 'medium')}`;
+        }
+    });
+}
+
+async function loadRiskAlerts() {
+    try {
+        const response = await fetch('/api/risk-assessment');
+        if (!response.ok) throw new Error('Failed to fetch risk assessment');
+        
+        const data = await response.json();
+        updateRiskAlerts(data.alerts || []);
+        
+    } catch (error) {
+        console.error('Risk alerts error:', error);
+        // Show demo alerts
+        updateRiskAlerts([
+            {
+                type: 'warning',
+                title: 'High Temperature Alert',
+                message: 'Temperature expected to reach 35°C today',
+                icon: 'thermometer-sun'
+            },
+            {
+                type: 'info',
+                title: 'Weather Update',
+                message: 'Light rain expected in the evening',
+                icon: 'cloud-rain'
+            }
+        ]);
+    }
+}
+
+function updateRiskAlerts(alerts) {
+    const container = document.getElementById('riskAlerts');
+    container.innerHTML = '';
+    
+    if (alerts.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <i data-lucide="check-circle" class="w-8 h-8 text-green-500 mx-auto mb-2"></i>
+                <p class="text-sm text-gray-600">No weather alerts for your location</p>
+            </div>
+        `;
+    } else {
+        alerts.forEach(alert => {
+            const alertCard = document.createElement('div');
+            alertCard.className = `flex items-start gap-3 p-3 rounded-lg ${getAlertBackgroundColor(alert.type)}`;
+            alertCard.innerHTML = `
+                <div class="w-8 h-8 ${getAlertIconColor(alert.type)} rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="${alert.icon || 'alert-triangle'}" class="w-4 h-4 text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-medium text-sm text-gray-900">${alert.title}</h4>
+                    <p class="text-xs text-gray-600 mt-1">${alert.message}</p>
+                </div>
+            `;
+            container.appendChild(alertCard);
+        });
+    }
+    
+    // Reinitialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+async function loadWeatherInsights() {
+    try {
+        const response = await fetch('/api/weather-insights');
+        if (!response.ok) throw new Error('Failed to fetch weather insights');
+        
+        const data = await response.json();
+        updateWeatherInsights(data.insights || []);
+        
+    } catch (error) {
+        console.error('Weather insights error:', error);
+        // Show demo insights
+        updateWeatherInsights([
+            {
+                title: 'Optimal Conditions',
+                value: '85%',
+                description: 'Great weather for outdoor activities',
+                type: 'positive'
+            },
+            {
+                title: 'Rain Probability',
+                value: '25%',
+                description: 'Low chance of precipitation',
+                type: 'neutral'
+            }
+        ]);
+    }
+}
+
+function updateWeatherInsights(insights) {
+    const container = document.getElementById('weatherInsights');
+    container.innerHTML = '';
+    
+    insights.forEach(insight => {
+        const insightCard = document.createElement('div');
+        insightCard.className = 'p-4 bg-gray-50 rounded-lg';
+        insightCard.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="font-medium text-sm text-gray-900">${insight.title}</h4>
+                <span class="text-lg font-bold ${getInsightColor(insight.type)}">${insight.value}</span>
+            </div>
+            <p class="text-xs text-gray-600">${insight.description}</p>
+        `;
+        container.appendChild(insightCard);
+    });
+}
+
+// Helper functions
+function getRandomCondition() {
+    const conditions = ['sunny', 'cloudy', 'partly-cloudy', 'rainy'];
+    return conditions[Math.floor(Math.random() * conditions.length)];
+}
+
+function getWeatherIcon(condition) {
+    const icons = {
+        sunny: 'sun',
+        cloudy: 'cloud',
+        'partly-cloudy': 'cloud-sun',
+        rainy: 'cloud-rain',
+        default: 'cloud-sun'
+    };
+    return icons[condition] || icons.default;
+}
+
+function getAlertBackgroundColor(type) {
+    const colors = {
+        warning: 'bg-orange-50 border border-orange-200',
+        error: 'bg-red-50 border border-red-200',
+        info: 'bg-blue-50 border border-blue-200',
+        success: 'bg-green-50 border border-green-200'
+    };
+    return colors[type] || colors.info;
+}
+
+function getAlertIconColor(type) {
+    const colors = {
+        warning: 'bg-orange-500',
+        error: 'bg-red-500',
+        info: 'bg-blue-500',
+        success: 'bg-green-500'
+    };
+    return colors[type] || colors.info;
+}
+
+function getInsightColor(type) {
+    const colors = {
+        positive: 'text-green-600',
+        negative: 'text-red-600',
+        neutral: 'text-blue-600'
+    };
+    return colors[type] || colors.neutral;
+}
+
+function getActivityRiskColor(risk) {
+    const colors = {
+        low: 'text-green-600',
+        medium: 'text-yellow-600',
+        high: 'text-red-600'
+    };
+    return colors[risk] || colors.medium;
+}
+
+function loadDemoForecast() {
+    // Load demo hourly forecast
+    updateHourlyForecast([
+        { temperature: 28, condition: 'sunny' },
+        { temperature: 30, condition: 'partly-cloudy' },
+        { temperature: 32, condition: 'cloudy' },
+        { temperature: 29, condition: 'partly-cloudy' }
+    ]);
+    
+    // Load demo weather details
+    updateWeatherDetails({
+        humidity: 65,
+        uv_index: 6,
+        pressure: 1013,
+        visibility: 10
+    });
+}
+</script>
 {% endblock %}

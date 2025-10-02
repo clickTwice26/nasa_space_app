@@ -1,358 +1,581 @@
 {% extends "base.html" %}
 
 {% block title %}TerraPulse - Data Insights{% endblock %}
-{% block subtitle %}Environmental Data{% endblock %}
+{% block subtitle %}NASA Data Analytics{% endblock %}
 
 {% block content %}
-<div class="p-6 space-y-6 max-w-7xl mx-auto">
-    <!-- Header Section -->
-    <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-teal-800 rounded-2xl p-8 text-white shadow-xl">
-        <div class="flex items-center gap-6 mb-6">
+<div class="space-y-4 pb-32">
+    <!-- Header Card -->
+    <div class="card bg-gradient-to-br from-blue-500 to-blue-600 text-white border-blue-300">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-semibold mb-1">NASA Data Insights</h2>
+                <p class="text-sm opacity-90">Real-time satellite and weather data</p>
+            </div>
             <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <i data-lucide="bar-chart-3" class="w-6 h-6 text-white"></i>
-            </div>
-            <div>
-                <h2 class="text-3xl font-display font-bold">Data Insights</h2>
-                <p class="text-blue-100 mt-1 text-lg">Real-time environmental monitoring</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-3 gap-8 mt-8">
-            <div class="text-center">
-                <p class="text-4xl font-bold text-white">1,247</p>
-                <p class="text-xs text-green-100 mt-1">Data Points</p>
-            </div>
-            <div class="text-center">
-                <p class="text-4xl font-bold text-white">64</p>
-                <p class="text-xs text-green-100 mt-1">Districts</p>
-            </div>
-            <div class="text-center">
-                <p class="text-4xl font-bold text-white">98%</p>
-                <p class="text-xs text-green-100 mt-1">Accuracy</p>
+                <i data-lucide="satellite" class="w-6 h-6"></i>
             </div>
         </div>
     </div>
 
-    <!-- Data Source Filters -->
-    <div class="card-light p-6">
-        <h3 class="text-sm font-semibold text-gray-900 mb-4">Data Sources</h3>
-        <div class="flex flex-wrap gap-3">
-            <button class="btn-terra-primary">
-                All Sources
-            </button>
-            <button class="btn-light-outline">
-                🌦 Climate
-            </button>
-            <button class="btn-light-outline">
-                🌱 Soil
-            </button>
-            <button class="btn-light-outline">
-                🛰 Satellite
-            </button>
-            <button class="btn-light-outline">
-                🌾 Crop
-            </button>
+    <!-- Data Sources -->
+    <div class="grid grid-cols-2 gap-3">
+        <div class="card card-compact bg-blue-50 border-blue-200">
+            <div class="text-center">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i data-lucide="cloud" class="w-5 h-5 text-blue-600"></i>
+                </div>
+                <div class="font-medium text-sm text-blue-900">Weather Data</div>
+                <div class="text-xs text-blue-600">NASA POWER</div>
+            </div>
+        </div>
+        
+        <div class="card card-compact bg-green-50 border-green-200">
+            <div class="text-center">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i data-lucide="droplets" class="w-5 h-5 text-green-600"></i>
+                </div>
+                <div class="font-medium text-sm text-green-900">Precipitation</div>
+                <div class="text-xs text-green-600">GPM IMERG</div>
+            </div>
+        </div>
+        
+        <div class="card card-compact bg-purple-50 border-purple-200">
+            <div class="text-center">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i data-lucide="wind" class="w-5 h-5 text-purple-600"></i>
+                </div>
+                <div class="font-medium text-sm text-purple-900">Air Quality</div>
+                <div class="text-xs text-purple-600">MODIS</div>
+            </div>
+        </div>
+        
+        <div class="card card-compact bg-orange-50 border-orange-200">
+            <div class="text-center">
+                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i data-lucide="globe" class="w-5 h-5 text-orange-600"></i>
+                </div>
+                <div class="font-medium text-sm text-orange-900">Imagery</div>
+                <div class="text-xs text-orange-600">Worldview</div>
+            </div>
         </div>
     </div>
 
-    <!-- NASA POWER Weather Data Section -->
-    <div class="card-light p-6">
+    <!-- Current Conditions -->
+    <div class="card">
         <div class="flex items-center justify-between mb-4">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                    <i data-lucide="satellite" class="w-5 h-5 text-blue-600"></i>
-                    <span>NASA POWER Weather Data</span>
-                </h3>
-                <p class="text-sm text-gray-500">Real-time satellite-derived meteorological data</p>
-            </div>
-            <button id="refresh-weather" class="btn-terra-primary text-sm" onclick="refreshWeatherData()">
-                <i data-lucide="refresh-cw" class="w-4 h-4 mr-1"></i>
-                Refresh
+            <h3 class="font-semibold text-gray-900">Current Conditions</h3>
+            <button onclick="refreshData()" class="btn btn-sm btn-secondary" id="refreshBtn">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
             </button>
         </div>
         
-        <!-- Location Input -->
-        <div class="bg-gray-50 rounded-lg p-4 mb-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Latitude</label>
-                    <input type="number" id="weather-lat" value="23.7644" step="0.0001" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-terra-green">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Longitude</label>
-                    <input type="number" id="weather-lon" value="90.3897" step="0.0001" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-terra-green">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Start Date</label>
-                    <input type="date" id="weather-start" value="2024-09-01" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-terra-green">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">End Date</label>
-                    <input type="date" id="weather-end" value="2024-09-07" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-terra-green">
+        <div id="currentConditions" class="space-y-3">
+            <!-- Loading state -->
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div class="text-center">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full animate-pulse mx-auto mb-3"></div>
+                    <p class="text-sm text-gray-600">Loading current conditions...</p>
                 </div>
             </div>
-            <button onclick="fetchWeatherData()" class="mt-3 btn-terra-primary text-sm">
-                <i data-lucide="download" class="w-4 h-4 mr-1"></i>
-                Fetch Weather Data
-            </button>
-        </div>
-        
-        <!-- Weather Data Display -->
-        <div id="weather-data-container" class="space-y-4">
-            <div class="text-center py-8 text-gray-500">
-                <i data-lucide="cloud" class="w-12 h-12 mx-auto mb-2 text-gray-400"></i>
-                <p>Select location and date range to fetch NASA POWER weather data</p>
-            </div>
-        </div>
-        
-        <!-- Weather Stats Summary -->
-        <div id="weather-stats" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200">
-            <!-- Stats will be populated by JavaScript -->
         </div>
     </div>
 
-    <!-- Climate Data Charts -->
-    <div class="space-y-8">
-        <!-- Temperature Trend -->
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <h3 class="card-title">Temperature Trends</h3>
-                    <p class="card-subtitle">Last 30 days across Bangladesh</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: var(--space-lg);">
-                    <div style="display: flex; align-items: center; gap: var(--space-sm);">
-                        <span style="width: 12px; height: 12px; background: var(--danger); border-radius: 50%;"></span>
-                        <span style="font-size: var(--text-xs); color: var(--text-muted);">Max Temp</span>
+    <!-- NASA Weather Parameters -->
+    <div class="card">
+        <h3 class="font-semibold text-gray-900 mb-4">NASA POWER Weather Data</h3>
+        
+        <div class="grid grid-cols-1 gap-3" id="weatherParams">
+            <!-- Temperature -->
+            <div class="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-4 border border-red-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="thermometer" class="w-5 h-5 text-red-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">Temperature</div>
+                            <div class="text-sm text-gray-600">2m above surface</div>
+                        </div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: var(--space-sm);">
-                        <span style="width: 12px; height: 12px; background: var(--secondary-color); border-radius: 50%;"></span>
-                        <span style="font-size: var(--text-xs); color: var(--text-muted);">Min Temp</span>
+                    <div class="text-right">
+                        <div class="text-lg font-bold text-red-700" id="temperature">--°C</div>
+                        <div class="text-xs text-red-600">Current</div>
                     </div>
                 </div>
             </div>
-            <!-- Chart Placeholder -->
-            <div class="h-48 bg-gradient-to-r from-red-100 via-yellow-100 to-blue-100 rounded-lg flex items-center justify-center relative overflow-hidden">
-                <div class="relative text-center">
-                    <i data-lucide="trending-up" class="w-12 h-12 text-gray-400 mx-auto mb-3"></i>
-                    <p class="text-sm text-gray-500 mb-1">Temperature Chart</p>
-                    <p class="text-xs text-gray-400">Interactive line chart showing daily temperature variations</p>
-                </div>
-            </div>
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-3 gap-8 mt-6 pt-6 border-t border-gray-100">
-                <div class="text-center">
-                    <p class="text-xl font-bold text-red-600">37.2°C</p>
-                    <p class="text-xs text-gray-500 mt-1">Highest</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-xl font-bold text-blue-600">18.5°C</p>
-                    <p class="text-xs text-gray-500 mt-1">Lowest</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-xl font-bold text-gray-900">28.9°C</p>
-                    <p class="text-xs text-gray-500 mt-1">Average</p>
-                </div>
-            </div>
-        </div>
 
-        <!-- Rainfall Data -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Rainfall Distribution</h3>
-                    <p class="text-sm text-gray-500">Monthly precipitation by district</p>
-                </div>
-                <button class="text-sm text-terra-green font-medium">View Map</button>
-            </div>
-            <!-- Chart Placeholder -->
-            <div class="chart-placeholder h-40 rounded-lg flex items-center justify-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 opacity-20"></div>
-                <div class="relative">
-                    <i data-lucide="cloud-rain" class="w-10 h-10 text-gray-400 mx-auto"></i>
-                    <p class="text-sm text-gray-500 mt-2 text-center">Rainfall Bar Chart</p>
-                </div>
-            </div>
-            <!-- Districts with highest/lowest rainfall -->
-            <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
-                <div class="bg-blue-50 p-3 rounded-lg">
-                    <p class="text-sm font-medium text-blue-900">Highest Rainfall</p>
-                    <p class="text-lg font-bold text-blue-600">285mm</p>
-                    <p class="text-xs text-blue-700">Sylhet District</p>
-                </div>
-                <div class="bg-orange-50 p-3 rounded-lg">
-                    <p class="text-sm font-medium text-orange-900">Lowest Rainfall</p>
-                    <p class="text-lg font-bold text-orange-600">42mm</p>
-                    <p class="text-xs text-orange-700">Rajshahi District</p>
+            <!-- Humidity -->
+            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="droplets" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">Relative Humidity</div>
+                            <div class="text-sm text-gray-600">2m above surface</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-lg font-bold text-blue-700" id="humidity">--%</div>
+                        <div class="text-xs text-blue-600">Current</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Soil Health Map -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Soil Health Index</h3>
-                    <p class="text-sm text-gray-500">Regional soil quality assessment</p>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span class="w-3 h-3 bg-green-500 rounded-full"></span>
-                    <span class="text-xs text-gray-600">Good</span>
-                    <span class="w-3 h-3 bg-yellow-500 rounded-full ml-2"></span>
-                    <span class="text-xs text-gray-600">Fair</span>
-                    <span class="w-3 h-3 bg-red-500 rounded-full ml-2"></span>
-                    <span class="text-xs text-gray-600">Poor</span>
-                </div>
-            </div>
-            <!-- Map Placeholder -->
-            <div class="chart-placeholder h-48 rounded-lg flex items-center justify-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-br from-green-400 via-yellow-400 to-red-400 opacity-20"></div>
-                <div class="relative">
-                    <i data-lucide="map" class="w-12 h-12 text-gray-400 mx-auto"></i>
-                    <p class="text-sm text-gray-500 mt-2 text-center">Interactive Soil Health Map</p>
-                    <p class="text-xs text-gray-400 text-center">Color-coded map showing soil quality across Bangladesh</p>
+            <!-- Wind Speed -->
+            <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-4 border border-green-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="wind" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">Wind Speed</div>
+                            <div class="text-sm text-gray-600">10m above surface</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-lg font-bold text-green-700" id="windSpeed">-- km/h</div>
+                        <div class="text-xs text-green-600">Current</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- NDVI Satellite Data -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Vegetation Health (NDVI)</h3>
-                    <p class="text-sm text-gray-500">Satellite-derived vegetation index</p>
-                </div>
-                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded border">
-                    Updated 2h ago
-                </span>
-            </div>
-            <!-- NDVI Chart Placeholder -->
-            <div class="chart-placeholder h-40 rounded-lg flex items-center justify-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 opacity-20"></div>
-                <div class="relative">
-                    <i data-lucide="satellite" class="w-10 h-10 text-gray-400 mx-auto"></i>
-                    <p class="text-sm text-gray-500 mt-2 text-center">NDVI Heatmap</p>
-                </div>
-            </div>
-            <!-- NDVI Stats -->
-            <div class="grid grid-cols-4 gap-3 mt-4 pt-4 border-t border-gray-100">
-                <div class="text-center">
-                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i data-lucide="leaf" class="w-4 h-4 text-green-600"></i>
+            <!-- Precipitation -->
+            <div class="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-4 border border-purple-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="cloud-rain" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">Precipitation</div>
+                            <div class="text-sm text-gray-600">Last 24 hours</div>
+                        </div>
                     </div>
-                    <p class="text-sm font-bold text-green-600">0.85</p>
-                    <p class="text-xs text-gray-500">Excellent</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-8 h-8 bg-lime-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i data-lucide="leaf" class="w-4 h-4 text-lime-600"></i>
-                    </div>
-                    <p class="text-sm font-bold text-lime-600">0.72</p>
-                    <p class="text-xs text-gray-500">Good</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i data-lucide="leaf" class="w-4 h-4 text-yellow-600"></i>
-                    </div>
-                    <p class="text-sm font-bold text-yellow-600">0.58</p>
-                    <p class="text-xs text-gray-500">Fair</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i data-lucide="leaf" class="w-4 h-4 text-red-600"></i>
-                    </div>
-                    <p class="text-sm font-bold text-red-600">0.34</p>
-                    <p class="text-xs text-gray-500">Poor</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Crop Yield Predictions -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Crop Yield Forecasts</h3>
-                    <p class="text-sm text-gray-500">AI-predicted yields for major crops</p>
-                </div>
-                <button class="text-sm text-terra-green font-medium">Details</button>
-            </div>
-            <!-- Crop Cards -->
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <i data-lucide="wheat" class="w-5 h-5 text-yellow-600"></i>
-                        <span class="text-sm font-medium text-yellow-900">Rice</span>
-                    </div>
-                    <p class="text-2xl font-bold text-yellow-700">4.2 MT/ha</p>
-                    <p class="text-xs text-yellow-600">+8% vs last year</p>
-                    <div class="mt-2 w-full bg-yellow-200 rounded-full h-2">
-                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 84%"></div>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <i data-lucide="wheat" class="w-5 h-5 text-orange-600"></i>
-                        <span class="text-sm font-medium text-orange-900">Wheat</span>
-                    </div>
-                    <p class="text-2xl font-bold text-orange-700">3.1 MT/ha</p>
-                    <p class="text-xs text-orange-600">-2% vs last year</p>
-                    <div class="mt-2 w-full bg-orange-200 rounded-full h-2">
-                        <div class="bg-orange-500 h-2 rounded-full" style="width: 62%"></div>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <i data-lucide="wheat" class="w-5 h-5 text-purple-600"></i>
-                        <span class="text-sm font-medium text-purple-900">Potato</span>
-                    </div>
-                    <p class="text-2xl font-bold text-purple-700">24.8 MT/ha</p>
-                    <p class="text-xs text-purple-600">+12% vs last year</p>
-                    <div class="mt-2 w-full bg-purple-200 rounded-full h-2">
-                        <div class="bg-purple-500 h-2 rounded-full" style="width: 92%"></div>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <i data-lucide="wheat" class="w-5 h-5 text-green-600"></i>
-                        <span class="text-sm font-medium text-green-900">Jute</span>
-                    </div>
-                    <p class="text-2xl font-bold text-green-700">2.8 MT/ha</p>
-                    <p class="text-xs text-green-600">+5% vs last year</p>
-                    <div class="mt-2 w-full bg-green-200 rounded-full h-2">
-                        <div class="bg-green-500 h-2 rounded-full" style="width: 70%"></div>
+                    <div class="text-right">
+                        <div class="text-lg font-bold text-purple-700" id="precipitation">-- mm</div>
+                        <div class="text-xs text-purple-600">24h total</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Data Export & Download -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Export Data</h3>
+        <button onclick="loadWeatherData()" class="btn btn-outline w-full mt-4">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Load NASA Weather Data</span>
+        </button>
+    </div>
+
+    <!-- Satellite Imagery -->
+    <div class="card">
+        <h3 class="font-semibold text-gray-900 mb-4">NASA Worldview Imagery</h3>
+        
+        <div class="space-y-3">
             <div class="grid grid-cols-2 gap-3">
-                <button class="flex items-center justify-center space-x-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-100 transition-colors">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span class="text-sm font-medium">Download CSV</span>
+                <button onclick="loadImagery('true_color')" class="btn btn-outline btn-sm">
+                    <i data-lucide="image" class="w-4 h-4"></i>
+                    <span>True Color</span>
                 </button>
-                <button class="flex items-center justify-center space-x-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 hover:bg-green-100 transition-colors">
-                    <i data-lucide="file-text" class="w-4 h-4"></i>
-                    <span class="text-sm font-medium">Generate Report</span>
+                <button onclick="loadImagery('vegetation')" class="btn btn-outline btn-sm">
+                    <i data-lucide="leaf" class="w-4 h-4"></i>
+                    <span>Vegetation</span>
                 </button>
-                <button class="flex items-center justify-center space-x-2 p-3 bg-purple-50 border border-purple-200 rounded-lg text-purple-700 hover:bg-purple-100 transition-colors">
-                    <i data-lucide="share" class="w-4 h-4"></i>
-                    <span class="text-sm font-medium">Share Dashboard</span>
+                <button onclick="loadImagery('temperature')" class="btn btn-outline btn-sm">
+                    <i data-lucide="thermometer" class="w-4 h-4"></i>
+                    <span>Temperature</span>
                 </button>
-                <button class="flex items-center justify-center space-x-2 p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 hover:bg-orange-100 transition-colors">
-                    <i data-lucide="api" class="w-4 h-4"></i>
-                    <span class="text-sm font-medium">API Access</span>
+                <button onclick="loadImagery('moisture')" class="btn btn-outline btn-sm">
+                    <i data-lucide="droplets" class="w-4 h-4"></i>
+                    <span>Soil Moisture</span>
                 </button>
             </div>
+            
+            <div id="imageryContainer" class="bg-gray-50 rounded-lg p-4 border border-gray-200 min-h-32">
+                <div class="text-center">
+                    <i data-lucide="satellite" class="w-12 h-12 text-gray-400 mx-auto mb-3"></i>
+                    <p class="text-sm text-gray-600">Select an imagery type to view satellite data</p>
+                    <p class="text-xs text-gray-500 mt-1">Powered by NASA Worldview</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Air Quality Data -->
+    <div class="card">
+        <h3 class="font-semibold text-gray-900 mb-4">Air Quality (MODIS)</h3>
+        
+        <div class="space-y-3" id="airQualityData">
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div class="text-center">
+                    <i data-lucide="wind" class="w-8 h-8 text-gray-400 mx-auto mb-3"></i>
+                    <p class="text-sm text-gray-600">Loading air quality data...</p>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="loadAirQuality()" class="btn btn-outline w-full mt-3">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>Load Air Quality Data</span>
+        </button>
+    </div>
+
+    <!-- Historical Data -->
+    <div class="card">
+        <h3 class="font-semibold text-gray-900 mb-4">Historical Trends</h3>
+        
+        <div class="grid grid-cols-1 gap-3">
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-medium text-gray-900">7-Day Temperature Avg</div>
+                        <div class="text-sm text-gray-600">Last week average</div>
+                    </div>
+                    <div class="text-lg font-bold text-blue-700" id="tempAvg">--°C</div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-medium text-gray-900">Weekly Precipitation</div>
+                        <div class="text-sm text-gray-600">Last 7 days total</div>
+                    </div>
+                    <div class="text-lg font-bold text-green-700" id="precipWeek">-- mm</div>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="loadHistoricalData()" class="btn btn-outline w-full mt-3">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>Load Historical Data</span>
+        </button>
+    </div>
+
+    <!-- Data Export -->
+    <div class="card">
+        <h3 class="font-semibold text-gray-900 mb-4">Export Data</h3>
+        <p class="text-sm text-gray-600 mb-4">Download NASA data for further analysis</p>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="exportData('csv')" class="btn btn-outline">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                <span>CSV Export</span>
+            </button>
+            <button onclick="exportData('json')" class="btn btn-outline">
+                <i data-lucide="code" class="w-4 h-4"></i>
+                <span>JSON Export</span>
+            </button>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    loadInitialData();
+});
+
+async function loadInitialData() {
+    // Load current conditions on page load
+    refreshData();
+}
+
+async function refreshData() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    const conditionsDiv = document.getElementById('currentConditions');
+    
+    // Show loading state
+    refreshBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>';
+    
+    try {
+        const response = await fetch('/api/current-conditions');
+        if (!response.ok) throw new Error('Failed to fetch data');
+        
+        const data = await response.json();
+        displayCurrentConditions(data);
+        
+    } catch (error) {
+        console.error('Error loading data:', error);
+        conditionsDiv.innerHTML = `
+            <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                <div class="text-center">
+                    <i data-lucide="alert-circle" class="w-8 h-8 text-red-400 mx-auto mb-3"></i>
+                    <p class="text-sm text-red-600">Failed to load current conditions</p>
+                </div>
+            </div>
+        `;
+    } finally {
+        refreshBtn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i>';
+        lucide.createIcons();
+    }
+}
+
+function displayCurrentConditions(data) {
+    const container = document.getElementById('currentConditions');
+    
+    // Parse the actual API response structure
+    const current = data.current || {};
+    
+    container.innerHTML = `
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-blue-50 rounded-lg p-3 border border-blue-200 text-center">
+                <div class="text-lg font-bold text-blue-700">${current.temperature || '--'}°C</div>
+                <div class="text-xs text-blue-600">Temperature</div>
+            </div>
+            <div class="bg-green-50 rounded-lg p-3 border border-green-200 text-center">
+                <div class="text-lg font-bold text-green-700">${current.humidity || '--'}%</div>
+                <div class="text-xs text-green-600">Humidity</div>
+            </div>
+            <div class="bg-purple-50 rounded-lg p-3 border border-purple-200 text-center">
+                <div class="text-lg font-bold text-purple-700">${current.wind_speed || '--'} km/h</div>
+                <div class="text-xs text-purple-600">Wind Speed</div>
+            </div>
+            <div class="bg-orange-50 rounded-lg p-3 border border-orange-200 text-center">
+                <div class="text-lg font-bold text-orange-700">${current.precipitation || '--'} mm</div>
+                <div class="text-xs text-orange-600">Rainfall</div>
+            </div>
+        </div>
+        <div class="mt-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-600">Weather:</span>
+                <span class="font-medium text-gray-900">${current.weather_description || 'N/A'}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm mt-1">
+                <span class="text-gray-600">UV Index:</span>
+                <span class="font-medium text-gray-900">${current.uv_index || '--'}</span>
+            </div>
+        </div>
+        <p class="text-xs text-gray-500 text-center mt-3">Last updated: ${new Date().toLocaleString()}</p>
+    `;
+}
+
+async function loadWeatherData() {
+    try {
+        const response = await fetch('/api/nasa-weather');
+        if (!response.ok) throw new Error('Failed to fetch weather data');
+        
+        const data = await response.json();
+        
+        // Update individual parameter displays - parse nested structure
+        const params = data.parameters || {};
+        document.getElementById('temperature').textContent = `${params.temperature_2m?.value || '--'}°C`;
+        document.getElementById('humidity').textContent = `${params.humidity?.value || '--'}%`;
+        document.getElementById('windSpeed').textContent = `${params.wind_speed?.value ? (params.wind_speed.value * 3.6).toFixed(1) : '--'} km/h`;
+        document.getElementById('precipitation').textContent = `${params.precipitation?.value || '--'} mm`;
+        
+    } catch (error) {
+        console.error('Weather data error:', error);
+        alert('Failed to load NASA weather data');
+    }
+}
+
+async function loadImagery(type) {
+    const container = document.getElementById('imageryContainer');
+    
+    container.innerHTML = `
+        <div class="text-center py-4">
+            <div class="w-8 h-8 bg-blue-300 rounded-full animate-pulse mx-auto mb-3"></div>
+            <p class="text-sm text-gray-600">Loading ${type.replace('_', ' ')} imagery...</p>
+            <p class="text-xs text-gray-500">Connecting to NASA Worldview</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`/api/imagery/${type}`);
+        if (!response.ok) throw new Error('Failed to load imagery');
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to retrieve imagery');
+        }
+        
+        container.innerHTML = `
+            <div class="text-center">
+                <div class="relative">
+                    <img id="imagery-${type}" 
+                         src="${data.image_url}" 
+                         alt="${type} imagery" 
+                         class="w-full rounded-lg border border-gray-300 mb-3"
+                         onload="handleImageLoad(this)"
+                         onerror="handleImageError(this, '${type}')"
+                         style="opacity: 0; transition: opacity 0.3s; max-height: 300px; object-fit: cover;">
+                    <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                        ${data.resolution}
+                    </div>
+                </div>
+                <div class="text-left space-y-1">
+                    <p class="text-sm font-medium text-gray-900">${data.description}</p>
+                    <p class="text-xs text-gray-600">Layer: ${data.layer_name}</p>
+                    <p class="text-xs text-gray-500">Date: ${data.date} • Source: ${data.source}</p>
+                </div>
+                <button onclick="refreshImagery('${type}')" class="btn btn-sm btn-outline mt-3 w-full">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                    Refresh Image
+                </button>
+            </div>
+        `;
+        
+        // Add timeout for image loading
+        setTimeout(() => {
+            const img = document.getElementById(`imagery-${type}`);
+            if (img && img.style.opacity === '0') {
+                handleImageError(img, type);
+            }
+        }, 10000); // 10 second timeout
+        
+        // Recreate icons
+        lucide.createIcons();
+        
+    } catch (error) {
+        console.error('Imagery error:', error);
+        container.innerHTML = `
+            <div class="text-center py-6">
+                <i data-lucide="satellite-dish" class="w-12 h-12 text-orange-400 mx-auto mb-3"></i>
+                <p class="text-sm text-gray-700 font-medium mb-2">NASA Worldview Imagery</p>
+                <p class="text-xs text-gray-600 mb-3">Live satellite imagery from NASA's Earth Observing System</p>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+                    <p class="text-xs text-yellow-800">Note: Live imagery requires NASA Earthdata login</p>
+                </div>
+                <button onclick="loadImagery('${type}')" class="btn btn-sm btn-outline">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                    Try Again
+                </button>
+            </div>
+        `;
+        lucide.createIcons();
+    }
+}
+
+function handleImageError(img, type) {
+    console.log('Image failed to load, showing placeholder');
+    
+    // Show fallback placeholder
+    img.parentNode.innerHTML = `
+        <div class="bg-gradient-to-br from-blue-100 to-green-100 rounded-lg border border-gray-300 p-8 mb-3">
+            <div class="text-center">
+                <i data-lucide="satellite" class="w-16 h-16 text-blue-500 mx-auto mb-4"></i>
+                <p class="text-sm font-medium text-gray-700">NASA ${type.replace('_', ' ').toUpperCase()} Imagery</p>
+                <p class="text-xs text-gray-500 mt-1">Satellite data visualization</p>
+                <p class="text-xs text-red-500 mt-2">Image temporarily unavailable</p>
+                <button onclick="refreshImagery('${type}')" class="btn btn-sm btn-primary mt-3">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                    Retry
+                </button>
+            </div>
+        </div>
+    `;
+    lucide.createIcons();
+}
+
+function refreshImagery(type) {
+    loadImagery(type);
+}
+
+async function loadAirQuality() {
+    const container = document.getElementById('airQualityData');
+    
+    container.innerHTML = `
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="text-center">
+                <div class="w-8 h-8 bg-gray-300 rounded-full animate-pulse mx-auto mb-3"></div>
+                <p class="text-sm text-gray-600">Loading air quality data...</p>
+            </div>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch('/api/air-quality');
+        if (!response.ok) throw new Error('Failed to load air quality');
+        
+        const data = await response.json();
+        
+        container.innerHTML = `
+            <div class="space-y-3">
+                <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium text-gray-900">PM2.5</span>
+                        <span class="text-lg font-bold text-blue-700">${data.pm25 || '--'} μg/m³</span>
+                    </div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium text-gray-900">PM10</span>
+                        <span class="text-lg font-bold text-green-700">${data.pm10 || '--'} μg/m³</span>
+                    </div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium text-gray-900">AOD</span>
+                        <span class="text-lg font-bold text-purple-700">${data.aod || '--'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Air quality error:', error);
+        container.innerHTML = `
+            <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                <div class="text-center">
+                    <i data-lucide="alert-circle" class="w-8 h-8 text-red-400 mx-auto mb-3"></i>
+                    <p class="text-sm text-red-600">Failed to load air quality data</p>
+                </div>
+            </div>
+        `;
+        lucide.createIcons();
+    }
+}
+
+async function loadHistoricalData() {
+    try {
+        const response = await fetch('/api/historical-data');
+        if (!response.ok) throw new Error('Failed to load historical data');
+        
+        const data = await response.json();
+        
+        document.getElementById('tempAvg').textContent = `${data.temp_avg || '--'}°C`;
+        document.getElementById('precipWeek').textContent = `${data.precip_week || '--'} mm`;
+        
+    } catch (error) {
+        console.error('Historical data error:', error);
+        alert('Failed to load historical data');
+    }
+}
+
+async function exportData(format) {
+    try {
+        const response = await fetch(`/api/export-data?format=${format}`);
+        if (!response.ok) throw new Error('Export failed');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nasa_data_${new Date().toISOString().split('T')[0]}.${format}`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+    } catch (error) {
+        console.error('Export error:', error);
+        alert('Failed to export data');
+    }
+}
+
+// Image handling functions
+function handleImageLoad(img) {
+    img.style.opacity = '1';
+    console.log('Image loaded successfully:', img.src);
+}
+
+async function refreshImagery(type) {
+    const container = document.getElementById(`${type}ImageryContainer`);
+    if (container) {
+        await loadImagery(type);
+    }
+}
+</script>
 {% endblock %}

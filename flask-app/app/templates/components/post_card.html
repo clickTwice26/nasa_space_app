@@ -1,53 +1,54 @@
-<!-- Post Component -->
+<!-- Mobile-Optimized Post Component -->
 {% macro post_card(author, author_type, time_ago, location, content, post_type, likes, comments, tags, has_image=false, alert_type=none) %}
-<div class="post-card bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
-    <div class="flex items-start space-x-3 sm:space-x-4">
-        <!-- Avatar -->
-        <div class="flex-shrink-0">
-            {% if author_type == 'expert' %}
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i data-lucide="shield-check" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"></i>
-                </div>
-            {% elif author_type == 'bot' %}
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <i data-lucide="trending-up" class="w-5 h-5 sm:w-6 sm:h-6 text-orange-600"></i>
-                </div>
-            {% elif author_type == 'official' %}
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <i data-lucide="calendar" class="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600"></i>
-                </div>
-            {% else %}
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                    <span class="text-white text-xs sm:text-sm font-semibold">{{ author[:2].upper() }}</span>
-                </div>
-            {% endif %}
-        </div>
-        
-        <!-- Content -->
-        <div class="flex-1 min-w-0">
-            <!-- Header -->
-            <div class="flex flex-wrap items-center gap-2 mb-3">
-                <span class="font-semibold text-gray-900 text-sm sm:text-base">{{ author }}</span>
+<div class="app-card">
+    <div class="app-card-body">
+        <div class="flex items-start gap-3">
+            <!-- Avatar -->
+            <div class="flex-shrink-0">
                 {% if author_type == 'expert' %}
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">Expert</span>
-                {% elif author_type == 'farmer' %}
-                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Farmer</span>
-                {% elif author_type == 'student' %}
-                    <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">Student</span>
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-blue-600"></i>
+                    </div>
                 {% elif author_type == 'bot' %}
-                    <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">Automated</span>
+                    <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-orange-600"></i>
+                    </div>
                 {% elif author_type == 'official' %}
-                    <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full">Official</span>
+                    <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                        <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
+                    </div>
+                {% else %}
+                    <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-xs font-semibold">{{ author[:2].upper() }}</span>
+                    </div>
                 {% endif %}
+            </div>
+            
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <!-- Header -->
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="font-semibold text-gray-900 text-body">{{ author }}</span>
+                    {% if author_type == 'expert' %}
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-caption font-medium rounded-full">Expert</span>
+                    {% elif author_type == 'farmer' %}
+                        <span class="px-2 py-1 bg-green-100 text-green-800 text-caption font-medium rounded-full">Farmer</span>
+                    {% elif author_type == 'student' %}
+                        <span class="px-2 py-1 bg-purple-100 text-purple-800 text-caption font-medium rounded-full">Student</span>
+                    {% elif author_type == 'bot' %}
+                        <span class="px-2 py-1 bg-orange-100 text-orange-800 text-caption font-medium rounded-full">Auto</span>
+                    {% elif author_type == 'official' %}
+                        <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-caption font-medium rounded-full">Official</span>
+                    {% endif %}
+                </div>
                 
-                <div class="flex items-center text-xs text-gray-500 flex-wrap">
+                <div class="flex items-center text-caption text-gray-500 mb-3">
                     <span>{{ time_ago }}</span>
                     {% if location %}
                         <span class="mx-1">•</span>
                         <span>{{ location }}</span>
                     {% endif %}
                 </div>
-            </div>
             
             <!-- Content Area -->
             {% if post_type == 'alert' and alert_type %}

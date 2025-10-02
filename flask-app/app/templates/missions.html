@@ -1,53 +1,192 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missions - NASA Space App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🚀 NASA Missions</h1>
-            <nav>
-                <a href="/">Home</a>
-                <a href="/missions">Missions</a>
-                <a href="/data">Data</a>
-                <a href="/about">About</a>
-            </nav>
-        </header>
-        
-        <main>
-            <div class="card">
-                <h2>Mission Control</h2>
-                <div class="mission-controls">
-                    <button onclick="loadMissions()">Load All Missions</button>
-                    <button onclick="showCreateMissionForm()">Create New Mission</button>
+{% extends "base.html" %}
+
+{% block title %}TerraPulse - Missions{% endblock %}
+{% block subtitle %}NASA Missions{% endblock %}
+
+{% block content %}
+<div class="space-y-4 pb-32">
+    <!-- Header Card -->
+    <div class="app-card">
+        <div class="app-card-body text-center">
+            <h1 class="text-heading-1 text-gray-900 mb-2">🚀 NASA Missions</h1>
+            <p class="text-body text-gray-600">Explore and manage space missions</p>
+        </div>
+    </div>
+
+    <!-- Mission Controls -->
+    <div class="app-card">
+        <div class="app-card-body">
+            <h2 class="text-heading-2 text-gray-900 mb-4">Mission Control</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button onclick="loadMissions()" class="app-button-primary w-full">
+                    Load All Missions
+                </button>
+                <button onclick="showCreateMissionForm()" class="app-button-secondary w-full">
+                    Create New Mission
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Mission Form -->
+    <div class="app-card" id="mission-form" style="display: none;">
+        <div class="app-card-body">
+            <h2 class="text-heading-2 text-gray-900 mb-4">Create New Mission</h2>
+            <form id="new-mission-form" class="space-y-4">
+                <div>
+                    <label for="mission-name" class="block text-body-sm font-medium text-gray-700 mb-2">Mission Name:</label>
+                    <input type="text" id="mission-name" required class="app-input w-full">
+                </div>
+                <div>
+                    <label for="mission-description" class="block text-body-sm font-medium text-gray-700 mb-2">Description:</label>
+                    <textarea id="mission-description" rows="3" class="app-input w-full resize-none"></textarea>
+                </div>
+                <div>
+                    <label for="mission-type" class="block text-body-sm font-medium text-gray-700 mb-2">Mission Type:</label>
+                    <select id="mission-type" class="app-input w-full">
+                        <option value="">Select Type</option>
+                        <option value="Earth Observation">Earth Observation</option>
+                        <option value="Mars Exploration">Mars Exploration</option>
+                        <option value="ISS">International Space Station</option>
+                        <option value="Deep Space">Deep Space</option>
+                        <option value="Lunar">Lunar</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="launch-date" class="block text-body-sm font-medium text-gray-700 mb-2">Launch Date:</label>
+                    <input type="date" id="launch-date" class="app-input w-full">
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button type="submit" class="app-button-primary flex-1">Create Mission</button>
+                    <button type="button" onclick="hideCreateMissionForm()" class="app-button-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Missions List -->
+    <div class="app-card">
+        <div class="app-card-body">
+            <h2 class="text-heading-2 text-gray-900 mb-4">Active Missions</h2>
+            <div id="missions-list" class="space-y-3">
+                <p class="text-body text-gray-500 text-center">Click "Load All Missions" to view missions</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let missions = [
+    {
+        id: 1,
+        name: "Artemis III",
+        description: "Return humans to the Moon",
+        type: "Lunar",
+        status: "Planned",
+        launch_date: "2026-09-01"
+    },
+    {
+        id: 2,
+        name: "Mars Sample Return",
+        description: "Retrieve samples from Mars surface",
+        type: "Mars Exploration", 
+        status: "Development",
+        launch_date: "2028-07-15"
+    },
+    {
+        id: 3,
+        name: "Europa Clipper",
+        description: "Study Jupiter's moon Europa",
+        type: "Deep Space",
+        status: "Active",
+        launch_date: "2024-10-14"
+    }
+];
+
+function loadMissions() {
+    const missionsList = document.getElementById('missions-list');
+    
+    if (missions.length === 0) {
+        missionsList.innerHTML = '<p class="text-body text-gray-500 text-center">No missions found</p>';
+        return;
+    }
+    
+    missionsList.innerHTML = missions.map(mission => `
+        <div class="app-card border-l-4 border-l-blue-500">
+            <div class="app-card-body">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex-1">
+                        <h3 class="text-body font-semibold text-gray-900">${mission.name}</h3>
+                        <p class="text-body-sm text-gray-600 mt-1">${mission.description}</p>
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            <span class="app-badge bg-blue-100 text-blue-800">${mission.type}</span>
+                            <span class="app-badge ${getStatusColor(mission.status)}">${mission.status}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-body-sm text-gray-500">Launch Date</p>
+                        <p class="text-body font-medium text-gray-900">${formatDate(mission.launch_date)}</p>
+                    </div>
                 </div>
             </div>
-            
-            <div class="card" id="mission-form" style="display: none;">
-                <h2>Create New Mission</h2>
-                <form id="new-mission-form">
-                    <div class="form-group">
-                        <label for="mission-name">Mission Name:</label>
-                        <input type="text" id="mission-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="mission-description">Description:</label>
-                        <textarea id="mission-description" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="mission-type">Mission Type:</label>
-                        <select id="mission-type">
-                            <option value="">Select Type</option>
-                            <option value="Earth Observation">Earth Observation</option>
-                            <option value="Mars Exploration">Mars Exploration</option>
-                            <option value="ISS">International Space Station</option>
-                            <option value="Deep Space">Deep Space</option>
-                            <option value="Lunar">Lunar</option>
-                        </select>
+        </div>
+    `).join('');
+}
+
+function getStatusColor(status) {
+    switch(status.toLowerCase()) {
+        case 'active': return 'bg-green-100 text-green-800';
+        case 'planned': return 'bg-yellow-100 text-yellow-800';
+        case 'development': return 'bg-orange-100 text-orange-800';
+        case 'completed': return 'bg-gray-100 text-gray-800';
+        default: return 'bg-gray-100 text-gray-800';
+    }
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+}
+
+function showCreateMissionForm() {
+    document.getElementById('mission-form').style.display = 'block';
+    document.getElementById('mission-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+function hideCreateMissionForm() {
+    document.getElementById('mission-form').style.display = 'none';
+}
+
+document.getElementById('new-mission-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        id: missions.length + 1,
+        name: document.getElementById('mission-name').value,
+        description: document.getElementById('mission-description').value,
+        type: document.getElementById('mission-type').value,
+        status: 'Planned',
+        launch_date: document.getElementById('launch-date').value
+    };
+    
+    missions.push(formData);
+    
+    // Reset form
+    this.reset();
+    hideCreateMissionForm();
+    
+    // Reload missions list
+    loadMissions();
+    
+    // Show success message
+    alert('Mission created successfully!');
+});
+</script>
+{% endblock %}
                     </div>
                     <div class="form-group">
                         <label for="launch-date">Launch Date:</label>

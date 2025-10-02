@@ -5,118 +5,105 @@
 {% block subtitle %}Discover Communities{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+<div class="pb-32">
+<!-- Header -->
+<div class="card" style="text-align: center;">
+    <h1 style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm);">Discover Communities</h1>
+    <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">Find and join agricultural communities that match your interests and expertise</p>
+</div>
+
+<!-- Search and Filters -->
+<div class="card">
+    <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+        <div>
+            <div style="position: relative;">
+                <i data-lucide="search" style="position: absolute; left: var(--spacing-lg); top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-muted);"></i>
+                <input type="text" placeholder="Search communities..." class="form-input" style="padding-left: calc(var(--spacing-lg) * 3);">
+            </div>
+        </div>
+        <div class="grid-2">
+            <select class="form-select">
+                <option>All Categories</option>
+                <option>Rice Farming</option>
+                <option>Vegetable Growing</option>
+                <option>Livestock</option>
+                <option>Organic Farming</option>
+                <option>Technology</option>
+            </select>
+            <select class="form-select">
+                <option>All Districts</option>
+                <option>Dhaka</option>
+                <option>Chittagong</option>
+                <option>Sylhet</option>
+                <option>Rajshahi</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Categories -->
+<div class="grid-2" style="margin-bottom: var(--spacing-xl);">
+    <div class="card card-compact" style="text-align: center; cursor: pointer; transition: all 0.2s ease;">
+        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f0fdf4, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--spacing-md);">
+            <i data-lucide="wheat" style="width: 24px; height: 24px; color: var(--terra-green);"></i>
+        </div>
+        <span style="font-weight: 600; color: var(--text-primary);">Rice & Grains</span>
+    </div>
     
-    <!-- Header -->
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Discover Communities</h1>
-        <p class="text-gray-600 max-w-2xl mx-auto">Find and join agricultural communities that match your interests and expertise</p>
+    <div class="card card-compact" style="text-align: center; cursor: pointer; transition: all 0.2s ease;">
+        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #fff7ed, #f97316); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--spacing-md);">
+            <i data-lucide="carrot" style="width: 24px; height: 24px; color: var(--terra-orange);"></i>
+        </div>
+        <span style="font-weight: 600; color: var(--text-primary);">Vegetables</span>
     </div>
-
-    <!-- Search and Filters -->
-    <div class="bg-white rounded-lg p-6 shadow-sm mb-6">
-        <div class="flex flex-col md:flex-row gap-4">
-            <div class="flex-1">
-                <div class="relative">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Search communities..." 
-                           class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <select class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>All Categories</option>
-                    <option>Rice Farming</option>
-                    <option>Vegetable Growing</option>
-                    <option>Livestock</option>
-                    <option>Organic Farming</option>
-                    <option>Technology</option>
-                </select>
-                <select class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>All Districts</option>
-                    <option>Dhaka</option>
-                    <option>Chittagong</option>
-                    <option>Sylhet</option>
-                    <option>Rajshahi</option>
-                </select>
-            </div>
+    
+    <div class="card card-compact" style="text-align: center; cursor: pointer; transition: all 0.2s ease;">
+        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #fef2f2, #ef4444); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--spacing-md);">
+            <i data-lucide="apple" style="width: 24px; height: 24px; color: var(--terra-red);"></i>
         </div>
+        <span style="font-weight: 600; color: var(--text-primary);">Fruits</span>
     </div>
-
-    <!-- Categories -->
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-        <div class="text-center p-4 bg-green-50 rounded-lg hover:bg-green-100 cursor-pointer transition-colors">
-            <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-seedling text-white"></i>
-            </div>
-            <span class="text-sm font-medium text-gray-700">Rice & Grains</span>
+    
+    <div class="card card-compact" style="text-align: center; cursor: pointer; transition: all 0.2s ease;">
+        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #fffbeb, #fbbf24); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--spacing-md);">
+            <i data-lucide="cow" style="width: 24px; height: 24px; color: #d97706;"></i>
         </div>
-        
-        <div class="text-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 cursor-pointer transition-colors">
-            <div class="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-carrot text-white"></i>
-            </div>
-            <span class="text-sm font-medium text-gray-700">Vegetables</span>
-        </div>
-        
-        <div class="text-center p-4 bg-red-50 rounded-lg hover:bg-red-100 cursor-pointer transition-colors">
-            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-apple-alt text-white"></i>
-            </div>
-            <span class="text-sm font-medium text-gray-700">Fruits</span>
-        </div>
-        
-        <div class="text-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 cursor-pointer transition-colors">
-            <div class="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-cow text-white"></i>
-            </div>
-            <span class="text-sm font-medium text-gray-700">Livestock</span>
-        </div>
-        
-        <div class="text-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors">
-            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-fish text-white"></i>
-            </div>
-            <span class="text-sm font-medium text-gray-700">Aquaculture</span>
-        </div>
-        
-        <div class="text-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 cursor-pointer transition-colors">
-            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-microchip text-white"></i>
-            </div>
-            <span class="text-sm font-medium text-gray-700">AgriTech</span>
-        </div>
+        <span style="font-weight: 600; color: var(--text-primary);">Livestock</span>
     </div>
+</div>
 
-    <!-- Popular Communities -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Popular Communities</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Community cards will be loaded here -->
-            <div class="bg-white rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-seedling text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Rice Farmers United</h3>
-                            <p class="text-sm text-gray-500">2,156 members</p>
-                        </div>
+<!-- Popular Communities -->
+<div>
+    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-xl);">Popular Communities</h2>
+    <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+        <!-- Community cards -->
+        <div class="card">
+            <div style="display: flex; align-items: start; justify-content: between; margin-bottom: var(--spacing-lg);">
+                <div style="display: flex; align-items: center; gap: var(--spacing-lg); flex: 1;">
+                    <div style="width: 48px; height: 48px; background: var(--terra-green); border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="wheat" style="width: 24px; height: 24px; color: white;"></i>
                     </div>
-                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                        Join
-                    </button>
+                    <div>
+                        <h3 style="font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-xs);">Rice Farmers United</h3>
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">2,156 members</p>
+                    </div>
                 </div>
-                <p class="text-gray-600 text-sm mb-4">Share rice cultivation tips, discuss varieties, market prices, and seasonal challenges</p>
-                <div class="flex items-center text-sm text-gray-500">
-                    <i class="fas fa-map-marker-alt mr-1"></i>
+                <button class="btn btn-primary" style="padding: var(--spacing-sm) var(--spacing-lg);">
+                    Join
+                </button>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: var(--spacing-lg);">Share rice cultivation tips, discuss varieties, market prices, and seasonal challenges</p>
+            <div style="display: flex; align-items: center; gap: var(--spacing-lg); font-size: 0.75rem; color: var(--text-muted);">
+                <div style="display: flex; align-items: center; gap: var(--spacing-xs);">
+                    <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
                     <span>Dhaka, Rangpur</span>
-                    <span class="mx-2">•</span>
-                    <i class="fas fa-comments mr-1"></i>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--spacing-xs);">
+                    <i data-lucide="message-circle" style="width: 14px; height: 14px;"></i>
                     <span>45 posts today</span>
                 </div>
             </div>
+        </div>
 
             <div class="bg-white rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow">
                 <div class="flex items-start justify-between mb-4">
@@ -236,4 +223,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+</div>
 {% endblock %}
