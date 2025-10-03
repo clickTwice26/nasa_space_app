@@ -155,29 +155,26 @@ class CommunityService:
     def get_community_feed(user_id, community_id=None, post_type=None, limit=20, offset=0):
         """Get community feed posts"""
         try:
-            # Get user's communities if no specific community
+            # Build query - show all public posts regardless of membership
             if community_id:
-                community_ids = [community_id]
-            else:
-                user_communities = db.session.query(CommunityMember.community_id).filter(
+                # If specific community requested, show only that community's posts
+                query = CommunityPost.query.filter(
                     and_(
-                        CommunityMember.user_id == user_id,
-                        CommunityMember.is_active == True
+                        CommunityPost.community_id == community_id,
+                        CommunityPost.is_active == True,
+                        CommunityPost.is_approved == True
                     )
-                ).all()
-                community_ids = [c[0] for c in user_communities]
-            
-            if not community_ids:
-                return []
-            
-            # Build query
-            query = CommunityPost.query.filter(
-                and_(
-                    CommunityPost.community_id.in_(community_ids),
-                    CommunityPost.is_active == True,
-                    CommunityPost.is_approved == True
                 )
-            )
+            else:
+                # Show all public posts from all communities
+                query = CommunityPost.query.join(Community).filter(
+                    and_(
+                        Community.is_public == True,
+                        Community.is_active == True,
+                        CommunityPost.is_active == True,
+                        CommunityPost.is_approved == True
+                    )
+                )
             
             # Filter by post type if specified
             if post_type and post_type != 'all':

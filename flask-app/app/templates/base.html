@@ -10,6 +10,9 @@
     <!-- TerraPulse Global CSS -->
     <link rel="stylesheet" href="/static/css/terrapulse.css">
     
+    <!-- Beautiful Loading Animations -->
+    <link rel="stylesheet" href="/static/css/loading-animations.css">
+    
     <!-- Leaflet CSS for interactive maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -702,7 +705,7 @@
         <!-- Bottom Navigation (hidden if not authenticated) -->
         {% if user %}
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 z-40 shadow-lg" id="bottom-nav">
-            <div class="grid grid-cols-5 h-16" id="nav-grid">
+            <div class="grid grid-cols-6 h-16" id="nav-grid">
                 <a href="/dashboard" class="nav-item nav-light {% if request.endpoint == 'main.dashboard' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="home" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Dashboard</span>
@@ -710,6 +713,10 @@
                 <a href="/predictions" class="nav-item nav-light {% if request.endpoint == 'main.predictions' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 farming-feature text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="trending-up" class="w-5 h-5"></i>
                     <span class="text-xs font-medium">Predict</span>
+                </a>
+                <a href="/ml-dashboard" class="nav-item nav-light {% if request.endpoint == 'ml_routes.ml_dashboard' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
+                    <i data-lucide="brain" class="w-5 h-5"></i>
+                    <span class="text-xs font-medium">ML Hub</span>
                 </a>
                 <a href="/data" class="nav-item nav-light {% if request.endpoint == 'main.data_page' %}nav-item-active{% endif %} flex flex-col items-center justify-center space-y-1 text-gray-700 hover:text-terra-green transition-colors">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
@@ -804,6 +811,12 @@
     <!-- Leaflet JavaScript for interactive maps -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Beautiful Loading Animations System -->
+    <script src="/static/js/loading-animations.js"></script>
+    
+    <!-- Main JavaScript -->
+    <script src="/static/js/main.js"></script>
     
     {% block scripts %}{% endblock %}
 </body>

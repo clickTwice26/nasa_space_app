@@ -1,0 +1,18 @@
+Dataset Summary
+===============
+Shape: (41, 49)
+Date range: 2011-01-10 00:00:00 to 2011-02-19 00:00:00
+Columns: ['date', 'year', 'month', 'day', 'day_of_year', 'week_of_year', 'quarter', 'is_weekend', 'season', 'month_sin', 'month_cos', 'day_sin', 'day_cos', 'global_mean_precip', 'global_max_precip', 'global_min_precip', 'global_std_precip', 'global_total_precip', 'global_precip_coverage', 'global_heavy_rain_coverage', 'global_p25_precip', 'global_p50_precip', 'global_p75_precip', 'global_p90_precip', 'global_p95_precip', 'usa_mean_precip', 'usa_max_precip', 'usa_min_precip', 'usa_std_precip', 'usa_total_precip', 'usa_precip_coverage', 'usa_heavy_rain_coverage', 'usa_p25_precip', 'usa_p50_precip', 'usa_p75_precip', 'usa_p90_precip', 'usa_p95_precip', 'global_mean_precip_lag_1', 'global_mean_precip_lag_3', 'usa_mean_precip_lag_1', 'usa_mean_precip_lag_3', 'global_mean_precip_rolling_mean_7', 'global_mean_precip_rolling_std_7', 'global_mean_precip_rolling_max_7', 'global_mean_precip_rolling_min_7', 'usa_mean_precip_rolling_mean_7', 'usa_mean_precip_rolling_std_7', 'usa_mean_precip_rolling_max_7', 'usa_mean_precip_rolling_min_7']
+
+Basic Statistics:
+                      date    year      month  ...  usa_mean_precip_rolling_std_7  usa_mean_precip_rolling_max_7  usa_mean_precip_rolling_min_7
+count                   41    41.0  41.000000  ...                      41.000000                      41.000000                      41.000000
+mean   2011-01-30 00:00:00  2011.0   1.463415  ...                       1.084367                       3.519448                       0.582675
+min    2011-01-10 00:00:00  2011.0   1.000000  ...                       0.315205                       1.111053                       0.248236
+25%    2011-01-20 00:00:00  2011.0   1.000000  ...                       0.741153                       2.559344                       0.308617
+50%    2011-01-30 00:00:00  2011.0   1.000000  ...                       1.173112                       3.980892                       0.527145
+75%    2011-02-09 00:00:00  2011.0   2.000000  ...                       1.380098                       4.242164                       0.801010
+max    2011-02-19 00:00:00  2011.0   2.000000  ...                       1.897910                       5.063276                       1.245247
+std                    NaN     0.0   0.504854  ...                       0.425215                       1.097326                       0.291493
+
+[8 rows x 49 columns]

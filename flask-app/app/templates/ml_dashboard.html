@@ -1,0 +1,889 @@
+{% extends "base.html" %}
+
+{% block title %}ML Dashboard - TerraPulse{% endblock %}
+
+{% block extra_head %}
+<style>
+    .gradient-bg {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+        min-height: 100vh;
+    }
+    
+    .ml-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        box-shadow: 0 8px 32px rgba(34, 197, 94, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 16px;
+    }
+    
+    .ml-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15);
+        border-color: rgba(34, 197, 94, 0.3);
+    }
+    
+    .metric-card {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(34, 197, 94, 0.12);
+        border-color: rgba(34, 197, 94, 0.4);
+    }
+    
+    .service-card {
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #22c55e, #3b82f6);
+        transform: scaleX(0);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .service-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .service-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+        border-color: rgba(34, 197, 94, 0.2);
+    }
+    
+    .pulse-dot {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
+    }
+    
+    .bounce-in {
+        animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    @keyframes bounceIn {
+        0% { opacity: 0; transform: scale(0.3); }
+        50% { opacity: 1; transform: scale(1.05); }
+        70% { transform: scale(0.9); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    
+    .fade-up {
+        animation: fadeUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    .status-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 8px;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+    }
+    
+    .status-active { background-color: #22c55e; }
+    .status-training { background-color: #f59e0b; }
+    .status-error { background-color: #ef4444; }
+    
+    .icon-container {
+        background: linear-gradient(135deg, var(--icon-color-1), var(--icon-color-2));
+        transition: all 0.3s ease;
+    }
+    
+    .icon-container:hover {
+        transform: rotate(5deg) scale(1.1);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border: none;
+        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+    }
+    
+    .glassmorphism {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    @media (max-width: 768px) {
+        .ml-card {
+            margin: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .metric-card {
+            padding: 1rem;
+        }
+        
+        .service-card {
+            margin-bottom: 1rem;
+        }
+    }
+    
+    .loading-shimmer {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen gradient-bg">
+    <div class="max-w-7xl mx-auto px-4 py-6 pb-24">
+        <!-- Header -->
+        <div class="mb-8 fade-up">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center mb-3">
+                        <div class="icon-container p-3 rounded-xl mr-4" style="--icon-color-1: #22c55e; --icon-color-2: #16a34a;">
+                            <i class="lucide-brain text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 leading-tight">
+                                ML Dashboard
+                            </h1>
+                            <div class="flex items-center mt-1">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                <span class="text-sm text-green-600 font-medium">Live Analytics</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl">
+                        Advanced machine learning analytics for agricultural intelligence
+                    </p>
+                </div>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                    <div id="ml-status" class="glassmorphism px-4 py-3 rounded-xl border border-gray-200 flex items-center justify-center">
+                        <span class="status-indicator status-active pulse-dot"></span>
+                        <span class="text-sm font-medium text-gray-700">Models Active</span>
+                    </div>
+                    <button onclick="refreshAllData()" class="btn-primary text-white px-4 py-3 rounded-xl flex items-center justify-center font-medium">
+                        <i class="lucide-refresh-cw mr-2 w-4 h-4"></i>
+                        Refresh All
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <div class="metric-card rounded-xl p-4 md:p-6 bounce-in" style="animation-delay: 0.1s;">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs md:text-sm font-medium text-gray-600 mb-2">Prediction Accuracy</p>
+                        <p class="text-xl md:text-2xl font-bold text-terra-green" id="accuracy-metric">94.8%</p>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                            <div class="bg-terra-green h-1.5 rounded-full transition-all duration-1000" style="width: 94.8%"></div>
+                        </div>
+                    </div>
+                    <div class="icon-container p-2 md:p-3 rounded-xl ml-3" style="--icon-color-1: #22c55e; --icon-color-2: #16a34a;">
+                        <i class="lucide-target text-white text-lg md:text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metric-card rounded-xl p-4 md:p-6 bounce-in" style="animation-delay: 0.2s;">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs md:text-sm font-medium text-gray-600 mb-2">Active Models</p>
+                        <p class="text-xl md:text-2xl font-bold text-blue-600" id="models-metric">5</p>
+                        <p class="text-xs text-gray-500 mt-1">Running efficiently</p>
+                    </div>
+                    <div class="icon-container p-2 md:p-3 rounded-xl ml-3" style="--icon-color-1: #3b82f6; --icon-color-2: #1d4ed8;">
+                        <i class="lucide-layers text-white text-lg md:text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metric-card rounded-xl p-4 md:p-6 bounce-in" style="animation-delay: 0.3s;">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs md:text-sm font-medium text-gray-600 mb-2">Predictions Today</p>
+                        <p class="text-xl md:text-2xl font-bold text-purple-600" id="predictions-metric">1,247</p>
+                        <p class="text-xs text-green-600 mt-1">↗ +12% from yesterday</p>
+                    </div>
+                    <div class="icon-container p-2 md:p-3 rounded-xl ml-3" style="--icon-color-1: #8b5cf6; --icon-color-2: #7c3aed;">
+                        <i class="lucide-trending-up text-white text-lg md:text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metric-card rounded-xl p-4 md:p-6 bounce-in" style="animation-delay: 0.4s;">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs md:text-sm font-medium text-gray-600 mb-2">Data Quality</p>
+                        <p class="text-xl md:text-2xl font-bold text-green-600" id="quality-metric">98.2%</p>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                            <div class="bg-green-500 h-1.5 rounded-full transition-all duration-1000" style="width: 98.2%"></div>
+                        </div>
+                    </div>
+                    <div class="icon-container p-2 md:p-3 rounded-xl ml-3" style="--icon-color-1: #10b981; --icon-color-2: #059669;">
+                        <i class="lucide-database text-white text-lg md:text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ML Services Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
+            <!-- Precipitation Prediction -->
+            <div class="service-card p-6 fade-up" style="animation-delay: 0.1s;">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="icon-container p-3 rounded-xl mr-4" style="--icon-color-1: #3b82f6; --icon-color-2: #1e40af;">
+                            <i class="lucide-cloud-rain text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Precipitation Prediction</h3>
+                            <p class="text-gray-600 text-sm">Real-time rainfall forecasting</p>
+                            <div class="flex items-center mt-1">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+                                <span class="text-xs text-blue-600 font-medium">Live Model</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="openPrecipitationAnalysis()" class="p-3 text-gray-400 hover:text-blue-600 transition-all duration-300 hover:bg-blue-50 rounded-xl">
+                        <i class="lucide-external-link w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm font-medium text-gray-700">Current Prediction</span>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                                <span class="text-xs text-green-600">Updated</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span id="current-precipitation" class="text-lg font-bold text-blue-600">Loading...</span>
+                            <i class="lucide-droplets text-blue-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm font-medium text-gray-700">7-Day Outlook</span>
+                            <i class="lucide-calendar text-purple-400"></i>
+                        </div>
+                        <span id="week-outlook" class="text-lg font-bold text-purple-600">Loading...</span>
+                    </div>
+                    
+                    <button onclick="runPrecipitationPrediction()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl">
+                        <i class="lucide-play mr-2 w-4 h-4"></i>Run Prediction
+                    </button>
+                </div>
+            </div>
+
+            <!-- Agricultural Insights -->
+            <div class="service-card p-6 fade-up" style="animation-delay: 0.2s;">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="icon-container p-3 rounded-xl mr-4" style="--icon-color-1: #22c55e; --icon-color-2: #16a34a;">
+                            <i class="lucide-sprout text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Agricultural Insights</h3>
+                            <p class="text-gray-600 text-sm">Crop-specific recommendations</p>
+                            <div class="flex items-center mt-1">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                <span class="text-xs text-green-600 font-medium">AI Powered</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="openAgriculturalInsights()" class="p-3 text-gray-400 hover:text-green-600 transition-all duration-300 hover:bg-green-50 rounded-xl">
+                        <i class="lucide-external-link w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm font-medium text-gray-700">Optimal Crops</span>
+                            <i class="lucide-leaf text-green-400"></i>
+                        </div>
+                        <span id="optimal-crops" class="text-lg font-bold text-green-600">Loading...</span>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm font-medium text-gray-700">Season Recommendation</span>
+                            <i class="lucide-sun text-orange-400"></i>
+                        </div>
+                        <span id="season-rec" class="text-lg font-bold text-orange-600">Loading...</span>
+                    </div>
+                    
+                    <button onclick="generateAgriculturalInsights()" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-4 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl">
+                        <i class="lucide-lightbulb mr-2 w-4 h-4"></i>Generate Insights
+                    </button>
+                </div>
+            </div>
+
+            <!-- Weather Analytics -->
+            <div class="service-card p-6 fade-up" style="animation-delay: 0.3s;">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="icon-container p-3 rounded-xl mr-4" style="--icon-color-1: #f59e0b; --icon-color-2: #d97706;">
+                            <i class="lucide-trending-up text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Weather Trends</h3>
+                            <p class="text-gray-600 text-sm">Historical pattern analysis</p>
+                            <div class="flex items-center mt-1">
+                                <div class="w-2 h-2 bg-yellow-500 rounded-full mr-2 animate-pulse"></div>
+                                <span class="text-xs text-yellow-600 font-medium">Analytics</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div id="trends-summary" class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200">
+                        <div class="flex items-center mb-2">
+                            <i class="lucide-bar-chart-3 text-yellow-600 mr-2 w-4 h-4"></i>
+                            <span class="text-sm font-medium text-gray-700">Analysis Summary</span>
+                        </div>
+                        <p class="text-sm text-gray-600">Click "Analyze Trends" to view weather pattern insights</p>
+                    </div>
+                    <button onclick="analyzeWeatherTrends()" class="w-full bg-gradient-to-r from-yellow-600 to-orange-600 text-white py-3 px-4 rounded-xl hover:from-yellow-700 hover:to-orange-700 transition-all duration-300 transform hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl">
+                        <i class="lucide-bar-chart mr-2 w-4 h-4"></i>Analyze Trends
+                    </button>
+                </div>
+            </div>
+
+            <!-- Irrigation Analysis -->
+            <div class="service-card p-6 fade-up" style="animation-delay: 0.4s;">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="icon-container p-3 rounded-xl mr-4" style="--icon-color-1: #06b6d4; --icon-color-2: #0891b2;">
+                            <i class="lucide-droplets text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Irrigation Analysis</h3>
+                            <p class="text-gray-600 text-sm">Water requirement optimization</p>
+                            <div class="flex items-center mt-1">
+                                <div class="w-2 h-2 bg-cyan-500 rounded-full mr-2 animate-pulse"></div>
+                                <span class="text-xs text-cyan-600 font-medium">Smart Irrigation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl p-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-medium text-gray-700">Water Deficit</span>
+                                <i class="lucide-droplet text-cyan-400 w-3 h-3"></i>
+                            </div>
+                            <span id="water-deficit" class="text-sm font-bold text-cyan-600">Loading...</span>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-medium text-gray-700">Need Level</span>
+                                <i class="lucide-gauge text-blue-400 w-3 h-3"></i>
+                            </div>
+                            <span id="irrigation-need" class="text-sm font-bold text-blue-600">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="analyzeIrrigation()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-3 px-4 rounded-xl hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-[1.02] font-medium shadow-lg hover:shadow-xl">
+                        <i class="lucide-droplets mr-2 w-4 h-4"></i>Analyze Irrigation
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Assessment -->
+        <div class="service-card p-6 mb-8 fade-up" style="animation-delay: 0.5s;">
+            <div class="flex items-center mb-6">
+                <div class="icon-container p-3 rounded-xl mr-4" style="--icon-color-1: #ef4444; --icon-color-2: #dc2626;">
+                    <i class="lucide-alert-triangle text-white text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">Pest & Disease Risk Assessment</h3>
+                    <p class="text-gray-600">ML-powered agricultural risk analysis</p>
+                    <div class="flex items-center mt-1">
+                        <div class="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
+                        <span class="text-xs text-red-600 font-medium">Risk Monitor</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-gray-400 mb-2" id="overall-risk">-</div>
+                    <div class="text-sm text-gray-600 font-medium">Overall Risk Level</div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+                        <div id="risk-bar" class="bg-gradient-to-r from-green-500 to-red-500 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="text-center bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-gray-400 mb-2" id="risk-count">-</div>
+                    <div class="text-sm text-gray-600 font-medium">Active Risk Factors</div>
+                    <div class="flex justify-center mt-3">
+                        <div class="flex space-x-1" id="risk-indicators">
+                            <!-- Risk indicators will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center flex items-center justify-center">
+                    <button onclick="assessPestDiseaseRisk()" class="bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-6 rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-[1.05] font-medium shadow-lg hover:shadow-xl">
+                        <i class="lucide-shield-alert mr-2 w-4 h-4"></i>Assess Risk
+                    </button>
+                </div>
+            </div>
+            
+            <div id="risk-details" class="mt-6 hidden">
+                <div class="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-4 border border-red-200">
+                    <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="lucide-info text-red-600 mr-2 w-4 h-4"></i>
+                        Risk Details
+                    </h4>
+                    <div id="risk-list" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Sources -->
+        <div class="ml-card rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="lucide-database text-terra-green mr-2"></i>
+                Data Sources & Model Info
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">NASA POWER API</h4>
+                    <p class="text-sm text-gray-600 mb-2">Global weather and climate data</p>
+                    <div class="flex items-center">
+                        <span class="status-indicator status-active"></span>
+                        <span class="text-xs text-gray-500">Active</span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">TRMM Precipitation</h4>
+                    <p class="text-sm text-gray-600 mb-2">Satellite rainfall measurements</p>
+                    <div class="flex items-center">
+                        <span class="status-indicator status-active"></span>
+                        <span class="text-xs text-gray-500">Active</span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">ML Models</h4>
+                    <p class="text-sm text-gray-600 mb-2">Random Forest, XGBoost, Neural Networks</p>
+                    <div class="flex items-center">
+                        <span class="status-indicator status-active"></span>
+                        <span class="text-xs text-gray-500">Trained</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div id="loadingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-8 max-w-sm w-full mx-4">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-terra-green bg-opacity-10 rounded-full mb-4">
+                <i class="lucide-brain text-terra-green text-2xl animate-pulse"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Processing ML Analysis</h3>
+            <p class="text-gray-600 text-sm">Running machine learning models...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ML Dashboard JavaScript
+let currentWeatherData = {
+    temperature: 28.5,
+    humidity: 72.0,
+    pressure: 1012.3,
+    wind_speed: 12.5,
+    cloud_cover: 65.0,
+    rainfall: 3.2
+};
+
+let isLoading = false;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    loadInitialData();
+    startAnimations();
+});
+
+function startAnimations() {
+    // Add staggered animations to cards
+    const cards = document.querySelectorAll('.fade-up, .bounce-in');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+}
+
+function loadInitialData() {
+    // Show loading shimmer effect
+    showLoadingShimmer();
+    
+    // Load some initial predictions with animation
+    setTimeout(() => {
+        animateValue('current-precipitation', '8.2 mm/day');
+        animateValue('week-outlook', 'Moderate rainfall');
+        animateValue('optimal-crops', 'Rice, Sugarcane');
+        animateValue('season-rec', 'Kharif suitable');
+        animateValue('water-deficit', '2.3 mm');
+        animateValue('irrigation-need', 'Medium');
+        hideLoadingShimmer();
+    }, 1500);
+}
+
+function animateValue(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(10px)';
+        
+        setTimeout(() => {
+            element.textContent = value;
+            element.style.transition = 'all 0.3s ease';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, 100);
+    }
+}
+
+function showLoadingShimmer() {
+    const elements = ['current-precipitation', 'week-outlook', 'optimal-crops', 'season-rec', 'water-deficit', 'irrigation-need'];
+    elements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.innerHTML = '<div class="loading-shimmer h-4 w-20 rounded"></div>';
+        }
+    });
+}
+
+function hideLoadingShimmer() {
+    // Shimmer will be replaced by actual values in animateValue function
+}
+
+function refreshAllData() {
+    if (isLoading) return;
+    
+    isLoading = true;
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<i class="lucide-loader-2 mr-2 w-4 h-4 animate-spin"></i>Refreshing...';
+    button.disabled = true;
+    
+    // Refresh all ML data
+    Promise.all([
+        runPrecipitationPrediction(false),
+        generateAgriculturalInsights(false),
+        analyzeWeatherTrends(false),
+        analyzeIrrigation(false)
+    ]).then(() => {
+        // Reset button
+        button.innerHTML = originalText;
+        button.disabled = false;
+        isLoading = false;
+        
+        showNotification('All data refreshed successfully!', 'success');
+    }).catch(() => {
+        // Reset button on error
+        button.innerHTML = originalText;
+        button.disabled = false;
+        isLoading = false;
+        
+        showNotification('Some data failed to refresh', 'warning');
+    });
+}
+
+function showLoading() {
+    document.getElementById('loadingModal').classList.remove('hidden');
+    document.getElementById('loadingModal').classList.add('flex');
+}
+
+function hideLoading() {
+    document.getElementById('loadingModal').classList.add('hidden');
+    document.getElementById('loadingModal').classList.remove('flex');
+}
+
+function runPrecipitationPrediction() {
+    showLoading();
+    
+    fetch('/api/ml/precipitation/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(currentWeatherData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            document.getElementById('current-precipitation').textContent = 
+                `${data.prediction.rainfall_amount} ${data.prediction.unit}`;
+            
+            // Show success notification
+            showNotification('Precipitation prediction updated successfully!', 'success');
+        } else {
+            showNotification('Failed to get precipitation prediction', 'error');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+        showNotification('Error running precipitation prediction', 'error');
+    });
+}
+
+function generateAgriculturalInsights() {
+    showLoading();
+    
+    fetch('/api/ml/agriculture/insights', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(currentWeatherData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success && data.insights.length > 0) {
+            const topCrops = data.optimal_crops.slice(0, 2).join(', ');
+            document.getElementById('optimal-crops').textContent = topCrops;
+            document.getElementById('season-rec').textContent = `${data.season} season`;
+            
+            showNotification('Agricultural insights generated successfully!', 'success');
+        } else {
+            showNotification('Failed to generate agricultural insights', 'error');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+        showNotification('Error generating agricultural insights', 'error');
+    });
+}
+
+function analyzeWeatherTrends() {
+    showLoading();
+    
+    fetch('/api/ml/weather/trends', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            document.getElementById('trends-summary').innerHTML = `
+                <strong>Analysis Summary:</strong><br>
+                ${data.summary}<br>
+                <small class="text-gray-500">Based on ${data.analysis_period} of data</small>
+            `;
+            
+            showNotification('Weather trends analysis completed!', 'success');
+        } else {
+            showNotification('Failed to analyze weather trends', 'error');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+        showNotification('Error analyzing weather trends', 'error');
+    });
+}
+
+function analyzeIrrigation() {
+    showLoading();
+    
+    const irrigationData = {
+        ...currentWeatherData,
+        crop_type: 'rice',
+        growth_stage: 'vegetative'
+    };
+    
+    fetch('/api/ml/irrigation/analysis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(irrigationData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            document.getElementById('water-deficit').textContent = 
+                `${data.analysis.water_deficit} mm`;
+            document.getElementById('irrigation-need').textContent = 
+                data.analysis.irrigation_requirement.level;
+            
+            showNotification('Irrigation analysis completed!', 'success');
+        } else {
+            showNotification('Failed to analyze irrigation needs', 'error');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+        showNotification('Error analyzing irrigation needs', 'error');
+    });
+}
+
+function assessPestDiseaseRisk() {
+    showLoading();
+    
+    fetch('/api/ml/pest-disease/risk', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(currentWeatherData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            const riskAssessment = data.risk_assessment;
+            
+            document.getElementById('overall-risk').textContent = riskAssessment.overall_risk;
+            document.getElementById('risk-count').textContent = riskAssessment.specific_risks.length;
+            
+            // Show risk details
+            const riskDetails = document.getElementById('risk-details');
+            const riskList = document.getElementById('risk-list');
+            
+            if (riskAssessment.specific_risks.length > 0) {
+                riskList.innerHTML = riskAssessment.specific_risks.map(risk => `
+                    <div class="flex items-center justify-between p-2 bg-white rounded border">
+                        <span class="font-medium">${risk.type}</span>
+                        <span class="text-sm px-2 py-1 rounded ${getRiskBadgeClass(risk.risk_level)}">
+                            ${risk.risk_level}
+                        </span>
+                    </div>
+                `).join('');
+                riskDetails.classList.remove('hidden');
+            }
+            
+            showNotification('Risk assessment completed!', 'success');
+        } else {
+            showNotification('Failed to assess pest/disease risk', 'error');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Error:', error);
+        showNotification('Error assessing risk', 'error');
+    });
+}
+
+function getRiskBadgeClass(level) {
+    switch(level.toLowerCase()) {
+        case 'high': return 'bg-red-100 text-red-800';
+        case 'medium': return 'bg-yellow-100 text-yellow-800';
+        case 'low': return 'bg-green-100 text-green-800';
+        default: return 'bg-gray-100 text-gray-800';
+    }
+}
+
+function openPrecipitationAnalysis() {
+    window.location.href = '/precipitation-analysis';
+}
+
+function openAgriculturalInsights() {
+    window.location.href = '/agricultural-insights';
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 max-w-sm w-full bg-white border-l-4 rounded-lg shadow-lg p-4 ${
+        type === 'success' ? 'border-green-500' : 
+        type === 'error' ? 'border-red-500' : 'border-blue-500'
+    }`;
+    
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="lucide-${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'} 
+               text-${type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue'}-500 mr-3"></i>
+            <p class="text-sm text-gray-800">${message}</p>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

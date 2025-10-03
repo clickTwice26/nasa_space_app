@@ -1,10 +1,10 @@
-// Data Explorer page JavaScript
+// Enhanced Data Explorer with Beautiful Loading Animations
 
 let currentPage = 1;
 let currentFilters = {};
 let weatherData = null;
 
-// NASA POWER Weather Data Functions
+// NASA POWER Weather Data Functions with Loading Animations
 async function fetchWeatherData() {
     const lat = document.getElementById('weather-lat').value;
     const lon = document.getElementById('weather-lon').value;
@@ -12,7 +12,7 @@ async function fetchWeatherData() {
     const endDate = document.getElementById('weather-end').value;
     
     if (!lat || !lon || !startDate || !endDate) {
-        showError('Please fill in all location and date fields', 'weather-data-container');
+        showNotification('Please fill in all location and date fields', 'warning');
         return;
     }
     
@@ -21,33 +21,39 @@ async function fetchWeatherData() {
     const end = endDate.replace(/-/g, '');
     
     const container = document.getElementById('weather-data-container');
-    container.innerHTML = `
-        <div class="text-center py-8">
-            <div class="spinner-border text-terra-green mx-auto mb-3"></div>
-            <p class="text-gray-600">Fetching NASA POWER weather data...</p>
-        </div>
-    `;
     
     try {
-        const response = await fetch(`/api/power-data?lat=${lat}&lon=${lon}&start=${start}&end=${end}`);
-        const data = await response.json();
+        const data = await apiCallWithLoading(
+            container,
+            `/api/power-data?lat=${lat}&lon=${lon}&start=${start}&end=${end}`,
+            {},
+            'Fetching NASA POWER weather data'
+        );
         
         if (data.success) {
             weatherData = data;
             displayWeatherData(data);
             displayWeatherStats(data);
-            showSuccess(`Loaded ${data.data.length} days of weather data`, 'weather-data-container');
+            showNotification(`Loaded ${data.data.length} days of weather data successfully!`, 'success');
         } else {
             throw new Error(data.error || 'Failed to fetch weather data');
         }
     } catch (error) {
-        showError(`Failed to fetch weather data: ${error.message}`, 'weather-data-container');
+        console.error('Weather data fetch error:', error);
+        showNotification(`Failed to fetch weather data: ${error.message}`, 'error');
+        
         container.innerHTML = `
             <div class="text-center py-8 text-red-600">
                 <i data-lucide="alert-circle" class="w-12 h-12 mx-auto mb-2"></i>
                 <p>Error: ${error.message}</p>
                 <button onclick="fetchWeatherData()" class="mt-3 btn-terra-primary text-sm">
+                    <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
                     Try Again
+                </button>
+            </div>
+        `;
+    }
+}
                 </button>
             </div>
         `;

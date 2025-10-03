@@ -105,6 +105,16 @@
         
         <div class="grid grid-cols-2 gap-3" id="weatherInsights">
             <!-- Weather insights will be populated automatically -->
+            <div class="p-3 bg-blue-50 rounded-lg border border-blue-200 text-center">
+                <button onclick="demoLoadingAnimation(this)" class="w-full text-sm font-medium text-blue-700 hover:text-blue-800 transition-colors">
+                    🌡️ Demo Loading
+                </button>
+            </div>
+            <div class="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
+                <button onclick="demoAPICall(this)" class="w-full text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
+                    🌍 Demo API Call
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1107,6 +1117,40 @@ function getActivityRiskColor(risk) {
         high: 'text-red-600'
     };
     return colors[risk] || colors.medium;
+}
+
+// Demo functions for loading animations
+function demoLoadingAnimation(button) {
+    const card = button.closest('.card');
+    
+    // Show loading animation for 2 seconds
+    showLoading(card, 'Loading weather data');
+    
+    setTimeout(() => {
+        hideLoading(card);
+        showNotification('Loading animation demo completed!', 'success');
+    }, 2000);
+}
+
+async function demoAPICall(button) {
+    const card = button.closest('.card');
+    
+    try {
+        // Simulate API call with beautiful loading
+        const result = await apiCallWithLoading(
+            card,
+            '/api/health', // Using existing health endpoint
+            {},
+            'Fetching demo data'
+        );
+        
+        showNotification('API call demo completed!', 'success');
+        console.log('Demo API result:', result);
+        
+    } catch (error) {
+        showNotification('API call demo failed', 'error');
+        console.error('Demo API error:', error);
+    }
 }
 
 function loadDemoForecast() {

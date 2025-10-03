@@ -16,16 +16,16 @@ def create_sample_users():
     print("Creating sample users...")
     
     users_data = [
-        {"full_name": "রহিম উদ্দিন", "email": "rahim@example.com", "district": "কুমিল্লা", "primary_crop": "ধান"},
-        {"full_name": "ফাতেমা খাতুন", "email": "fatema@example.com", "district": "রংপুর", "primary_crop": "আলু"},
-        {"full_name": "আবদুল করিম", "email": "karim@example.com", "district": "বরিশাল", "primary_crop": "পাট"},
-        {"full_name": "রাশিদা বেগম", "email": "rashida@example.com", "district": "সিলেট", "primary_crop": "চা"},
-        {"full_name": "মোহাম্মদ আলী", "email": "ali@example.com", "district": "দিনাজপুর", "primary_crop": "ভুট্টা"},
-        {"full_name": "সালমা আক্তার", "email": "salma@example.com", "district": "যশোর", "primary_crop": "সরিষা"},
-        {"full_name": "নাজমুল হক", "email": "nazmul@example.com", "district": "নোয়াখালী", "primary_crop": "তুলা"},
-        {"full_name": "রোকেয়া খাতুন", "email": "rokeya@example.com", "district": "পাবনা", "primary_crop": "ধান"},
-        {"full_name": "আনোয়ার হোসেন", "email": "anowar@example.com", "district": "ফরিদপুর", "primary_crop": "পেঁয়াজ"},
-        {"full_name": "নাসরিন সুলতানা", "email": "nasrin@example.com", "district": "টাঙ্গাইল", "primary_crop": "টমেটো"}
+        {"full_name": "রহিম উদ্দিন", "email": "rahim@example.com", "username": "rahim_uddin", "district": "কুমিল্লা", "primary_crop": "ধান"},
+        {"full_name": "ফাতেমা খাতুন", "email": "fatema@example.com", "username": "fatema_khatun", "district": "রংপুর", "primary_crop": "আলু"},
+        {"full_name": "আবদুল করিম", "email": "karim@example.com", "username": "abdul_karim", "district": "বরিশাল", "primary_crop": "পাট"},
+        {"full_name": "রাশিদা বেগম", "email": "rashida@example.com", "username": "rashida_begum", "district": "সিলেট", "primary_crop": "চা"},
+        {"full_name": "মোহাম্মদ আলী", "email": "ali@example.com", "username": "mohammad_ali", "district": "দিনাজপুর", "primary_crop": "ভুট্টা"},
+        {"full_name": "সালমা আক্তার", "email": "salma@example.com", "username": "salma_akter", "district": "যশোর", "primary_crop": "সরিষা"},
+        {"full_name": "নাজমুল হক", "email": "nazmul@example.com", "username": "nazmul_hoque", "district": "নোয়াখালী", "primary_crop": "তুলা"},
+        {"full_name": "রোকেয়া খাতুন", "email": "rokeya@example.com", "username": "rokeya_khatun", "district": "পাবনা", "primary_crop": "ধান"},
+        {"full_name": "আনোয়ার হোসেন", "email": "anowar@example.com", "username": "anowar_hossain", "district": "ফরিদপুর", "primary_crop": "পেঁয়াজ"},
+        {"full_name": "নাসরিন সুলতানা", "email": "nasrin@example.com", "username": "nasrin_sultana", "district": "টাঙ্গাইল", "primary_crop": "টমেটো"}
     ]
     
     created_users = []
@@ -33,14 +33,13 @@ def create_sample_users():
         existing_user = User.query.filter_by(email=user_data['email']).first()
         if not existing_user:
             user = User(
+                username=user_data['username'],
+                password='demo123',  # Simple password for demo users
                 full_name=user_data['full_name'],
                 email=user_data['email'],
                 district=user_data['district'],
                 primary_crop=user_data['primary_crop'],
-                age=random.randint(25, 65),
                 farm_size=random.randint(1, 50),
-                farming_experience=random.randint(5, 40),
-                phone_number=f"01{random.randint(700000000, 999999999)}",
                 onboarding_completed=True
             )
             created_users.append(user)
@@ -58,6 +57,14 @@ def create_sample_users():
 def create_sample_communities():
     """Create sample communities"""
     print("Creating sample communities...")
+    
+    # Get a user to be the creator
+    users = User.query.all()
+    if not users:
+        print("No users available to create communities")
+        return []
+    
+    creator = users[0]  # Use first user as creator
     
     communities_data = [
         {
@@ -100,6 +107,7 @@ def create_sample_communities():
                 category=comm_data['category'],
                 district=comm_data['district'],
                 location=comm_data['location'],
+                created_by=creator.id,
                 is_public=True,
                 is_active=True,
                 member_count=random.randint(50, 500)
@@ -260,20 +268,6 @@ def create_bangla_posts():
             "type": "success",
             "category": "ধান",
             "tags": ["মিশ্র-চাষ", "মাছ-ধান", "অতিরিক্ত-আয়"]
-        },
-        {
-            "title": "পোল্ট্রি খামারে জৈব সার উৎপাদন",
-            "content": "মুরগির খামার থেকে যে বর্জ্য বের হয় তা দিয়ে চমৎকার জৈব সার তৈরি করছি। ভার্মি কম্পোস্ট পদ্ধতি ব্যবহার করি। এক মাসেই প্রস্তুত হয়ে যায়। নিজের জমিতে ব্যবহার করি, বিক্রিও করি। 🐔🌱",
-            "type": "tip",
-            "category": "জৈব",
-            "tags": ["পোল্ট্রি", "বর্জ্য-ব্যবস্থাপনা", "ভার্মি-কম্পোস্ট"]
-        },
-        {
-            "title": "আম বাগানে আন্তঃফসল চাষ",
-            "content": "আমের বাগানে খালি জায়গায় হলুদ ও আদা চাষ করছি। আমের গাছের ছায়ায় এগুলো ভালো হয়। অতিরিক্ত আয়ের সুযোগ তৈরি হয়েছে। জমির সর্বোচ্চ ব্যবহার করতে পারছি। 🥭🧅",
-            "type": "tip",
-            "category": "সবজি",
-            "tags": ["আন্তঃফসল", "বাগান-চাষ", "সর্বোচ্চ-ব্যবহার"]
         }
     ]
     
@@ -293,17 +287,17 @@ def create_bangla_posts():
         )
         
         post = CommunityPost(
-            title=post_data['title'],
+            community_id=community.id,
+            user_id=user.id,
             content=post_data['content'],
             post_type=post_data['type'],
-            category=post_data['category'],
-            tags=json.dumps(post_data['tags']),
-            author_id=user.id,
-            community_id=community.id,
+            title=post_data.get('title'),
+            tags=post_data.get('tags'),
+            location=post_data.get('location'),
             is_active=True,
-            like_count=random.randint(5, 150),
-            comment_count=random.randint(0, 35),
-            view_count=random.randint(10, 500),
+            likes_count=random.randint(5, 150),
+            comments_count=random.randint(0, 35),
+            shares_count=random.randint(10, 500),
             created_at=post_time,
             updated_at=post_time
         )
@@ -319,8 +313,7 @@ def create_bangla_posts():
             if liker.id != user.id:  # Don't like own post
                 like = PostLike(
                     post_id=post.id,
-                    user_id=liker.id,
-                    created_at=post_time + timedelta(hours=random.randint(1, 24))
+                    user_id=liker.id
                 )
                 db.session.add(like)
         
@@ -379,268 +372,4 @@ def main():
         print(f"- Comments: {len(PostComment.query.all())}")
 
 if __name__ == "__main__":
-    main()
-        {
-            'name': 'Agricultural Students Forum',
-            'description': 'A platform for agricultural students to discuss research, share knowledge, and network.',
-            'category': 'general',
-            'district': 'Dhaka',
-            'location': 'University Areas'
-        }
-    ]
-    
-    created_communities = []
-    
-    for i, comm_data in enumerate(communities_data):
-        # Select a random user as creator
-        creator = random.choice(users)
-        
-        community = Community(
-            name=comm_data['name'],
-            description=comm_data['description'],
-            category=comm_data['category'],
-            district=comm_data['district'],
-            location=comm_data['location'],
-            created_by=creator.id,
-            is_public=True,
-            requires_approval=False
-        )
-        
-        db.session.add(community)
-        db.session.flush()  # Get the ID
-        
-        # Add creator as admin member
-        admin_member = CommunityMember(
-            community_id=community.id,
-            user_id=creator.id,
-            role='admin'
-        )
-        db.session.add(admin_member)
-        
-        # Add some random members
-        num_members = random.randint(10, 50)
-        member_users = random.sample([u for u in users if u.id != creator.id], 
-                                   min(num_members, len(users) - 1))
-        
-        for user in member_users:
-            member = CommunityMember(
-                community_id=community.id,
-                user_id=user.id,
-                role='member'
-            )
-            db.session.add(member)
-        
-        created_communities.append(community)
-        print(f"Created community: {community.name} with {num_members + 1} members")
-    
-    db.session.commit()
-    return created_communities
-
-def create_sample_posts(communities):
-    """Create sample posts in communities"""
-    print("Creating sample posts...")
-    
-    users = User.query.all()
-    
-    # Sample posts data
-    posts_data = [
-        # Rice farming posts
-        {
-            'content': 'এই মৌসুমে ধানের জমিতে সেচের পরিমাণ কমাতে হবে। বৃষ্টির পানি যতটা সম্ভব সংরক্ষণ করুন। #রাইস #সেচ #পানি_সংরক্ষণ',
-            'post_type': 'text',
-            'category': 'rice'
-        },
-        {
-            'content': 'আমার জমিতে এবার ব্রি ধান-২৯ চাষ করেছি। ফলন খুবই ভালো হয়েছে। প্রতি বিঘায় ২৫ মণ ধান পেয়েছি।',
-            'post_type': 'text',
-            'category': 'rice'
-        },
-        {
-            'title': 'ধানের বাজার দর',
-            'content': 'আজকের বাজার দর: সরু চাল ৪৮ টাকা/কেজি, মোটা চাল ৪২ টাকা/কেজি। কৃষক ভাইরা এখনই বিক্রি করুন।',
-            'post_type': 'market',
-            'market_price': 48.0,
-            'market_unit': 'kg',
-            'market_crop': 'Rice',
-            'market_location': 'Dhaka Wholesale Market',
-            'category': 'rice'
-        },
-        
-        # Weather alerts
-        {
-            'title': 'Heavy Rainfall Alert',
-            'content': 'আগামী ৩ দিন প্রবল বৃষ্টিপাতের সম্ভাবনা। ফসল রক্ষার জন্য প্রয়োজনীয় ব্যবস্থা নিন। জমিতে পানি নিষ্কাশনের ব্যবস্থা করুন।',
-            'post_type': 'alert',
-            'alert_type': 'weather',
-            'alert_severity': 'high',
-            'alert_expires_at': datetime.now(timezone.utc) + timedelta(days=3),
-            'category': 'weather'
-        },
-        {
-            'title': 'Pest Attack Warning',
-            'content': 'গত সপ্তাহে বিভিন্ন এলাকায় পোকার আক্রমণ বেড়েছে। বিশেষ করে ধানের মাজরা পোকা। নিয়মিত জমি পরিদর্শন করুন।',
-            'post_type': 'alert',
-            'alert_type': 'pest',
-            'alert_severity': 'medium',
-            'alert_expires_at': datetime.now(timezone.utc) + timedelta(days=7),
-            'category': 'rice'
-        },
-        
-        # Technology posts
-        {
-            'content': 'ড্রোন ব্যবহার করে ফসলের স্বাস্থ্য পরীক্ষা করা যায়। এটি খুবই কার্যকর প্রযুক্তি। কেউ কি এই বিষয়ে অভিজ্ঞতা শেয়ার করতে পারেন?',
-            'post_type': 'text',
-            'category': 'technology'
-        },
-        {
-            'content': 'মোবাইল অ্যাপ দিয়ে মাটির পিএইচ পরীক্ষা করার নতুন পদ্ধতি দেখেছি। কেউ ব্যবহার করেছেন কি?',
-            'post_type': 'text',
-            'category': 'technology'
-        },
-        
-        # Vegetable farming
-        {
-            'content': 'শীতকালীন সবজি চাষের প্রস্তুতি নিতে হবে। বীজ কেনা শুরু করুন। টমেটো, বাঁধাকপি, ফুলকপির বীজ এখনই কিনুন।',
-            'post_type': 'text',
-            'category': 'vegetables'
-        },
-        {
-            'title': 'Vegetable Market Prices',
-            'content': 'আজকের সবজির দাম: টমেটো ৬০ টাকা/কেজি, আলু ২৮ টাকা/কেজি, পেঁয়াজ ৪৫ টাকা/কেজি',
-            'post_type': 'market',
-            'market_price': 60.0,
-            'market_unit': 'kg',
-            'market_crop': 'Tomato',
-            'market_location': 'Karwan Bazar',
-            'category': 'vegetables'
-        },
-        
-        # Events
-        {
-            'title': 'Agricultural Training Workshop',
-            'content': 'কৃষি বিভাগের পক্ষ থেকে আধুনিক চাষাবাদ পদ্ধতির ওপর প্রশিক্ষণ কর্মশালা। সবাই অংশগ্রহণ করুন।',
-            'post_type': 'event',
-            'event_type': 'training',
-            'event_date': datetime.now(timezone.utc) + timedelta(days=10),
-            'event_location': 'Agricultural Extension Office, Dhaka',
-            'category': 'general'
-        },
-        
-        # Student posts
-        {
-            'content': 'আমি কৃষি বিষয়ে পড়াশুনা করছি। কেউ কি মাটি বিজ্ঞান নিয়ে ভালো কোনো বই সাজেস্ট করতে পারেন?',
-            'post_type': 'text',
-            'category': 'general'
-        }
-    ]
-    
-    created_posts = []
-    
-    for post_data in posts_data:
-        # Find appropriate community
-        category = post_data.pop('category', 'general')
-        community = None
-        
-        for comm in communities:
-            if comm.category == category or category == 'general':
-                community = comm
-                break
-        
-        if not community:
-            community = communities[0]  # Fallback to first community
-        
-        # Get random member of the community
-        members = CommunityMember.query.filter_by(
-            community_id=community.id,
-            is_active=True
-        ).all()
-        
-        if not members:
-            continue
-        
-        author = random.choice(members).user
-        
-        # Create post
-        post = CommunityPost(
-            community_id=community.id,
-            user_id=author.id,
-            **post_data
-        )
-        
-        db.session.add(post)
-        db.session.flush()  # Get the ID
-        
-        # Add some random likes
-        num_likes = random.randint(0, 15)
-        likers = random.sample(members, min(num_likes, len(members)))
-        
-        for member in likers:
-            if member.user_id != author.id:  # Don't like own post
-                like = PostLike(
-                    post_id=post.id,
-                    user_id=member.user_id
-                )
-                db.session.add(like)
-        
-        # Add some random comments
-        num_comments = random.randint(0, 5)
-        commenters = random.sample(members, min(num_comments, len(members)))
-        
-        comment_texts = [
-            'অনেক ভালো পোস্ট! ধন্যবাদ।',
-            'এই তথ্য খুবই কাজের।',
-            'আমারও একই অভিজ্ঞতা।',
-            'চমৎকার শেয়ারিং।',
-            'আরো জানতে চাই এ বিষয়ে।',
-            'সত্যিই খুব উপকারী তথ্য।',
-            'আমি এটা ট্রাই করে দেখব।'
-        ]
-        
-        for member in commenters:
-            comment = PostComment(
-                post_id=post.id,
-                user_id=member.user_id,
-                content=random.choice(comment_texts)
-            )
-            db.session.add(comment)
-        
-        created_posts.append(post)
-        print(f"Created post: {post.title or post.content[:50]}... with {num_likes} likes and {num_comments} comments")
-    
-    db.session.commit()
-    
-    # Update community stats
-    for community in communities:
-        community.update_stats()
-    
-    return created_posts
-
-def main():
-    """Main seeding function"""
-    app = create_app()
-    
-    with app.app_context():
-        print("Starting community data seeding...")
-        
-        # Create communities
-        communities = create_sample_communities()
-        
-        if communities:
-            # Create posts
-            posts = create_sample_posts(communities)
-            
-            print(f"\nSeeding completed successfully!")
-            print(f"Created {len(communities)} communities")
-            print(f"Created {len(posts)} posts")
-            
-            # Print stats
-            total_members = sum(c.member_count for c in communities)
-            total_posts = sum(c.post_count for c in communities)
-            
-            print(f"Total community members: {total_members}")
-            print(f"Total community posts: {total_posts}")
-        else:
-            print("Failed to create communities")
-
-if __name__ == '__main__':
     main()

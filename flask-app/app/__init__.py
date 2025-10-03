@@ -54,6 +54,7 @@ def create_app(config_name='development'):
     from app.routes.auth_routes import auth_bp
     from app.routes.community_routes import community_bp
     from app.routes.risk import risk_bp
+    from app.routes.ml_routes import ml_routes
     
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp, url_prefix='/api')
@@ -61,6 +62,7 @@ def create_app(config_name='development'):
     app.register_blueprint(auth_bp)
     app.register_blueprint(community_bp)
     app.register_blueprint(risk_bp, url_prefix='/api')
+    app.register_blueprint(ml_routes)
     
     # Context processor to make user data available to all templates
     @app.context_processor
